@@ -1,0 +1,35 @@
+/* 
+  Localizable.strings
+  TailTrail
+*/
+
+// General
+"Back" = "Артқа";
+"Done" = "Дайын";
+"Search" = "Іздеу";
+"Pet" = "Жануарды";
+"Search pet" = "Жануарды іздеу";
+
+// Pet Species
+"Dog" = "Иттер";
+"Cat" = "Мысықтар";
+"Bird" = "Құстар";
+"Other" = "Басқа";
+
+// Location
+"Country" = "Ел";
+"City" = "Қала";
+"Select Location" = "Орынды таңдаңыз";
+
+// Language
+"Select Language" = "Тілді таңдаңыз";
+
+// Feed
+"All pet categories near you" = "Жаныңыздағы барлық жануарлар";
+
+// Statuses
+"Lost" = "Жоғалған";
+"Found" = "Табылған";
+"lost" = "жоғалған";
+"found" = "табылған";
+"reunited" = "қайта қауышты"; 

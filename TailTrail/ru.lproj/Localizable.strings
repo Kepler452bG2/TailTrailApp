@@ -1,0 +1,35 @@
+/* 
+  Localizable.strings
+  TailTrail
+*/
+
+// General
+"Back" = "Назад";
+"Done" = "Готово";
+"Search" = "Поиск";
+"Pet" = "Питомца";
+"Search pet" = "Найти питомца";
+
+// Pet Species
+"Dog" = "Собаки";
+"Cat" = "Кошки";
+"Bird" = "Птицы";
+"Other" = "Другие";
+
+// Location
+"Country" = "Страна";
+"City" = "Город";
+"Select Location" = "Выберите локацию";
+
+// Language
+"Select Language" = "Выберите язык";
+
+// Feed
+"All pet categories near you" = "Все категории питомцев рядом";
+
+// Statuses
+"Lost" = "Потерянные";
+"Found" = "Найденные";
+"lost" = "потерян";
+"found" = "найден";
+"reunited" = "воссоединен"; 

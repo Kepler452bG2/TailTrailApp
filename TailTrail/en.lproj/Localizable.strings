@@ -1,0 +1,35 @@
+/* 
+  Localizable.strings
+  TailTrail
+*/
+
+// General
+"Back" = "Back";
+"Done" = "Done";
+"Search" = "Search";
+"Pet" = "Pet";
+"Search pet" = "Search pet";
+
+// Pet Species
+"Dog" = "Dog";
+"Cat" = "Cat";
+"Bird" = "Bird";
+"Other" = "Other";
+
+// Location
+"Country" = "Country";
+"City" = "City";
+"Select Location" = "Select Location";
+
+// Language
+"Select Language" = "Select Language";
+
+// Feed
+"All pet categories near you" = "All pet categories near you";
+
+// Statuses
+"Lost" = "Lost";
+"Found" = "Found";
+"lost" = "lost";
+"found" = "found";
+"reunited" = "reunited"; 
