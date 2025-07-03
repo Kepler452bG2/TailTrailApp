@@ -1,7 +1,0 @@
-FROM python:3.11-alpine
-
-WORKDIR /src
-
-COPY .. /src
-
-RUN pip install --no-cache-dir -r requirements/base.txt
