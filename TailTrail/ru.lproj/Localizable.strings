@@ -6,9 +6,9 @@
 // General
 "Back" = "Назад";
 "Done" = "Готово";
-"Search" = "Поиск";
-"Pet" = "Питомца";
-"Search pet" = "Найти питомца";
+"Search" = "Search";
+"Pet" = "Pet";
+"Search pet" = "Search Pet";
 
 // Pet Species
 "Dog" = "Собаки";
@@ -25,7 +25,7 @@
 "Select Language" = "Выберите язык";
 
 // Feed
-"All pet categories near you" = "Все категории питомцев рядом";
+// "All pet categories near you" = "Все категории питомцев рядом";
 
 // Statuses
 "Lost" = "Потерянные";

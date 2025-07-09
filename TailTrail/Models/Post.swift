@@ -4,10 +4,12 @@ import CoreLocation
 struct Post: Identifiable, Codable, Equatable, Hashable {
     let id: String
     let title: String
+    let petName: String
     let species: PetSpecies
     let breed: String
     let age: Double
-    let gender: PetGender
+    let ageCategory: AgeCategory
+    let gender: Gender
     let weight: PetWeight
     let color: String
     let imageNames: [String]
@@ -44,11 +46,24 @@ struct Post: Identifiable, Codable, Equatable, Hashable {
     }
 }
 
-enum PetSpecies: String, Codable, CaseIterable {
+enum AgeCategory: String, Codable, CaseIterable {
+    case young = "Young"
+    case adult = "Adult"
+    case senior = "Senior"
+}
+
+enum Gender: String, Codable, CaseIterable {
+    case male = "Male"
+    case female = "Female"
+}
+
+enum PetSpecies: String, Codable, CaseIterable, Identifiable {
     case dog = "dog"
     case cat = "cat"
     case bird = "bird"
     case other = "other"
+
+    var id: String { self.rawValue }
 
     var iconName: String {
         switch self {

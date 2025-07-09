@@ -2,33 +2,16 @@ import SwiftUI
 
 struct FeedView: View {
     @EnvironmentObject var languageManager: LanguageManager
+    @EnvironmentObject var postService: PostService
     
     @State private var selectedSpecies: PetSpecies? = nil
     @State private var selectedStatus: PostStatus = .lost
     @State private var searchText = ""
-    
-    // --- New Hierarchical Location Data ---
-    @State private var selectedCountry = "USA"
-    @State private var selectedCity = "New York"
-    
-    let locationData: [String: [String]] = [
-        "USA": ["New York", "Los Angeles", "Chicago", "Houston", "Phoenix"],
-        "Kazakhstan": ["Almaty", "Astana", "Shymkent", "Karaganda", "Aktobe"],
-        "Turkey": ["Istanbul", "Ankara", "Izmir", "Bursa", "Antalya"],
-        "Russia": ["Moscow", "Saint Petersburg", "Novosibirsk", "Yekaterinburg", "Kazan"]
-    ]
-    
-    var countries: [String] {
-        locationData.keys.sorted()
-    }
-    
-    var citiesForSelectedCountry: [String] {
-        locationData[selectedCountry] ?? []
-    }
-    // ------------------------------------
+    @State private var autoScrollIndex = 0
+    private let timer = Timer.publish(every: 3, on: .main, in: .common).autoconnect()
 
-    private var filteredPosts: [Post] {
-        return MockData.posts.filter { post in
+    var filteredPosts: [Post] {
+        return postService.posts.filter { post in
             let statusMatch = post.status == selectedStatus
             let speciesMatch = selectedSpecies == nil || post.species == selectedSpecies
             let searchMatch = searchText.isEmpty ||
@@ -38,96 +21,76 @@ struct FeedView: View {
             return statusMatch && speciesMatch && searchMatch
         }
     }
+    
+    private let cardColors: [Color] = [
+        .pink.opacity(0.4), .blue.opacity(0.4), .green.opacity(0.4), .yellow.opacity(0.4)
+    ]
 
     private var lostCount: Int {
-        MockData.posts.filter { $0.status == .lost }.count
+        postService.posts.filter { $0.status == .lost }.count
     }
     
     private var foundCount: Int {
-        MockData.posts.filter { $0.status == .found }.count
+        postService.posts.filter { $0.status == .found }.count
     }
-
-    private let cardColors: [Color] = [
-        .yellow.opacity(0.6),
-        .pink.opacity(0.6),
-        .blue.opacity(0.6),
-        .green.opacity(0.6)
-    ]
 
     var body: some View {
         NavigationStack {
-            ZStack {
-                Color.theme.background.ignoresSafeArea()
-                
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 24) {
-                        navigationHeader
-                        searchBar
-                        speciesFilter
-                        lostFoundSegmentedControl
-                        lostFoundInYourArea
-                        mainPostList
-                    }
-                    .padding(.vertical)
+            ScrollView {
+                VStack(alignment: .leading, spacing: 24) {
+                    navigationHeader
+                    searchBar
+                    speciesFilter
+                    lostFoundSegmentedControl
+                    nearbyPetsSection
+                    mainPostList
                 }
+                .padding(.vertical)
             }
-            .toolbar(.hidden, for: .navigationBar)
-            .preferredColorScheme(.dark)
+            .background(Color("BackgroundColor").ignoresSafeArea())
+            .navigationBarHidden(true)
         }
     }
-    
+
     private var navigationHeader: some View {
         HStack(alignment: .top) {
-            VStack(alignment: .leading, spacing: -10) {
-                HStack(alignment: .lastTextBaseline, spacing: 4) {
-                    Text("Search".localized())
+            VStack(alignment: .leading, spacing: -15) {
+                HStack(alignment: .firstTextBaseline, spacing: 2) {
+                    Text("Search")
                         .font(.system(size: 40, weight: .heavy))
-                        .foregroundColor(.black)
-
-                    // Sparkles
+                    
                     ZStack {
-                        // Left stick
-                        Path { path in
-                            path.move(to: CGPoint(x: 0, y: 25))
-                            path.addQuadCurve(to: CGPoint(x: 11, y: 10), control: CGPoint(x: 4, y: 18))
-                        }
-                        .stroke(style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
-
-                        // Middle stick (longest)
-                        Path { path in
-                            path.move(to: CGPoint(x: 12, y: 28))
-                            path.addQuadCurve(to: CGPoint(x: 28, y: 8), control: CGPoint(x: 18, y: 18))
-                        }
-                        .stroke(style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
-                        
-                        // Right stick
-                        Path { path in
-                            path.move(to: CGPoint(x: 24, y: 29))
-                            path.addQuadCurve(to: CGPoint(x: 34, y: 18), control: CGPoint(x: 29, y: 24))
-                        }
-                        .stroke(style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
+                        // Декоративные линии
+                        Path { path in path.move(to: CGPoint(x: 0, y: 10)); path.addLine(to: CGPoint(x: 8, y: 0)) }.stroke(style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
+                        Path { path in path.move(to: CGPoint(x: 5, y: 18)); path.addLine(to: CGPoint(x: 18, y: 0)) }.stroke(style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
+                        Path { path in path.move(to: CGPoint(x: 15, y: 18)); path.addLine(to: CGPoint(x: 23, y: 8)) }.stroke(style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
                     }
-                    .frame(width: 32, height: 32)
-                    .foregroundColor(.black)
-                    .offset(x: 0, y: -10)
+                    .offset(x: 10, y: 0)
                 }
 
-                // Outlined Text with a thinner stroke
-                let petText = "Pet".localized()
+                // Текст "Pet" с обводкой
                 ZStack {
-                    Text(petText).offset(x: 1, y: 1)
-                    Text(petText).offset(x: -1, y: -1)
-                    Text(petText).offset(x: -1, y: 1)
-                    Text(petText).offset(x: 1, y: -1)
-                    Text(petText).foregroundColor(Color.theme.background)
+                    // Обводка
+                    Text("Pet").offset(x: 1, y: 1)
+                    Text("Pet").offset(x: -1, y: -1)
+                    Text("Pet").offset(x: -1, y: 1)
+                    Text("Pet").offset(x: 1, y: -1)
                 }
                 .font(.system(size: 40, weight: .heavy))
                 .foregroundColor(.black)
+                .overlay(
+                    // Заливка
+                    Text("Pet")
+                        .font(.system(size: 40, weight: .heavy))
+                        .foregroundColor(.white)
+                )
             }
+            .foregroundColor(.black)
+            .padding(.leading)
             
             Spacer()
             
-            HStack(spacing: 16) {
+            HStack(spacing: 8) {
                 NavigationLink(destination: NotificationsView()) {
                     Image(systemName: "bell.badge.fill")
                         .font(.title2)
@@ -142,134 +105,96 @@ struct FeedView: View {
         }
         .padding(.horizontal)
     }
-    
+
     private var searchBar: some View {
         HStack {
             Image(systemName: "magnifyingglass")
-            TextField("Search pet".localized(), text: $searchText)
-                .autocorrectionDisabled()
+            TextField("Search pet", text: $searchText)
         }
         .foregroundColor(.gray)
         .padding()
-        .background(
-            ZStack {
-                Capsule()
-                    .fill(Color.yellow)
-                    .offset(x: 3, y: 3)
-                
-                Capsule()
-                    .fill(Color.white)
-                    .overlay(
-                        Capsule().stroke(Color.black, lineWidth: 1.5)
-                    )
-            }
-        )
+        .background(Capsule().fill(Color.white).overlay(Capsule().stroke(Color.black, lineWidth: 1.5)))
         .padding(.horizontal)
     }
-    
+
+    private var mainPostList: some View {
+        LazyVGrid(columns: [GridItem(.adaptive(minimum: 160), spacing: 16)], spacing: 16) {
+            ForEach(filteredPosts) { post in
+                NavigationLink(destination: PostDetailView(post: post)) {
+                    PetCardView(post: post)
+                }
+                .onAppear {
+                    if post == postService.posts.last {
+                        postService.loadMorePosts()
+                    }
+                }
+            }
+        }
+        .padding(.horizontal)
+    }
+
+    private var lostFoundSegmentedControl: some View {
+        HStack(spacing: 0) {
+            SegmentedControlButton(title: "Lost", count: lostCount, status: .lost, selection: $selectedStatus)
+            SegmentedControlButton(title: "Found", count: foundCount, status: .found, selection: $selectedStatus)
+        }
+        .padding(4)
+        .background(Color("CardBackgroundColor").cornerRadius(12))
+        .padding(.horizontal)
+    }
+
     private var speciesFilter: some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 18) {
-                ForEach(PetSpecies.allCases, id: \.self) { species in
-                    Button(action: {
-                        withAnimation(.bouncy) {
-                        selectedSpecies = (selectedSpecies == species) ? nil : species
-                        }
-                    }) {
-                        Text(species.rawValue.capitalized.localized())
-                    }
-                    .buttonStyle(StickerButtonStyle(isSelected: selectedSpecies == species))
+            HStack(spacing: 12) {
+                FilterButton(species: nil, selection: $selectedSpecies)
+                ForEach(PetSpecies.allCases) { species in
+                    FilterButton(species: species, selection: $selectedSpecies)
                 }
             }
             .padding(.horizontal)
         }
     }
-    
-    private var lostFoundInYourArea: some View {
+
+    private var nearbyPetsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("All pet categories near you".localized())
+            Text("All pet categories near you")
                 .font(.title3.weight(.bold))
-                .foregroundColor(.black)
-                .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal)
             
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 16) {
-                    ForEach(Array(MockData.posts.enumerated()), id: \.element.id) { index, post in
-                        NavigationLink(destination: PostDetailView(post: post)) {
-                            PostCardView(
-                                post: post,
-                                color: cardColors[index % cardColors.count]
-                            )
-                                .frame(width: 250)
+            ScrollViewReader { proxy in
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 16) {
+                        ForEach(postService.posts.prefix(10)) { post in
+                            NavigationLink(destination: PostDetailView(post: post)) {
+                                NearbyPetCardView(post: post)
+                            }
+                            .id(post.id)
+                            .scrollTransition { content, phase in
+                                content
+                                    .scaleEffect(phase.isIdentity ? 1.0 : 0.85)
+                            }
                         }
                     }
+                    .scrollTargetLayout()
                 }
-                .padding(.horizontal)
-            }
-        }
-    }
-    
-    private var lostFoundSegmentedControl: some View {
-        HStack(spacing: 0) {
-            SegmentedControlButton(title: "Lost".localized(), count: lostCount, status: .lost, selection: $selectedStatus)
-            SegmentedControlButton(title: "Found".localized(), count: foundCount, status: .found, selection: $selectedStatus)
-        }
-        .padding(4)
-        .background(Color.theme.cardBackground)
-        .cornerRadius(12)
-        .padding(.horizontal)
-    }
-    
-    private var mainPostList: some View {
-        LazyVGrid(columns: [GridItem(.adaptive(minimum: 160), spacing: 16)], spacing: 16) {
-            ForEach(Array(filteredPosts.enumerated()), id: \.element.id) { index, post in
-                NavigationLink(destination: PostDetailView(post: post)) {
-                    PostCardView(
-                        post: post,
-                        color: cardColors[index % cardColors.count]
-                    )
+                .contentMargins(.horizontal, (UIScreen.main.bounds.width - 140) / 2)
+                .scrollTargetBehavior(.viewAligned)
+                .frame(height: 220)
+                .onReceive(timer) { _ in
+                    let pets = Array(postService.posts.prefix(10))
+                    guard !pets.isEmpty else { return }
+                    
+                    autoScrollIndex = (autoScrollIndex + 1) % pets.count
+                    
+                    withAnimation(.spring(response: 0.6, dampingFraction: 0.7)) {
+                        proxy.scrollTo(pets[autoScrollIndex].id, anchor: .center)
+                    }
                 }
-                .buttonStyle(.plain)
             }
-        }
-        .padding(.horizontal)
-    }
-}
-
-// Custom button style for the "sticker" effect
-private struct StickerButtonStyle: ButtonStyle {
-    let isSelected: Bool
-
-    func makeBody(configuration: Configuration) -> some View {
-        if isSelected {
-            // Selected state style (solid black)
-            configuration.label
-                .font(.headline.weight(.semibold))
-                .padding(.horizontal, 24)
-                .padding(.vertical, 12)
-                .background(Color.black)
-                .foregroundColor(Color.white)
-                .clipShape(Capsule())
-        } else {
-            // Unselected state style (white with black border)
-            configuration.label
-                .font(.headline.weight(.semibold))
-                .padding(.horizontal, 24)
-                .padding(.vertical, 12)
-                .background(
-                    Capsule()
-                        .fill(Color.white)
-                        .overlay(
-                            Capsule().stroke(Color.black, lineWidth: 1.5)
-                        )
-                )
-                .foregroundColor(.black)
         }
     }
 }
 
-// A new component for the segmented control buttons with counters
 private struct SegmentedControlButton: View {
     let title: String
     let count: Int
@@ -277,30 +202,55 @@ private struct SegmentedControlButton: View {
     @Binding var selection: PostStatus
     
     var body: some View {
-        Button(action: {
-            withAnimation(.bouncy) {
-                selection = status
-            }
-        }) {
+        Button(action: { withAnimation(.bouncy) { selection = status } }) {
             HStack(spacing: 8) {
                 Text(title)
                 Text("\(count)")
                     .font(.caption.bold())
                     .padding(6)
-                    .background(Color.black.opacity(0.2))
+                    .background(selection == status ? Color.white.opacity(0.3) : Color.black.opacity(0.1))
                     .clipShape(Circle())
             }
-            .foregroundColor(selection == status ? .white : .gray)
+            .foregroundColor(selection == status ? .black : .gray)
             .padding(.horizontal)
-            .padding(.vertical, 8)
+            .padding(.vertical, 10)
             .frame(maxWidth: .infinity)
-            .background(selection == status ? Color.theme.accent : Color.clear)
-            .cornerRadius(8)
+            .background(selection == status ? Color(red: 255/255, green: 196/255, blue: 0/255) : Color.clear)
+            .clipShape(Capsule())
+        }
+    }
+}
+
+private struct FilterButton: View {
+    let species: PetSpecies?
+    @Binding var selection: PetSpecies?
+    
+    var isSelected: Bool {
+        species == selection
+    }
+    
+    var body: some View {
+        Button(action: {
+            withAnimation {
+                selection = species
+            }
+        }) {
+            Text(species?.rawValue.capitalized ?? "All")
+                .font(.subheadline.weight(.medium))
+                .padding(.horizontal, 20)
+                .padding(.vertical, 10)
+                .background(isSelected ? Color.black : Color("CardBackgroundColor"))
+                .foregroundColor(isSelected ? .white : Color("PrimaryTextColor"))
+                .clipShape(Capsule())
+                .overlay(
+                    Capsule().stroke(Color.black, lineWidth: isSelected ? 0 : 1.5)
+                )
         }
     }
 }
 
 #Preview {
     FeedView()
+        .environmentObject(LanguageManager.shared)
         .environmentObject(PostService())
 } 

@@ -1,11 +1,9 @@
 import SwiftUI
 
 struct MessagesView: View {
-    @Binding var selectedTab: Int
     @State private var searchText = ""
     
-    // Filtered chat sessions based on search text
-    private var filteredSessions: [ChatSession] {
+    var filteredSessions: [ChatSession] {
         if searchText.isEmpty {
             return MockData.chatSessions
         } else {
@@ -14,36 +12,42 @@ struct MessagesView: View {
             }
         }
     }
+
+    // This is for programmatic navigation from other views
+    @Binding var selectedTab: Int
     
     var body: some View {
         NavigationStack {
             ZStack {
-                Color.theme.background.ignoresSafeArea()
+                Color("BackgroundColor").ignoresSafeArea()
                 
                 VStack {
-                    // Custom Header
-                    HStack {
-                        Button(action: { selectedTab = 0 }) {
-                            Image(systemName: "chevron.left")
-                                .font(.title2.bold())
-                        }
-                        Spacer()
-                        Text("Messages")
-                            .font(.title2.bold())
-                        Spacer()
-                    }
-                    .padding()
-                    .foregroundColor(.black)
-                    
                     // Search Bar
                     HStack {
                         Image(systemName: "magnifyingglass")
+                            .foregroundColor(.gray)
                         TextField("Search", text: $searchText)
                     }
-                    .padding()
-                    .background(Color.white)
+                    .padding(12)
+                    .background(Color(.systemGray6))
                     .cornerRadius(12)
                     .padding(.horizontal)
+                    .padding(.top)
+                    
+                    ZStack {
+                        // Outline
+                        Text("Chats").offset(x: 1, y: 1)
+                        Text("Chats").offset(x: -1, y: -1)
+                        Text("Chats").offset(x: -1, y: 1)
+                        Text("Chats").offset(x: 1, y: -1)
+                    }
+                    .font(.largeTitle.bold())
+                    .foregroundColor(.black)
+                    .overlay(
+                        Text("Chats")
+                            .font(.largeTitle.bold())
+                            .foregroundColor(.white)
+                    )
                     
                     // Chat List
                     List(filteredSessions) { session in
@@ -53,12 +57,14 @@ struct MessagesView: View {
                             }
                             .opacity(0)
                             
-                            ChatRow(session: session)
+                            ChatRowView(session: session)
                         }
                         .listRowSeparator(.hidden)
                         .listRowBackground(Color.clear)
+                        .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
                     }
-                    .listStyle(PlainListStyle())
+                    .listStyle(.plain)
+                    .background(Color.clear)
                 }
             }
             .navigationBarHidden(true)

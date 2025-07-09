@@ -44,7 +44,7 @@ struct MainTabView: View {
         }
         .padding(.horizontal, 30)
         .frame(height: 70)
-        .background(Color("AccentColor"))
+        .background(Color.orange)
         .clipShape(Capsule())
         .overlay(
             newPostButton.offset(y: -25)
@@ -59,9 +59,9 @@ struct MainTabView: View {
         }) {
             Image(systemName: "pawprint.fill")
                 .font(.system(size: 28, weight: .bold))
-                .foregroundColor(.white)
+                .foregroundColor(.black)
                 .padding(24)
-                .background(Color.orange)
+                .background(Color(red: 255/255, green: 196/255, blue: 0/255))
                 .clipShape(Circle())
                 .shadow(radius: 5, y: 3)
         }
@@ -80,15 +80,15 @@ private struct TabBarButton: View {
             ZStack {
                 if isSelected {
                     RoundedRectangle(cornerRadius: 16)
-                        .fill(Color.yellow)
-                        .frame(width: 60, height: 40)
+                        .fill(Color(red: 255/255, green: 196/255, blue: 0/255))
                         .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.black, lineWidth: 2))
                 }
                 
-                Image(systemName: icon) // Use filled icon for selected
+                Image(systemName: icon)
                     .font(.title2)
-                    .foregroundColor(isSelected ? .black : .white)
+                    .foregroundColor(.black)
             }
+            .frame(width: 60, height: 40)
         }
     }
 }

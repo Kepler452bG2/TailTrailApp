@@ -14,7 +14,7 @@ class CreatePostViewModel: ObservableObject {
     @Published var color: String = ""
     @Published var isMixedBreed: Bool = false
     @Published var age: Double = 2 // Years
-    @Published var gender: PetGender = .male
+    @Published var gender: Gender = .male
     @Published var spayedStatus: SpayedStatus = .notSure
     @Published var weight: PetWeight = .medium
 
@@ -75,12 +75,16 @@ class CreatePostViewModel: ObservableObject {
             print("Location has not been determined yet.")
             return
         }
+        
+        // This is a simplified conversion. You might want more sophisticated logic.
+        let ageCategory: AgeCategory = age <= 2 ? .young : (age <= 8 ? .adult : .senior)
 
         postService.createPost(
             petName: petName,
             petSpecies: species,
             petBreed: breed,
             age: age,
+            ageCategory: ageCategory,
             gender: gender,
             weight: weight,
             color: color,

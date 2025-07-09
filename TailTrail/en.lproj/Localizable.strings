@@ -8,12 +8,12 @@
 "Done" = "Done";
 "Search" = "Search";
 "Pet" = "Pet";
-"Search pet" = "Search pet";
+"Search pet" = "Search Pet";
 
 // Pet Species
-"Dog" = "Dog";
-"Cat" = "Cat";
-"Bird" = "Bird";
+"Dog" = "Dogs";
+"Cat" = "Cats";
+"Bird" = "Birds";
 "Other" = "Other";
 
 // Location

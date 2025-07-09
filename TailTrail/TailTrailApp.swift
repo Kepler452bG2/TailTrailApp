@@ -9,24 +9,28 @@ import SwiftUI
 
 @main
 struct TailTrailApp: App {
-    @AppStorage("hasCompletedIntro") private var hasCompletedIntro: Bool = false
     @StateObject private var postService = PostService()
     @StateObject private var languageManager = LanguageManager.shared
     @StateObject private var tabBarVisibility = TabBarVisibility()
+    @StateObject private var authManager = AuthenticationManager()
+
+    @State private var showIntro: Bool = true // Временно для отладки
 
     var body: some Scene {
         WindowGroup {
-            if hasCompletedIntro {
-                MainTabView()
-                    .environmentObject(postService)
-                    .environmentObject(languageManager)
-                    .environmentObject(tabBarVisibility)
-                    .id(languageManager.currentLanguage)
-            } else {
-                IntroView(hasCompletedIntro: $hasCompletedIntro)
+            ZStack {
+                if showIntro {
+                    IntroView(showIntro: $showIntro)
+                } else if !authManager.isAuthenticated {
+                    LoginView()
+                } else {
+                    MainTabView()
+                }
             }
+            .environmentObject(postService)
+            .environmentObject(languageManager)
+            .environmentObject(tabBarVisibility)
+            .environmentObject(authManager)
         }
-        .environmentObject(postService)
-        .environmentObject(languageManager)
     }
 }

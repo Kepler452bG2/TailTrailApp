@@ -5,6 +5,11 @@ struct UserProfileCard: View {
     @State private var selectedPhotoItem: PhotosPickerItem?
     @State private var selectedImage: Image?
     @State private var showingSettings = false
+    
+    // State to hold the profile data
+    @State private var name = "Ameliani"
+    @State private var bio = "Pet lover"
+    @State private var phone = "+1 (555) 123-4567"
 
     var body: some View {
         VStack(spacing: 16) {
@@ -38,14 +43,14 @@ struct UserProfileCard: View {
                 }
             }
             
-            Text("Ameliani")
+            Text(name)
                 .font(.largeTitle.bold())
             
-            Text("Pet lover")
+            Text(bio)
                 .font(.headline)
                 .foregroundColor(.gray)
             
-            NavigationLink(destination: EditProfileView()) {
+            NavigationLink(destination: NewEditProfileView(name: $name, bio: $bio, phone: $phone)) {
                 Text("Edit Profile")
                     .fontWeight(.bold)
                     .padding()

@@ -6,9 +6,9 @@
 // General
 "Back" = "Артқа";
 "Done" = "Дайын";
-"Search" = "Іздеу";
-"Pet" = "Жануарды";
-"Search pet" = "Жануарды іздеу";
+"Search" = "Search";
+"Pet" = "Friend";
+"Search pet" = "Search friend";
 
 // Pet Species
 "Dog" = "Иттер";
@@ -25,11 +25,11 @@
 "Select Language" = "Тілді таңдаңыз";
 
 // Feed
-"All pet categories near you" = "Жаныңыздағы барлық жануарлар";
+// "All pet categories near you" = "Жаныңыздағы барлық жануарлар санаттары";
 
 // Statuses
-"Lost" = "Жоғалған";
-"Found" = "Табылған";
+"Lost" = "Жоғалғандар";
+"Found" = "Табылғандар";
 "lost" = "жоғалған";
 "found" = "табылған";
 "reunited" = "қайта қауышты"; 

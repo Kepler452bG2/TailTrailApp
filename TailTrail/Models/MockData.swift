@@ -4,83 +4,53 @@ import CoreLocation
 struct MockData {
     static let posts: [Post] = [
         Post(
-            id: UUID().uuidString,
-            title: "Missing Golden Retriever",
+            id: "1",
+            title: "Lost Golden Retriever",
+            petName: "Buddy",
             species: .dog,
             breed: "Golden Retriever",
             age: 3,
+            ageCategory: .adult,
             gender: .male,
             weight: .large,
             color: "Golden",
             imageNames: ["golden_retriever"],
-            locationName: "Almaty, Bostandyk District",
-            lastSeenLocation: CLLocationCoordinate2D(latitude: 43.2389, longitude: 76.8897),
-            description: "Friendly and playful golden retriever named Buddy. Last seen near Central Park. He has a blue collar with a name tag.",
-            contactPhone: "+1 (555) 123-4567",
-            authorId: "currentUser_123", // Belongs to current user
-            timestamp: Date().addingTimeInterval(-3600 * 5), // 5 hours ago
+            locationName: "Central Park",
+            lastSeenLocation: CLLocationCoordinate2D(latitude: 40.785091, longitude: -73.968285),
+            description: "Friendly golden retriever, answers to the name of 'Buddy'. Last seen near the carousel.",
+            contactPhone: "123-456-7890",
+            authorId: "user1",
+            timestamp: Date().addingTimeInterval(-3600),
             status: .lost
         ),
         Post(
-            id: UUID().uuidString,
+            id: "2",
             title: "Found Siamese Cat",
+            petName: "Luna",
             species: .cat,
             breed: "Siamese",
-            age: 1,
+            age: 2,
+            ageCategory: .young,
             gender: .female,
             weight: .small,
             color: "Cream",
             imageNames: ["siamese_cat"],
-            locationName: "Astana, Yesil District",
-            lastSeenLocation: CLLocationCoordinate2D(latitude: 51.1694, longitude: 71.4491),
-            description: "Found a young Siamese cat hiding under a car. She is very shy but seems healthy. No collar.",
-            contactPhone: "+7 (701) 987-6543",
-            authorId: "user_abc_456", // Belongs to another user
-            timestamp: Date().addingTimeInterval(-3600 * 24 * 2), // 2 days ago
+            locationName: "Times Square",
+            lastSeenLocation: CLLocationCoordinate2D(latitude: 40.7580, longitude: -73.9855),
+            description: "Found a Siamese cat, very vocal and seems lost. No collar.",
+            contactPhone: "098-765-4321",
+            authorId: "user2",
+            timestamp: Date().addingTimeInterval(-7200),
             status: .found
         ),
         Post(
-            id: UUID().uuidString,
-            title: "Lost Holland Lop Bunny",
-            species: .other, // Changed from .bunny
-            breed: "Holland Lop",
-            age: 2,
-            gender: .male,
-            weight: .small,
-            color: "White",
-            imageNames: ["bunny_placeholder_1"],
-            locationName: "Shymkent, Al-Farabi District",
-            lastSeenLocation: CLLocationCoordinate2D(latitude: 42.3417, longitude: 69.5917),
-            description: "Our bunny, Snowball, escaped from his hutch in the backyard. He is white with grey spots.",
-            contactPhone: "+7 (777) 555-1234",
-            authorId: "user_def_789", // Belongs to another user
-            timestamp: Date().addingTimeInterval(-3600 * 24 * 7), // 1 week ago
-            status: .lost
-        ),
-        Post(
-            id: UUID().uuidString,
-            title: "Lost Pomeranian Spitz",
-            species: .dog,
-            breed: "Pomeranian Spitz",
-            age: 5,
-            gender: .male,
-            weight: .small,
-            color: "White",
-            imageNames: ["dog_placeholder_2"],
-            locationName: "Almaty, Medeu District",
-            lastSeenLocation: CLLocationCoordinate2D(latitude: 43.2567, longitude: 76.9286),
-            description: "Small, fluffy white Pomeranian named Archie. He is very energetic and might be scared.",
-            contactPhone: "+1 (555) 123-4567",
-            authorId: "currentUser_123", // Belongs to current user
-            timestamp: Date().addingTimeInterval(-3600 * 3), // 3 hours ago
-            status: .lost
-        ),
-        Post(
-            id: UUID().uuidString,
+            id: "3",
             title: "Missing cat Phoebe",
+            petName: "Phoebe",
             species: .cat,
-            breed: "Unknown",
+            breed: "Calico",
             age: 4,
+            ageCategory: .adult,
             gender: .female,
             weight: .medium,
             color: "Calico",
@@ -90,15 +60,35 @@ struct MockData {
             description: "This is my family's cat phoebe, she went missing last night around 10-11pm she left from our balcony, and we tried getting her to come in but she ran away, the area is 17th Ave S fargo, and she might even be around Prairiewood, please lmk if you see her.",
             contactPhone: "+1 (701) 555-9876",
             authorId: "user_kchol_1",
-            timestamp: Date().addingTimeInterval(-3600 * 12), // 12 hours ago
+            timestamp: Date().addingTimeInterval(-43200),
             status: .lost
+        ),
+        Post(
+            id: "4",
+            title: "Found Cat Near Me",
+            petName: "Leo",
+            species: .cat,
+            breed: "Tabby",
+            age: 1,
+            ageCategory: .young,
+            gender: .male,
+            weight: .small,
+            color: "Brown",
+            imageNames: ["phoebe_2"],
+            locationName: "East Village",
+            lastSeenLocation: CLLocationCoordinate2D(latitude: 40.7265, longitude: -73.9835),
+            description: "Found this little guy wandering around. He's very friendly and playful.",
+            contactPhone: "555-987-6543",
+            authorId: "user4",
+            timestamp: Date().addingTimeInterval(-172800),
+            status: .found
         )
     ]
 
     static let chatSessions: [ChatSession] = [
         ChatSession(
             participantName: "Elena Petrova",
-            participantAvatar: "person.crop.circle.fill",
+            participantAvatar: "phoebe_1",
             messages: [
                 ChatMessage(text: "Hello! I think I saw your golden retriever near the Magnum store.", timestamp: Date().addingTimeInterval(-60 * 5), isFromCurrentUser: false),
                 ChatMessage(text: "Really? That's great news! When was it?", timestamp: Date().addingTimeInterval(-60 * 3), isFromCurrentUser: true)
@@ -108,7 +98,7 @@ struct MockData {
         ),
         ChatSession(
             participantName: "Madge Gomez",
-            participantAvatar: "person.crop.circle",
+            participantAvatar: "phoebe_2",
             messages: [
                 ChatMessage(text: "Hahahaha thanks, i didnt know there were bots on ride", timestamp: Date().addingTimeInterval(-3600 * 2), isFromCurrentUser: false)
             ],
@@ -117,7 +107,7 @@ struct MockData {
         ),
         ChatSession(
             participantName: "Chad Griffin",
-            participantAvatar: "person.crop.circle.fill",
+            participantAvatar: "phoebe_3",
             messages: [
                 ChatMessage(text: "you interest the Pet show..?", timestamp: Date().addingTimeInterval(-3600 * 24), isFromCurrentUser: false)
             ],
@@ -126,7 +116,7 @@ struct MockData {
         ),
         ChatSession(
             participantName: "Glenn Guzman",
-            participantAvatar: "person.crop.circle.fill",
+            participantAvatar: "siamese_cat",
             messages: [
                 ChatMessage(text: "Thats pretty wild on you", timestamp: Date().addingTimeInterval(-3600 * 24), isFromCurrentUser: false)
             ],
@@ -135,7 +125,7 @@ struct MockData {
         ),
         ChatSession(
             participantName: "Cora Bush",
-            participantAvatar: "person.crop.circle.fill",
+            participantAvatar: "golden_retriever",
             messages: [
                 ChatMessage(text: "Hey hey, what are you favorites..?", timestamp: Date().addingTimeInterval(-3600 * 24), isFromCurrentUser: false)
             ],
