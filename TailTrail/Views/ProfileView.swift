@@ -1,147 +1,134 @@
 import SwiftUI
 
 struct ProfileView: View {
-    @EnvironmentObject private var postService: PostService
+    @EnvironmentObject var authManager: AuthenticationManager
     
-    private var myPosts: [Post] {
-        // Renamed from myPets for clarity
-        Array(MockData.posts.prefix(4))
-    }
-
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(spacing: 24) {
-                    UserProfileCard()
-                        myPostsSection
-                    }
-                    .padding()
+            ZStack {
+                // Background color
+                Color(hex: "#FF6B6B").ignoresSafeArea()
+
+                VStack {
+                    // Top profile section
+                    profileHeader
+                    
+                    // White content card
+                    settingsList
+                        .background(Color.white)
+                        .clipShape(RoundedRectangle(cornerRadius: 30))
+                }
             }
-                .background(Color.theme.background)
             .navigationBarHidden(true)
         }
     }
     
-    private var myPostsSection: some View {
-        VStack {
+    private var profileHeader: some View {
+        VStack(spacing: 12) {
             HStack {
-                Text("My Posts")
-                    .font(.title2.bold())
                 Spacer()
-                Button("See all") {}
-                    .font(.headline)
-                    .foregroundColor(.gray)
-        }
+                NavigationLink(destination: NotificationsView()) {
+                    Image(systemName: "bell")
+                        .font(.title2)
+                        .padding(10)
+                        .background(Color.white.opacity(0.3))
+                        .clipShape(Circle())
+                }
+            }
             
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: 160), spacing: 16)]) {
-                ForEach(myPosts) { pet in
-                    MyPetCard(post: pet)
-                }
-                }
-            }
-        }
-    }
-    
-// MARK: - Subviews for Profile
-
-private struct MyPetCard: View {
-    let post: Post
-    
-    private var shadowColor: Color {
-        post.id.hashValue.isMultiple(of: 2) ? .pink.opacity(0.6) : .blue.opacity(0.6)
-        }
-
-    var body: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 25)
-                .fill(shadowColor)
-                .offset(x: 4, y: 4)
-
-            VStack(alignment: .leading, spacing: 8) {
-                HStack {
-                            Image(post.imageNames.first ?? "photo")
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                        .frame(width: 50, height: 50)
-                                .clipShape(Circle())
-                    Spacer()
-                    Image(systemName: "ellipsis")
-                }
-                
-                Spacer()
-                
-                Text(post.title)
-                    .font(.headline.bold())
-                Text(post.breed)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
-            .padding()
-            .frame(width: 160, height: 160)
-            .background(Color.white)
-            .clipShape(RoundedRectangle(cornerRadius: 25))
-            .overlay(
-                RoundedRectangle(cornerRadius: 25)
-                    .stroke(Color.black, lineWidth: 1.5)
-            )
-        }
-        .foregroundColor(.black)
-            }
-        }
-
-private struct PetCareRow: View {
-    let name: String
-    let distance: Double
-    let rating: Double
-    
-    var body: some View {
-        HStack {
-            Image(systemName: "pawprint.circle.fill")
-                .font(.largeTitle)
+            Image(systemName: "person.circle.fill")
+                .font(.system(size: 80))
+                .foregroundColor(.white.opacity(0.8))
+            
+            Text(authManager.currentUser?.email ?? "Wawa Fikre")
+                .font(.title.bold())
                 .foregroundColor(.white)
-                .background(Color.black)
-                .clipShape(Circle())
             
-            VStack(alignment: .leading) {
-                Text(name)
-                    .font(.headline.bold())
-                HStack {
-                    Image(systemName: "location.fill")
-                    Text("\(String(format: "%.1f", distance)) km")
-                    Image(systemName: "star.fill")
-                        .foregroundColor(.yellow)
-                    Text(String(format: "%.1f", rating))
-                }
-                .font(.caption)
-                .foregroundColor(.secondary)
-            }
-            Spacer()
-            Image(systemName: "ellipsis")
+            Spacer().frame(height: 20)
         }
         .padding()
-        .background(Color.white)
-        .cornerRadius(20)
+    }
+    
+    private var settingsList: some View {
+        List {
+            SettingsRow(icon: "person.fill", title: "Profile", destination: EditProfileView())
+            SettingsRow(icon: "bell.fill", title: "Notification", destination: NotificationsView())
+            SettingsRow(icon: "lock.fill", title: "Security", destination: SecuritySettingsView())
+            SettingsRow(icon: "hand.raised.fill", title: "Blocked Users", destination: BlockedUsersView())
+            SettingsRow(icon: "location.fill", title: "Location", destination: LocationSettingsView())
+            SettingsRow(icon: "globe", title: "Language", value: "English (US)", destination: LanguageSelectionView())
+            SettingsRow(icon: "questionmark.circle.fill", title: "Help & Support", destination: HelpAndSupportView())
+            SettingsRow(icon: "shield.lefthalf.filled", title: "Privacy Policy", destination: PrivacyPolicyView())
+            SettingsRow(icon: "heart.fill", title: "Favorites", destination: PlaceholderView(title: "Favorites"))
+            
+            Button(action: {
+                authManager.logout()
+            }) {
+                HStack {
+                    Image(systemName: "arrow.right.to.line")
+                    Text("Logout")
+                }
+                .foregroundColor(.red)
+            }
+        }
+        .listStyle(.plain)
+        .padding(.top, 10)
+        .padding(.bottom, 80) // Add padding to account for the custom tab bar
     }
 }
 
-private struct CareServiceButton: View {
+// Reusable row for the settings list
+private struct SettingsRow<Destination: View>: View {
+    let icon: String
     let title: String
+    var value: String? = nil
+    let destination: Destination
+
+    var body: some View {
+        NavigationLink(destination: destination) {
+            HStack(spacing: 16) {
+                Image(systemName: icon)
+                    .font(.headline)
+                    .frame(width: 30)
+                Text(title)
+                Spacer()
+                if let value {
+                    Text(value)
+                        .foregroundColor(.gray)
+                }
+            }
+            .padding(.vertical, 8)
+        }
+    }
+}
+
+// A placeholder view for unimplemented screens
+struct PlaceholderView: View {
+    let title: String
+    @Environment(\.presentationMode) var presentationMode
     
     var body: some View {
-        Button(action: {}) {
-            Text(title)
-                .font(.headline)
-                .padding(.horizontal, 24)
-                .padding(.vertical, 12)
-                .background(Color.white)
-                .clipShape(Capsule())
-                .overlay(Capsule().stroke(Color.gray.opacity(0.3)))
+        VStack {
+            HStack {
+                Button(action: { presentationMode.wrappedValue.dismiss() }) {
+                    Image(systemName: "chevron.left")
+                }
+                Spacer()
+                Text(title)
+                    .font(.headline)
+                Spacer()
+            }
+            .padding()
+            Spacer()
+            Text("\(title) screen coming soon!")
+            Spacer()
         }
-        .foregroundColor(.black)
+        .navigationBarHidden(true)
     }
 }
 
+
 #Preview {
-        ProfileView()
-    .environmentObject(PostService())
+    ProfileView()
+        .environmentObject(AuthenticationManager())
 } 

@@ -1,215 +1,287 @@
 import SwiftUI
-import MapKit
 
 struct PostDetailView: View {
-    @Environment(\.presentationMode) var presentationMode
-    @StateObject private var locationManager = LocationManager()
-    
     let post: Post
-    @State private var isLiked = false
+    @Environment(\.presentationMode) var presentationMode
+    @EnvironmentObject var authManager: AuthenticationManager
+    @EnvironmentObject var postService: PostService
+    @State private var showFullScreenImage = false
+    @State private var chatToNavigate: ChatSession? = nil
+    @State private var isLiked: Bool
+    @State private var isShowingReportDialog = false
+    @State private var showReportConfirmation = false
+    @State private var showBlockConfirmation = false
+    
+    // Enum for report reasons
+    enum ReportReason: String, CaseIterable, Identifiable {
+        case spam = "It's spam"
+        case inappropriate = "Inappropriate content"
+        case harassment = "Harassment or hateful speech"
+        case scam = "Scam or fraud"
+        case other = "Other"
+        
+        var id: String { self.rawValue }
+    }
+    
+    init(post: Post) {
+        self.post = post
+        _isLiked = State(initialValue: post.isLiked)
+    }
 
     var body: some View {
         ZStack(alignment: .top) {
-            // 1. Beige Background
-            Color.theme.background.ignoresSafeArea()
-            
-            ScrollView {
-                // 2. Main Content Card
-                mainContentCard
-                    .padding(.top, 160) // Space for the overlapping image
-            }
-            
-            NavigationLink(destination: FullScreenImageView(imageNames: post.imageNames)) {
-                floatingImageHeader
-            }
-        }
-        .ignoresSafeArea(edges: .top)
-        .navigationBarBackButtonHidden(true)
-        .overlay(backButton, alignment: .topLeading)
-    }
-    
-    private var mainContentCard: some View {
-        VStack(spacing: 16) {
-            petInfoHeader.padding(.top, 80)
-            infoGrid
-            petStorySection
-            
-            // New bottom section combining author and contact button
-            HStack {
-                postedBySection
-                Spacer()
-                contactButton
-            }
-        }
-        .padding()
-        .background(Color.white)
-        .clipShape(RoundedRectangle(cornerRadius: 35))
-        .overlay(
-            RoundedRectangle(cornerRadius: 35)
-                .stroke(Color.gray.opacity(0.3), lineWidth: 1.5)
-        )
-        .padding()
-    }
+            Color("BackgroundColor").ignoresSafeArea()
 
-    private var floatingImageHeader: some View {
-        ZStack {
-            Circle()
-                .fill(Color.yellow.opacity(0.6))
-                .frame(width: 230, height: 230)
-                .shadow(radius: 10)
+            ScrollView(.vertical, showsIndicators: false) {
+                VStack(spacing: 0) {
+                    // Top Image
+                    AsyncImage(url: URL(string: post.images.first ?? "")) { image in
+                        image.resizable().aspectRatio(contentMode: .fill)
+                    } placeholder: {
+                        Color.gray.opacity(0.3)
+                    }
+                    .frame(height: UIScreen.main.bounds.height / 3)
+                    .clipped()
+                    .onTapGesture { showFullScreenImage = true }
 
-            TabView {
-                ForEach(post.imageNames, id: \.self) { imageName in
-                    Image(imageName)
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
+                    // White Content Card
+                    contentCard
+                        .background(Color.white)
+                        .cornerRadius(30, corners: [.topLeft, .topRight])
+                        .offset(y: -30)
                 }
             }
-            .frame(width: 210, height: 210)
-            .clipShape(Circle())
-            .overlay(Circle().stroke(Color.white, lineWidth: 5))
-            .tabViewStyle(PageTabViewStyle())
-        }
-        .offset(y: 40)
-    }
-    
-    private var petInfoHeader: some View {
-        HStack(alignment: .center) {
-            VStack(alignment: .leading) {
-                Text(post.title)
-                    .font(.largeTitle.bold())
+
+            // Back button overlay
+            VStack {
                 HStack {
-                    Image(systemName: "mappin.and.ellipse")
-                    Text("\(post.locationName) (\(distance(to: post)))")
+                    Button(action: { presentationMode.wrappedValue.dismiss() }) {
+                        Image(systemName: "chevron.left")
+                            .font(.title2.bold())
+                            .foregroundColor(.black)
+                            .padding()
+                            .background(Color.white.opacity(0.7))
+                            .clipShape(Circle())
+                    }
+                    Spacer()
                 }
-                .font(.subheadline)
-                .foregroundColor(.gray)
-            }
-            Spacer()
-            Button(action: { isLiked.toggle() }) {
-                Image(systemName: "heart.fill")
-                    .font(.title2)
-                    .foregroundColor(isLiked ? .red : .pink.opacity(0.3))
-                    .padding()
-                    .background(Color.pink.opacity(0.1))
-                    .clipShape(Circle())
+                .padding()
+                Spacer()
             }
         }
-        .foregroundColor(.black)
+        .navigationBarHidden(true)
+        .ignoresSafeArea(.all, edges: .top)
+        .fullScreenCover(isPresented: $showFullScreenImage) {
+            FullScreenImageView(imageNames: post.images)
+        }
     }
     
-    private var infoGrid: some View {
-        HStack(spacing: 12) {
-            InfoBox(label: "Age", value: "\(Int(post.age)) months")
-            InfoBox(label: "Color", value: post.color)
-            InfoBox(label: "Weight", value: post.weight.rawValue)
+    private var contentCard: some View {
+        VStack(alignment: .leading, spacing: 15) {
+            // Header: Like button, Pet Name, Location
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Missing \(post.species ?? "pet")")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                    Text(post.petName ?? "No Name")
+                        .font(.largeTitle.bold())
+                    HStack {
+                        Image(systemName: "mappin.and.ellipse")
+                        Text(post.locationName ?? "Unknown location")
+                    }.font(.subheadline).foregroundColor(.secondary)
+                }
+                Spacer()
+
+                HStack {
+                    // Like Button
+                    Button(action: {
+                        isLiked.toggle()
+                        // TODO: Call a service to update the backend.
+                    }) {
+                        Image(systemName: isLiked ? "heart.fill" : "heart")
+                            .foregroundColor(isLiked ? .red : .gray)
+                            .font(.title2)
+                            .frame(width: 44, height: 44)
+                            .background(Color.white)
+                            .clipShape(Circle())
+                            .shadow(color: .gray.opacity(0.3), radius: 5)
+                    }
+
+                    // Report and Block Menu
+                    Menu {
+                        Button {
+                            isShowingReportDialog = true
+                        } label: {
+                            Label("Report Post", systemImage: "exclamationmark.bubble")
+                        }
+                        
+                        Button(role: .destructive) {
+                            Task {
+                                do {
+                                    try await NetworkManager.shared.blockUser(userId: post.userId, authManager: authManager)
+                                    showBlockConfirmation = true
+                                } catch {
+                                    print("❌ Failed to block user: \(error)")
+                                }
+                            }
+                        } label: {
+                            Label("Block User", systemImage: "person.crop.circle.badge.xmark")
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis.circle")
+                            .foregroundColor(.primary)
+                            .font(.title2)
+                            .frame(width: 44, height: 44)
+                            .background(Color.white)
+                            .clipShape(Circle())
+                            .shadow(color: .gray.opacity(0.3), radius: 5)
+                    }
+                }
+            }
+            .confirmationDialog("Report Post", isPresented: $isShowingReportDialog, titleVisibility: .visible) {
+                ForEach(ReportReason.allCases) { reason in
+                    Button(reason.rawValue) {
+                        Task {
+                            do {
+                                try await NetworkManager.shared.reportPost(postId: post.id, reason: reason.rawValue, authManager: authManager)
+                                showReportConfirmation = true
+                            } catch {
+                                // Optionally, show an error alert to the user
+                                print("❌ Failed to submit report: \(error)")
+                            }
+                        }
+                    }
+                }
+                Button("Cancel", role: .cancel) { }
+            }
+            .alert("Thank You", isPresented: $showReportConfirmation) {
+                Button("OK", role: .cancel) { }
+            } message: {
+                Text("Your report has been submitted and will be reviewed.")
+            }
+            .alert("User Blocked", isPresented: $showBlockConfirmation) {
+                Button("OK", role: .cancel) {
+                    Task {
+                        await postService.refreshPosts()
+                        presentationMode.wrappedValue.dismiss()
+                    }
+                }
+            } message: {
+                Text("You will no longer see posts or receive messages from this user.")
+            }
+
+
+            // Details Grid
+            detailsGrid
+            
+            // Pet Story
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Pet Story").font(.title3.bold())
+                Text(post.description ?? "No description provided.")
+                    .font(.body)
+                    .foregroundColor(.secondary)
+                    .lineLimit(4)
+            }
+
+            // Posted By / Contact button
+            postedByView
         }
-        .frame(height: 60)
-        .padding(.vertical)
+        .padding(25)
     }
 
-    private var petStorySection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Pet Story")
-                .font(.title2.bold())
-            Text(post.description)
-                .font(.body)
-                .foregroundColor(.gray)
+    private var detailsGrid: some View {
+        let details = [
+            ("Age", post.age != nil ? String(format: "%.1f months", post.age!) : "N/A"),
+            ("Breed", post.breed ?? "N/A"),
+            ("Color", post.color ?? "N/A"),
+            ("Weight", post.weight != nil ? String(format: "%.1f lb", post.weight!) : "N/A"),
+            ("Gender", post.gender ?? "N/A")
+        ]
+        
+        return LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+            ForEach(details, id: \.0) { detail in
+                infoBox(title: detail.0, value: detail.1)
+            }
         }
-        .foregroundColor(.black)
     }
-    
-    private var postedBySection: some View {
+
+    private func infoBox(title: String, value: String) -> some View {
+        VStack {
+            Text(title).font(.caption).foregroundColor(.secondary)
+            Text(value)
+                .font(.subheadline.weight(.medium))
+                .minimumScaleFactor(0.8)
+                .lineLimit(1)
+        }
+        .frame(maxWidth: .infinity, minHeight: 60)
+        .padding(8)
+        .background(Color(white: 0.95))
+        .cornerRadius(12)
+    }
+
+    private var postedByView: some View {
         HStack {
-            Image(systemName: "person.crop.circle.fill")
-                .font(.largeTitle)
-                .foregroundColor(.gray)
-            VStack(alignment: .leading) {
-                Text("Posted by")
-                    .font(.caption)
-                    .foregroundColor(.gray)
-                Text("Nannie Barker")
-                    .fontWeight(.semibold)
-            }
-        }
-        .foregroundColor(.black)
-    }
-    
-    private var contactButton: some View {
-        NavigationLink(destination: ChatDetailView(session: findChatSession())) {
-            Text("Contact Me")
-                .font(.headline)
-                .fontWeight(.bold)
-                .foregroundColor(.white)
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(Color.green)
-                .cornerRadius(16)
-        }
-    }
+            Image("dog1").resizable().aspectRatio(contentMode: .fill).frame(width: 50, height: 50).clipShape(Circle())
+            Text("Nannie Barker").font(.subheadline.bold())
+            Spacer()
 
-    private var backButton: some View {
-        Button(action: { presentationMode.wrappedValue.dismiss() }) {
-            Image(systemName: "chevron.left")
-                .font(.title2.bold())
-                .padding()
-                .background(.thinMaterial)
-                .foregroundColor(.primary)
-                .clipShape(Circle())
+            Button(action: {
+                self.chatToNavigate = findOrCreateChatSession(with: post.userId)
+            }) {
+                Text("Contact Me")
+                    .font(.subheadline.bold())
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 12)
+                    .background(Color.green)
+                    .clipShape(Capsule())
+                    .overlay(Capsule().stroke(Color.black, lineWidth: 1.5))
+            }
+            .background(
+                NavigationLink(destination: chatDestination, isActive: .constant(chatToNavigate != nil), label: { EmptyView() })
+            )
         }
         .padding()
+        .background(Color(white: 0.95))
+        .cornerRadius(25)
     }
     
-    private func distance(to post: Post) -> String {
-        guard let userLocation = locationManager.location else { return "N/A" }
-        let postLocation = CLLocation(latitude: post.coordinate.latitude, longitude: post.coordinate.longitude)
-        let distanceInMeters = userLocation.distance(from: postLocation)
-        
-        let formatter = LengthFormatter()
-        formatter.numberFormatter.maximumFractionDigits = 1
-        return formatter.string(fromMeters: distanceInMeters)
+    @ViewBuilder
+    private var chatDestination: some View {
+        if let session = chatToNavigate {
+            ChatDetailView(session: session)
+        } else {
+            EmptyView()
+        }
     }
-    
-    private func findChatSession() -> ChatSession {
-        // Find the helper associated with the post author
-        guard let helper = MockData.topHelpers.first(where: { $0.id == post.authorId }) else {
-            // Return a default/empty session if no match is found
-            return ChatSession(participantName: "Unknown", participantAvatar: "person.crop.circle", messages: [], unreadCount: 0, isOnline: false)
+
+    private func findOrCreateChatSession(with userId: String) -> ChatSession {
+        if let existingSession = MockData.chatSessions.first(where: { $0.participantName == "Nannie Barker" }) {
+            return existingSession
+        } else {
+            let newSession = ChatSession(participantName: "Nannie Barker", participantAvatar: "dog1", messages: [], unreadCount: 0, isOnline: true)
+            return newSession
         }
-        
-        // Find the chat session that includes the helper's name
-        if let session = MockData.chatSessions.first(where: { $0.participantName.contains(helper.name) }) {
-            return session
-        }
-        
-        // If no existing session, create a new one
-        return ChatSession(participantName: helper.name, participantAvatar: helper.avatarName, messages: [], unreadCount: 0, isOnline: helper.isVerified)
     }
 }
 
-private struct InfoBox: View {
-    let label: String
-    let value: String
-    
-    var body: some View {
-        VStack {
-            Text(value)
-                .font(.headline.bold())
-            Text(label)
-                .font(.caption)
-                .foregroundColor(.gray)
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .padding()
-        .background(Color(white: 0.95))
-        .cornerRadius(12)
-        .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.gray.opacity(0.2), lineWidth: 1))
-        .foregroundColor(.black)
+extension View {
+    func cornerRadius(_ radius: CGFloat, corners: UIRectCorner) -> some View {
+        clipShape( RoundedCorner(radius: radius, corners: corners) )
+    }
+}
+
+struct RoundedCorner: Shape {
+    var radius: CGFloat = .infinity
+    var corners: UIRectCorner = .allCorners
+
+    func path(in rect: CGRect) -> Path {
+        let path = UIBezierPath(roundedRect: rect, byRoundingCorners: corners, cornerRadii: CGSize(width: radius, height: radius))
+        return Path(path.cgPath)
     }
 }
 
 #Preview {
-    NavigationView {
-        PostDetailView(post: MockData.posts[0])
-    }
+    PostDetailView(post: MockData.posts.first!)
 } 

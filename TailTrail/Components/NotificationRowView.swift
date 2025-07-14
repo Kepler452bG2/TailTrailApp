@@ -6,7 +6,7 @@ struct NotificationRowView: View {
     private var shadowColor: Color {
         switch notification.type {
         case .newMessage: return .blue.opacity(0.6)
-        case .petFound, .newAlert: return .green.opacity(0.6)
+        case .petFound: return .green.opacity(0.6)
         case .postLiked: return .pink.opacity(0.6)
         }
     }
@@ -21,14 +21,15 @@ struct NotificationRowView: View {
                 Image(systemName: notification.type.iconName)
                     .font(.title)
                     .frame(width: 50, height: 50)
-                    .background(shadowColor.opacity(0.4))
+                    .background(notification.type.iconColor.opacity(0.2))
                     .clipShape(Circle())
-                    .foregroundColor(.black)
+                    .foregroundColor(notification.type.iconColor)
 
                 VStack(alignment: .leading) {
-                    Text(notification.description)
+                    Text(notification.message)
                         .fontWeight(.semibold)
-                    Text(notification.timestamp, style: .relative)
+                        .lineLimit(2)
+                    Text(notification.date)
                         .font(.caption)
                         .foregroundColor(.gray)
                 }
@@ -46,14 +47,14 @@ struct NotificationRowView: View {
                 }
             }
             .padding()
-            .background(Color.white)
+            .background(Color("CardBackgroundColor"))
             .clipShape(RoundedRectangle(cornerRadius: 25))
             .overlay(
                 RoundedRectangle(cornerRadius: 25)
-                    .stroke(Color.black, lineWidth: 1.5)
+                    .stroke(Color.gray.opacity(0.2), lineWidth: 1)
             )
         }
-        .foregroundColor(.black)
+        .foregroundColor(Color("PrimaryTextColor"))
     }
     
     private func findPost(by id: String) -> Post? {
@@ -66,6 +67,6 @@ struct NotificationRowView: View {
 }
 
 #Preview {
-    NotificationRowView(notification: MockData.notifications.first!)
-        .padding()
+    NotificationsView()
+        .environmentObject(NotificationsViewModel())
 } 

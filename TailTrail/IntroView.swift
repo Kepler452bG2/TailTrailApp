@@ -13,10 +13,16 @@ struct IntroView: View {
                 decorativeElements
                 
                 imageGrid
+                
                 Spacer()
-                headerText
-                descriptionText
+                
+                VStack(alignment: .leading, spacing: 20) {
+                    headerText
+                    descriptionText
+                }
+
                 Spacer()
+                
                 letsGoButton
             }
             .padding(30)
@@ -47,21 +53,21 @@ struct IntroView: View {
                 Image("dog1")
                     .resizable().aspectRatio(contentMode: .fill)
                     .frame(width: 140, height: 180)
-                    .clipShape(ThreeRoundedCornersShape(cornerRadius: 25).rotation(.degrees(270)))
+                    .clipShape(ThreeRoundedCornersShape(radius: 25).rotation(.degrees(270)))
                 Image("cat2")
                     .resizable().aspectRatio(contentMode: .fill)
                     .frame(width: 140, height: 130)
-                    .clipShape(ThreeRoundedCornersShape(cornerRadius: 25).rotation(.degrees(180)))
+                    .clipShape(ThreeRoundedCornersShape(radius: 25).rotation(.degrees(180)))
             }
             HStack(spacing: 15) {
                 Image("dog2")
                     .resizable().aspectRatio(contentMode: .fill)
                     .frame(width: 140, height: 130)
-                    .clipShape(ThreeRoundedCornersShape(cornerRadius: 25))
+                    .clipShape(ThreeRoundedCornersShape(radius: 25))
                 Image("dog3")
                     .resizable().aspectRatio(contentMode: .fill)
                     .frame(width: 140, height: 180)
-                    .clipShape(ThreeRoundedCornersShape(cornerRadius: 25).rotation(.degrees(90)))
+                    .clipShape(ThreeRoundedCornersShape(radius: 25).rotation(.degrees(90)))
             }
         }
     }
@@ -89,7 +95,7 @@ struct IntroView: View {
     }
 
     private var descriptionText: some View {
-        Text("Made with ❤️ for pet families everywhere")
+        Text("Find your lost pet today! Start your search or report a found pet now. Made with ❤️ for pet families everywhere")
             .font(.title3)
             .foregroundColor(.gray)
             .multilineTextAlignment(.leading)

@@ -22,11 +22,11 @@ class MapViewModel: ObservableObject {
         case .all:
             panelFilteredPosts = allPosts
         case .status(let status):
-            panelFilteredPosts = allPosts.filter { $0.status == status }
+            panelFilteredPosts = allPosts.filter { $0.status == status.rawValue }
         case .species(let species):
-            panelFilteredPosts = allPosts.filter { $0.species == species }
+            panelFilteredPosts = allPosts.filter { $0.species == species.rawValue }
         case .recent:
-            panelFilteredPosts = allPosts.filter { $0.timestamp > Date().addingTimeInterval(-3600 * 24) }
+            panelFilteredPosts = allPosts.filter { $0.createdAt > Date().addingTimeInterval(-3600 * 24) }
         }
         
         // Then, apply the text search on top of that
@@ -34,17 +34,18 @@ class MapViewModel: ObservableObject {
             return panelFilteredPosts
         } else {
             return panelFilteredPosts.filter { post in
-                post.title.localizedCaseInsensitiveContains(searchText) ||
-                post.description.localizedCaseInsensitiveContains(searchText)
+                let petNameMatch = (post.petName ?? "").localizedCaseInsensitiveContains(searchText)
+                let descriptionMatch = (post.description ?? "").localizedCaseInsensitiveContains(searchText)
+                return petNameMatch || descriptionMatch
             }
         }
     }
 
     var lostCount: Int {
-        allPosts.filter { $0.status == .lost }.count
+        allPosts.filter { $0.status == PostStatus.lost.rawValue }.count
     }
 
     var foundCount: Int {
-        allPosts.filter { $0.status == .found }.count
+        allPosts.filter { $0.status == PostStatus.found.rawValue }.count
     }
 } 

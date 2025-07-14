@@ -3,6 +3,7 @@ import SwiftUI
 struct ChatDetailView: View {
     @EnvironmentObject var tabBarVisibility: TabBarVisibility
     @StateObject private var viewModel: ChatViewModel
+    @Environment(\.presentationMode) var presentationMode
     
     init(session: ChatSession) {
         _viewModel = StateObject(wrappedValue: ChatViewModel(session: session))
@@ -15,6 +16,15 @@ struct ChatDetailView: View {
         }
         .navigationTitle(viewModel.chatPartnerName)
         .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(true)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button(action: { presentationMode.wrappedValue.dismiss() }) {
+                    Image(systemName: "chevron.left")
+                        .foregroundColor(.orange)
+                }
+            }
+        }
         .background(Color.theme.background.ignoresSafeArea())
         .foregroundColor(Color.theme.primaryText)
         .onAppear { tabBarVisibility.isHidden = true }

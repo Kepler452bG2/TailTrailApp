@@ -2,64 +2,44 @@ import SwiftUI
 import MapKit
 
 struct ActivityReportMapView: View {
-    
-    @State private var cameraPosition: MapCameraPosition
-    
     let posts: [Post]
     
-    init(posts: [Post]) {
-        self.posts = posts
-        _cameraPosition = State(initialValue: .region(ActivityReportMapView.calculateRegion(for: posts)))
-    }
-    
-    var body: some View {
-        Map(position: $cameraPosition) {
-            ForEach(posts) { post in
-                Marker("", coordinate: post.lastSeenLocation)
-                    .tint(post.status == .lost ? .red : .green)
-            }
-        }
-        .mapControls {
-            // Hides all map controls for a cleaner look
-        }
-        .disabled(true) // Make the map non-interactive
-        .frame(height: 200)
-        .cornerRadius(20)
-    }
-    
-    static func calculateRegion(for posts: [Post]) -> MKCoordinateRegion {
-        guard !posts.isEmpty else {
-            // Return a default region if there are no posts
+    // Compute the region to display
+    private var region: MKCoordinateRegion {
+        // Find the first valid coordinate to center the map on
+        guard let firstCoordinate = posts.compactMap(\.coordinate).first else {
+            // Return a default region if no posts have coordinates
             return MKCoordinateRegion(
-                center: CLLocationCoordinate2D(latitude: 43.2220, longitude: 76.8512),
-                span: MKCoordinateSpan(latitudeDelta: 0.5, longitudeDelta: 0.5)
+                center: CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194),
+                span: MKCoordinateSpan(latitudeDelta: 0.1, longitudeDelta: 0.1)
             )
         }
         
-        var minLat = posts[0].lastSeenLocation.latitude
-        var maxLat = posts[0].lastSeenLocation.latitude
-        var minLon = posts[0].lastSeenLocation.longitude
-        var maxLon = posts[0].lastSeenLocation.longitude
-        
-        for post in posts {
-            minLat = min(minLat, post.lastSeenLocation.latitude)
-            maxLat = max(maxLat, post.lastSeenLocation.latitude)
-            minLon = min(minLon, post.lastSeenLocation.longitude)
-            maxLon = max(maxLon, post.lastSeenLocation.longitude)
+        return MKCoordinateRegion(
+            center: firstCoordinate,
+            span: MKCoordinateSpan(latitudeDelta: 0.1, longitudeDelta: 0.1)
+        )
+    }
+
+    var body: some View {
+        // Filter posts to only include those with valid coordinates
+        let postsWithCoordinates = posts.filter { $0.coordinate != nil }
+
+        Map(coordinateRegion: .constant(region), annotationItems: postsWithCoordinates) { post in
+            MapAnnotation(coordinate: post.coordinate!) { // Force-unwrap is safe here due to the filter above
+                Image(systemName: "mappin.circle.fill")
+                    .font(.title)
+                    .foregroundColor(post.status == PostStatus.lost.rawValue ? .red : .green)
+                    .overlay(
+                        Circle().stroke(Color.white, lineWidth: 2)
+                    )
+            }
         }
-        
-        let center = CLLocationCoordinate2D(latitude: (minLat + maxLat) / 2, longitude: (minLon + maxLon) / 2)
-        // Add some padding to the span - bigger multiplier means more zoom out
-        let span = MKCoordinateSpan(latitudeDelta: (maxLat - minLat) * 2.5, longitudeDelta: (maxLon - minLon) * 2.5)
-        
-        return MKCoordinateRegion(center: center, span: span)
     }
 }
 
-
-#Preview {
-    ActivityReportMapView(posts: MockData.posts)
-        .padding()
-        .background(Color.theme.background)
-        .preferredColorScheme(.dark)
+struct ActivityReportMapView_Previews: PreviewProvider {
+    static var previews: some View {
+        ActivityReportMapView(posts: MockData.posts)
+    }
 } 

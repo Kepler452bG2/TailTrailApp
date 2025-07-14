@@ -15,15 +15,29 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         locationManager.requestWhenInUseAuthorization()
     }
 
-    func requestLocation() {
+    func requestLocationUpdate() {
         locationManager.startUpdatingLocation()
     }
     
+    func fetchLocation() async -> CLLocation? {
+        // A more robust implementation would handle authorization status changes here
+        requestLocationUpdate()
+        
+        return await withCheckedContinuation { continuation in
+            // This is a simplified approach. A real-world app would need a more
+            // sophisticated way to handle timeouts and errors, perhaps with a delegate
+            // or a Combine publisher that can be awaited.
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3) { // Wait for 3 seconds
+                continuation.resume(returning: self.location)
+            }
+        }
+    }
+
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         authorizationStatus = manager.authorizationStatus
         
         if authorizationStatus == .authorizedWhenInUse || authorizationStatus == .authorizedAlways {
-            requestLocation()
+            requestLocationUpdate()
         }
     }
 

@@ -1,0 +1,3 @@
+// For now, the production URL is the same as development. You can change this later.
+SLASH = /
+API_BASE_URL = http:$(SLASH)$(SLASH)209.38.237.102:8080 

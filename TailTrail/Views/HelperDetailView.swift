@@ -5,7 +5,7 @@ struct HelperDetailView: View {
     
     // Find all posts by this helper from the mock data
     private var helperPosts: [Post] {
-        MockData.posts.filter { $0.authorId == helper.id }
+        MockData.posts.filter { $0.userId == helper.id }
     }
     
     // Find a chat session to navigate to. This is a simple simulation.
@@ -78,7 +78,7 @@ struct HelperDetailView: View {
     }
     
     private var bioSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 8) {
             Text("About Me")
                 .font(.title2.bold())
             
@@ -97,11 +97,12 @@ struct HelperDetailView: View {
                 Text("No posts found.")
                     .foregroundColor(.secondary)
             } else {
-                ForEach(helperPosts) { post in
-                    NavigationLink(destination: PostDetailView(post: post)) {
-                        PostCardView(post: post, color: .pink.opacity(0.6))
+                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
+                    ForEach(helperPosts) { post in
+                        NavigationLink(destination: PostDetailView(post: post)) {
+                            ProfilePostCard(post: post)
+                        }
                     }
-                    .buttonStyle(.plain)
                 }
             }
         }

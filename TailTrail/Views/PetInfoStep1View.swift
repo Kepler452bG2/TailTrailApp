@@ -2,125 +2,66 @@ import SwiftUI
 
 struct PetInfoStep1View: View {
     @EnvironmentObject var viewModel: CreatePostViewModel
-    
+
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 24) {
-                Text("Let's start with your pet's basic info")
-                    .font(.headline)
-                    .foregroundColor(.theme.secondaryText)
-                
-                // Name & Breed
-                TextField("Pet name", text: $viewModel.petName)
-                    .textFieldStyle(CustomTextFieldStyle())
-                
-                HStack {
-                    TextField("Breed", text: $viewModel.breed)
-                        .textFieldStyle(CustomTextFieldStyle())
-                    
-                    TextField("Color", text: $viewModel.color)
-                        .textFieldStyle(CustomTextFieldStyle())
+            VStack(alignment: .leading, spacing: 15) {
+                FormField(title: "Pet's Name", placeholder: "e.g., Bobby", text: $viewModel.petName)
 
-                    Toggle("Mixed breed", isOn: $viewModel.isMixedBreed)
-                        .labelsHidden()
-                        .tint(Color.theme.accent)
+                Text("Species").font(.headline)
+                Picker("Species", selection: $viewModel.selectedSpecies) {
+                    ForEach(PetSpecies.allCases) { species in
+                        Text(species.rawValue.capitalized).tag(species)
+                    }
                 }
-                
-                // Age Slider
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Age: \(String(format: "%.1f", viewModel.age)) years")
-                    Slider(value: $viewModel.age, in: 0...15, step: 0.5)
-                        .tint(Color.theme.accent)
+                .pickerStyle(SegmentedPickerStyle())
+
+                FormField(title: "Breed", placeholder: "e.g., Golden Retriever", text: $viewModel.petBreed)
+                FormField(title: "Color", placeholder: "e.g., Golden", text: $viewModel.petColor)
+
+                HStack(spacing: 15) {
+                    FormField(title: "Age (years)", placeholder: "e.g., 5", text: $viewModel.petAge)
+                        .keyboardType(.numberPad)
+                    FormField(title: "Weight (kg)", placeholder: "e.g., 15", text: $viewModel.petWeight)
+                        .keyboardType(.decimalPad)
                 }
 
-                // Gender
-                CustomPicker(title: "Gender", selection: $viewModel.gender)
-                
-                // Spayed/Neutered
-                CustomPicker(title: "Spayed/neutered", selection: $viewModel.spayedStatus)
-                
-                // Weight
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Weight")
-                    WeightPicker(selection: $viewModel.weight)
+                Text("Gender").font(.headline)
+                Picker("Gender", selection: $viewModel.selectedGender) {
+                    ForEach(PetGender.allCases, id: \.self) { gender in
+                        Text(gender.rawValue.capitalized).tag(gender)
+                    }
                 }
-
-                // Continue Button
-                Button(action: { viewModel.goToNextStep() }) {
-                    Image(systemName: "arrow.right")
-                        .font(.title.bold())
-                        .frame(maxWidth: .infinity, alignment: .trailing)
-                }
-                .tint(Color.theme.accent)
+                .pickerStyle(SegmentedPickerStyle())
             }
             .padding()
         }
-        .foregroundColor(Color.theme.primaryText)
     }
 }
 
-// MARK: - Reusable Components
-
-private struct CustomPicker<T: RawRepresentable & Hashable & CaseIterable>: View where T.RawValue == String {
+// A reusable view for text input fields
+private struct FormField: View {
     let title: String
-    @Binding var selection: T
-
+    let placeholder: String
+    @Binding var text: String
+    
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 5) {
             Text(title)
-            HStack {
-                ForEach(Array(T.allCases), id: \.self) { value in
-                    Button(action: { selection = value }) {
-                        Text(value.rawValue)
-                            .fontWeight(.medium)
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(selection == value ? Color.theme.accent.opacity(0.3) : Color.theme.cardBackground)
-                            .cornerRadius(12)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .stroke(selection == value ? Color.theme.accent : Color.clear, lineWidth: 2)
-                            )
-                    }
-                }
-            }
+                .font(.headline)
+            TextField(placeholder, text: $text)
+                .padding(10)
+                .background(Color(.systemGray6))
+                .cornerRadius(8)
         }
     }
 }
 
-private struct WeightPicker: View {
-    @Binding var selection: PetWeight
-
-    var body: some View {
-        HStack {
-            ForEach(PetWeight.allCases, id: \.self) { weight in
-                Button(action: { selection = weight }) {
-                    VStack {
-                        Image(systemName: "dog.fill") // Placeholder icon
-                            .font(.title)
-                        Text(weight.rawValue)
-                            .font(.caption)
-                        Text(weight.subtitle)
-                            .font(.caption2)
-                            .foregroundColor(.theme.secondaryText)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(selection == weight ? Color.theme.accent.opacity(0.3) : Color.theme.cardBackground)
-                    .cornerRadius(12)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(selection == weight ? Color.theme.accent : Color.clear, lineWidth: 2)
-                    )
-                }
-            }
-        }
+struct PetInfoStep1View_Previews: PreviewProvider {
+    static var previews: some View {
+        let auth = AuthenticationManager()
+        let service = PostService(authManager: auth)
+        PetInfoStep1View()
+            .environmentObject(CreatePostViewModel(postService: service))
     }
-}
-
-
-#Preview {
-    PetInfoStep1View()
-        .environmentObject(CreatePostViewModel())
-        .preferredColorScheme(.dark)
 } 

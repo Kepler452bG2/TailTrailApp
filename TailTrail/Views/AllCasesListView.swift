@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct AllCasesListView: View {
-    let posts: [Post]
+    @EnvironmentObject var postService: PostService
 
     var body: some View {
         ZStack {
@@ -9,9 +9,9 @@ struct AllCasesListView: View {
 
             ScrollView {
                 LazyVStack(spacing: 16) {
-                    ForEach(posts) { post in
+                    ForEach(postService.posts) { post in
                         NavigationLink(destination: PostDetailView(post: post)) {
-                            PostCardView(post: post, color: .yellow.opacity(0.6))
+                            PostCardView(post: post)
                         }
                         .buttonStyle(.plain)
                     }
@@ -29,7 +29,8 @@ struct AllCasesListView: View {
 
 #Preview {
     NavigationStack {
-        AllCasesListView(posts: MockData.posts)
+        AllCasesListView()
             .preferredColorScheme(.dark)
+            .environmentObject(PostService(authManager: AuthenticationManager()))
     }
 } 

@@ -50,7 +50,7 @@ struct UserProfileCard: View {
                 .font(.headline)
                 .foregroundColor(.gray)
             
-            NavigationLink(destination: NewEditProfileView(name: $name, bio: $bio, phone: $phone)) {
+            NavigationLink(destination: EditProfileView()) {
                 Text("Edit Profile")
                     .fontWeight(.bold)
                     .padding()

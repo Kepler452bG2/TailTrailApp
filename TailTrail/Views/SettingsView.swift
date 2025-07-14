@@ -60,17 +60,18 @@ struct SettingsView: View {
         }
         .background(Color.theme.background)
         .navigationBarHidden(true)
-        .overlay(backButton, alignment: .topTrailing)
+        .overlay(backButton, alignment: .topLeading)
         .foregroundColor(.black)
     }
     
     private var backButton: some View {
-        Button("Done".localized()) {
+        Button(action: {
             presentationMode.wrappedValue.dismiss()
+        }) {
+            Image(systemName: "chevron.left")
+                .font(.title2.bold())
+                .padding()
         }
-        .fontWeight(.bold)
-        .padding()
-        .foregroundColor(.black)
     }
 }
 

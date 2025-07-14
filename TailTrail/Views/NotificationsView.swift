@@ -14,7 +14,7 @@ struct NotificationsView: View {
         case .all:
             return viewModel.notifications
         case .petAlerts:
-            return viewModel.notifications.filter { $0.type == .newAlert || $0.type == .petFound }
+            return viewModel.notifications.filter { $0.type == .petFound }
         case .messages:
             return viewModel.notifications.filter { $0.type == .newMessage }
         case .likes:

@@ -12,11 +12,18 @@ struct FeedView: View {
 
     var filteredPosts: [Post] {
         return postService.posts.filter { post in
-            let statusMatch = post.status == selectedStatus
-            let speciesMatch = selectedSpecies == nil || post.species == selectedSpecies
+            // Updated status matching logic to include "active" posts in the "lost" tab
+            let statusMatch: Bool
+            if selectedStatus == .lost {
+                statusMatch = post.status == "lost" || post.status == "active"
+            } else {
+                statusMatch = post.status == selectedStatus.rawValue
+            }
+            
+            let speciesMatch = selectedSpecies == nil || post.species == selectedSpecies?.rawValue
             let searchMatch = searchText.isEmpty ||
-                              post.title.localizedCaseInsensitiveContains(searchText) ||
-                              post.description.localizedCaseInsensitiveContains(searchText)
+                              (post.petName ?? "").localizedCaseInsensitiveContains(searchText) ||
+                              (post.description ?? "").localizedCaseInsensitiveContains(searchText)
             
             return statusMatch && speciesMatch && searchMatch
         }
@@ -27,11 +34,11 @@ struct FeedView: View {
     ]
 
     private var lostCount: Int {
-        postService.posts.filter { $0.status == .lost }.count
+        postService.posts.filter { $0.status == PostStatus.lost.rawValue }.count
     }
     
     private var foundCount: Int {
-        postService.posts.filter { $0.status == .found }.count
+        postService.posts.filter { $0.status == PostStatus.found.rawValue }.count
     }
 
     var body: some View {
@@ -49,6 +56,11 @@ struct FeedView: View {
             }
             .background(Color("BackgroundColor").ignoresSafeArea())
             .navigationBarHidden(true)
+            .onAppear {
+                Task {
+                    await postService.refreshPosts()
+                }
+            }
         }
     }
 
@@ -95,11 +107,6 @@ struct FeedView: View {
                     Image(systemName: "bell.badge.fill")
                         .font(.title2)
                 }
-                
-                NavigationLink(destination: SettingsView()) {
-                    Image(systemName: "gearshape")
-                        .font(.title2)
-                }
             }
             .foregroundColor(.black)
         }
@@ -107,30 +114,46 @@ struct FeedView: View {
     }
 
     private var searchBar: some View {
-        HStack {
-            Image(systemName: "magnifyingglass")
-            TextField("Search pet", text: $searchText)
+        ZStack {
+            Capsule()
+                .fill(Color.theme.tabBarSelected)
+                .offset(x: 2, y: 2)
+
+            HStack {
+                Image(systemName: "magnifyingglass")
+                TextField("Search pet", text: $searchText)
+            }
+            .foregroundColor(.gray)
+            .padding()
+            .background(Capsule().fill(Color.white))
+            .overlay(Capsule().stroke(Color.black, lineWidth: 1.5))
         }
-        .foregroundColor(.gray)
-        .padding()
-        .background(Capsule().fill(Color.white).overlay(Capsule().stroke(Color.black, lineWidth: 1.5)))
         .padding(.horizontal)
     }
 
     private var mainPostList: some View {
-        LazyVGrid(columns: [GridItem(.adaptive(minimum: 160), spacing: 16)], spacing: 16) {
+        let columns: [GridItem] = [
+            GridItem(.flexible()),
+            GridItem(.flexible())
+        ]
+        
+        return LazyVGrid(columns: columns, spacing: 0) {
             ForEach(filteredPosts) { post in
                 NavigationLink(destination: PostDetailView(post: post)) {
                     PetCardView(post: post)
                 }
+                .buttonStyle(.plain)
+                .padding(8)
                 .onAppear {
                     if post == postService.posts.last {
-                        postService.loadMorePosts()
+                        Task {
+                            await postService.loadMorePosts()
+                        }
                     }
                 }
             }
         }
-        .padding(.horizontal)
+        .padding(.horizontal, 8)
     }
 
     private var lostFoundSegmentedControl: some View {
@@ -252,5 +275,5 @@ private struct FilterButton: View {
 #Preview {
     FeedView()
         .environmentObject(LanguageManager.shared)
-        .environmentObject(PostService())
+        .environmentObject(PostService(authManager: AuthenticationManager()))
 } 

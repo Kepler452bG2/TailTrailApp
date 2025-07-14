@@ -18,7 +18,7 @@ struct ChatRowView: View {
                 .offset(x: 4, y: 4)
 
             HStack(spacing: 16) {
-                Image(session.participantAvatar)
+                Image(systemName: session.participantAvatar)
                     .resizable()
                     .scaledToFill()
                     .frame(width: 60, height: 60)

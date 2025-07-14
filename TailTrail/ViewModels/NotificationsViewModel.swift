@@ -21,7 +21,7 @@ class NotificationsViewModel: ObservableObject {
             } else { // Contact Owner
                 guard let postId = notification.postID,
                       let post = MockData.posts.first(where: { $0.id == postId }),
-                      let helper = MockData.topHelpers.first(where: { $0.id == post.authorId }) else { return }
+                      let helper = MockData.topHelpers.first(where: { $0.id == post.userId }) else { return }
                 path.append(helper)
             }
             
@@ -32,17 +32,6 @@ class NotificationsViewModel: ObservableObject {
         case .postLiked:
             guard let postId = notification.postID, let post = MockData.posts.first(where: { $0.id == postId }) else { return }
             path.append(post)
-            
-        case .newAlert:
-            if isPrimary { // Help Search
-                guard let postId = notification.postID, let post = MockData.posts.first(where: { $0.id == postId }) else { return }
-                path.append(post)
-            } else { // Share Alert
-                guard let postId = notification.postID,
-                      let post = MockData.posts.first(where: { $0.id == postId }) else { return }
-                let shareText = "Help find this missing pet! \(post.title) last seen near \(post.locationName)."
-                shareableItem = ShareableItem(text: shareText)
-            }
         }
     }
 } 

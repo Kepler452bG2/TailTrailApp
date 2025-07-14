@@ -1,101 +1,81 @@
 import SwiftUI
 
 struct MainTabView: View {
+    @EnvironmentObject var authManager: AuthenticationManager
+    @EnvironmentObject var postService: PostService
+    @EnvironmentObject var languageManager: LanguageManager
     @EnvironmentObject var tabBarVisibility: TabBarVisibility
-    @State private var selectedTab = 0
-    @State private var showCreatePostSheet = false
+    
+    @StateObject private var createPostViewModel: CreatePostViewModel
+    
+    @State private var selectedTab: Int = 0
+    @State private var isCreatePostViewPresented = false
+    
+    init(postService: PostService) {
+        _createPostViewModel = StateObject(wrappedValue: CreatePostViewModel(postService: postService))
+    }
 
     var body: some View {
         ZStack(alignment: .bottom) {
-            // Main content view switcher
-            Group {
-                switch selectedTab {
-                case 0: FeedView()
-                case 1: MapView()
-                case 2: MessagesView(selectedTab: $selectedTab)
-                case 3: ProfileView()
-                default: FeedView()
-                }
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-
-            // Custom Tab Bar
+            
+            // Using a Group to contain the switched views
+            tabContent(for: selectedTab)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            
+            // Show custom tab bar only if it's not hidden
             if !tabBarVisibility.isHidden {
-                customTabBar
+                CustomTabBar(selectedTab: $selectedTab) {
+                    isCreatePostViewPresented.toggle()
+                }
             }
         }
         .ignoresSafeArea(.keyboard, edges: .bottom)
-        .sheet(isPresented: $showCreatePostSheet) {
-            CreatePostView()
+        .sheet(isPresented: $isCreatePostViewPresented) {
+            // Provide all necessary environment objects to the sheet
+            CreatePostView(postService: postService)
+                .environmentObject(createPostViewModel)
+                .environmentObject(postService)
+                .environmentObject(authManager)
+                .environmentObject(languageManager)
+                .environmentObject(tabBarVisibility)
         }
     }
 
-    private var customTabBar: some View {
-        HStack {
-            TabBarButton(icon: "list.bullet", tag: 0, selection: $selectedTab)
-            Spacer()
-            TabBarButton(icon: "map", tag: 1, selection: $selectedTab)
-            
-            Spacer().frame(width: 80) // Placeholder for the elevated button
-            
-            TabBarButton(icon: "message", tag: 2, selection: $selectedTab)
-            Spacer()
-            TabBarButton(icon: "person", tag: 3, selection: $selectedTab)
-        }
-        .padding(.horizontal, 30)
-        .frame(height: 70)
-        .background(Color.orange)
-        .clipShape(Capsule())
-        .overlay(
-            newPostButton.offset(y: -25)
-        )
-        .padding(.horizontal)
-        .shadow(radius: 10)
-    }
-
-    private var newPostButton: some View {
-        Button(action: {
-            showCreatePostSheet = true
-        }) {
-            Image(systemName: "pawprint.fill")
-                .font(.system(size: 28, weight: .bold))
-                .foregroundColor(.black)
-                .padding(24)
-                .background(Color(red: 255/255, green: 196/255, blue: 0/255))
-                .clipShape(Circle())
-                .shadow(radius: 5, y: 3)
+    // A ViewBuilder function to handle the tab switching logic
+    @ViewBuilder
+    private func tabContent(for tab: Int) -> some View {
+        switch tab {
+        case 0:
+            FeedView()
+        case 1:
+            MapView()
+        case 2:
+            MessagesView(selectedTab: $selectedTab)
+        case 3:
+            AllCasesListView()
+        case 4:
+            ProfileView()
+        default:
+            FeedView()
         }
     }
 }
 
-private struct TabBarButton: View {
-    let icon: String
-    let tag: Int
-    @Binding var selection: Int
-    
-    var isSelected: Bool { selection == tag }
-    
-    var body: some View {
-        Button(action: { selection = tag }) {
-            ZStack {
-                if isSelected {
-                    RoundedRectangle(cornerRadius: 16)
-                        .fill(Color(red: 255/255, green: 196/255, blue: 0/255))
-                        .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.black, lineWidth: 2))
-                }
-                
-                Image(systemName: icon)
-                    .font(.title2)
-                    .foregroundColor(.black)
-            }
-            .frame(width: 60, height: 40)
-        }
+#if DEBUG
+struct MainTabView_Previews: PreviewProvider {
+    static var previews: some View {
+        // Create mock instances for the preview
+        let authManager = AuthenticationManager()
+        let postService = PostService(authManager: authManager)
+        
+        // To make the preview work, we need to simulate an authenticated state
+        authManager.isUserAuthenticated = true
+
+        return MainTabView(postService: postService)
+            .environmentObject(authManager)
+            .environmentObject(postService)
+            .environmentObject(LanguageManager.shared)
+            .environmentObject(TabBarVisibility())
     }
 }
-
-#Preview {
-    MainTabView()
-        .environmentObject(PostService())
-        .environmentObject(LanguageManager.shared)
-        .environmentObject(TabBarVisibility())
-} 
+#endif 
