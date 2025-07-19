@@ -7,15 +7,16 @@
 
 import Foundation
 
-struct User: Identifiable, Codable {
-    var id: UUID
-    var email: String
-    var phone: String?
-    var createdAt: Date?
+struct User: Codable, Identifiable {
+    let id: UUID
+    let name: String?
+    let email: String
+    let phone: String?
+    let createdAt: String
     var imageUrl: String?
 
     enum CodingKeys: String, CodingKey {
-        case id, email, phone
+        case id, name, email, phone
         case createdAt = "created_at"
         case imageUrl = "image_url"
     }

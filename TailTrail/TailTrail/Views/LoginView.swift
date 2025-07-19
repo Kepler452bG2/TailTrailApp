@@ -7,76 +7,77 @@ struct LoginView: View {
     @State private var isLoggingIn = false
     @EnvironmentObject var authManager: AuthenticationManager
     
+    private var isFormValid: Bool {
+        !email.isEmpty && !password.isEmpty
+    }
+    
     var body: some View {
-        VStack(spacing: 20) {
-            Text("welcome_back")
-                .font(.largeTitle)
-                .fontWeight(.bold)
-                .padding(.bottom, 20)
+        ZStack {
+            Image("catanddog")
+                .resizable()
+                .scaledToFill()
+                .edgesIgnoringSafeArea(.all)
             
-            TextField("email", text: $email)
-                .textFieldStyle(CustomTextFieldStyle())
-                .keyboardType(.emailAddress)
-                .autocapitalization(.none)
+            VStack {
+                Spacer()
+                
+        VStack(spacing: 20) {
+                    Text("Welcome Back")
+                        .font(.largeTitle.bold())
+                        .padding(.top, 40)
+            
+                    TextField("Email", text: $email)
+                        .textFieldStyle(ModernTextFieldStyle())
 
-            SecureField("password", text: $password)
-                .textFieldStyle(CustomTextFieldStyle())
+                    SecureField("Password", text: $password)
+                        .textFieldStyle(ModernTextFieldStyle())
 
+                    if isLoggingIn {
+                        ProgressView()
+                    } else {
             Button(action: {
+                            isLoggingIn = true
                 Task {
-                    isLoggingIn = true
-                    let success = await authManager.loginUser(email: email, password: password)
-                    if !success {
-                        // TODO: Show error alert
-                        print("Login failed")
-                    }
+                                _ = await authManager.loginUser(email: email, password: password)
                     isLoggingIn = false
                 }
             }) {
-                if isLoggingIn {
-                    ProgressView()
-                } else {
-                    Text("login")
+                            Text("Login")
+                                .fontWeight(.bold)
+                                .foregroundColor(.black)
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(
+                                    LinearGradient(gradient: Gradient(colors: [Color.yellow.opacity(0.8), Color.yellow]), startPoint: .top, endPoint: .bottom)
+                                )
+                                .cornerRadius(12)
+                                .shadow(color: .gray.opacity(0.4), radius: 5, y: 5)
+                        }
+                        .disabled(!isFormValid)
+                        .padding(.bottom, 10)
                 }
-            }
-            .buttonStyle(SimpleLandingButtonStyle(backgroundColor: .blue))
-            .disabled(isLoggingIn || !authManager.isFormValid)
-            .padding(.top)
-            
-            HStack {
-                VStack { Divider() }
-                Text("or")
-                    .font(.footnote)
-                    .foregroundColor(.secondary)
-                VStack { Divider() }
-            }
-            .padding(.vertical)
-            
-            SignInWithAppleButton(
-                .signIn,
-                onRequest: { request in
-                    request.requestedScopes = [.fullName, .email]
-                },
-                onCompletion: { result in
-                    authManager.handleSignInWithApple(result: result)
-                }
-            )
-            .signInWithAppleButtonStyle(.black)
-            .frame(height: 50)
-            .cornerRadius(8)
-            
-            Spacer()
+                    
+                    // SignInWithAppleButton has been removed.
             
             NavigationLink(destination: RegistrationView()) {
                 HStack {
-                    Text("dont_have_account")
-                    Text("sign_up")
+                            Text("Don't have an account?")
+                            Text("Sign Up")
                         .fontWeight(.bold)
                 }
                 .font(.footnote)
-            }
+                        .foregroundColor(.accentColor)
+                    }
+                    .padding(.bottom)
         }
         .padding()
-        .background(Color("BackgroundColor").edgesIgnoringSafeArea(.all))
+                .background(
+                    .thinMaterial,
+                    in: RoundedRectangle(cornerRadius: 20, style: .continuous)
+                )
+            }
+            .padding(.horizontal, 32)
+        }
+        .navigationBarHidden(true)
     }
 } 

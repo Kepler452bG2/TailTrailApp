@@ -5,86 +5,119 @@ struct RegistrationView: View {
     @State private var email = ""
     @State private var password = ""
     @State private var confirmPassword = ""
+    @State private var agreeToTerms = false
+    @State private var isPasswordVisible = false
     @State private var isSigningUp = false
     @EnvironmentObject var authManager: AuthenticationManager
     @Environment(\.presentationMode) var presentationMode
 
+    private var isFormValid: Bool {
+        !email.isEmpty && !password.isEmpty && password == confirmPassword && agreeToTerms
+    }
+
     var body: some View {
+        ZStack {
+            Image("catanddog")
+                .resizable()
+                .scaledToFill()
+                .edgesIgnoringSafeArea(.all)
+
+            ScrollView {
         VStack(spacing: 20) {
-            Text("create_account")
-                .font(.largeTitle)
-                .fontWeight(.bold)
-                .padding(.bottom, 20)
+                    Text("Sign Up to Continue")
+                        .font(.largeTitle.bold())
+                        .padding(.top, 40)
 
-            TextField("email", text: $email)
-                .textFieldStyle(CustomTextFieldStyle())
-                .keyboardType(.emailAddress)
+                    TextField("Email", text: $email)
+                        .textFieldStyle(ModernTextFieldStyle())
+
+                    // Password Field with inline icon
+                    ZStack(alignment: .trailing) {
+                        if isPasswordVisible {
+                            TextField("Password", text: $password)
+                                .textFieldStyle(ModernTextFieldStyle())
+                                .autocapitalization(.none)
+                        } else {
+                            SecureField("Password", text: $password)
+                                .textFieldStyle(ModernTextFieldStyle())
                 .autocapitalization(.none)
+                        }
+                        Button(action: { isPasswordVisible.toggle() }) {
+                            Image(systemName: isPasswordVisible ? "eye.slash.fill" : "eye.fill")
+                                .foregroundColor(.secondary)
+                                .padding(.trailing, 15)
+                        }
+                    }
 
-            SecureField("password", text: $password)
-                .textFieldStyle(CustomTextFieldStyle())
-            
-            SecureField("confirm_password", text: $confirmPassword)
-                .textFieldStyle(CustomTextFieldStyle())
+                    // Confirm Password Field with inline icon
+                    ZStack(alignment: .trailing) {
+                        if isPasswordVisible {
+                            TextField("Confirm Password", text: $confirmPassword)
+                                .textFieldStyle(ModernTextFieldStyle())
+                                .autocapitalization(.none)
+                        } else {
+                            SecureField("Confirm Password", text: $confirmPassword)
+                                .textFieldStyle(ModernTextFieldStyle())
+                                .autocapitalization(.none)
+                        }
+                        Button(action: { isPasswordVisible.toggle() }) {
+                            Image(systemName: isPasswordVisible ? "eye.slash.fill" : "eye.fill")
+                                .foregroundColor(.secondary)
+                                .padding(.trailing, 15)
+                        }
+                    }
 
+                    HStack {
+                        Button(action: { agreeToTerms.toggle() }) {
+                            Image(systemName: agreeToTerms ? "checkmark.square.fill" : "square")
+                                .foregroundColor(agreeToTerms ? .yellow : .gray)
+                        }
+                        
+                        Text("I agree to the [Terms & Privacy Policy](https://github.com/Kepler452bG2/tailtrail-support/blob/main/README.md)")
+                            .font(.footnote)
+                            .foregroundColor(.secondary)
+                    }
+
+                    if isSigningUp {
+                        ProgressView().padding()
+                    } else {
             Button(action: {
                 Task {
                     isSigningUp = true
                     let success = await authManager.registerUser(email: email, password: password)
                     if !success {
-                        // Показать ошибку
-                        print("Registration failed")
+                                    // Handle error, e.g., show an alert
                     }
                     isSigningUp = false
                 }
             }) {
-                if isSigningUp {
-                    ProgressView()
-                } else {
-                    Text("sign_up")
-                }
-            }
-            .modifier(ModernButtonModifier(color: .green))
-            .disabled(isSigningUp || email.isEmpty || password.isEmpty || password != confirmPassword)
-            .padding(.top)
-
+                            Text("Sign Up")
+                                .fontWeight(.bold)
+                                .foregroundColor(.white)
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(Color.yellow)
+                                .cornerRadius(12)
+                        }
+                        .disabled(!isFormValid)
+                        .opacity(isFormValid ? 1.0 : 0.5)
+                    }
+                    
+                    Button(action: { presentationMode.wrappedValue.dismiss() }) {
             HStack {
-                VStack { Divider() }
-                Text("or")
+                            Text("Already have an account?")
+                            Text("Login").fontWeight(.bold)
+                        }
                     .font(.footnote)
-                    .foregroundColor(.secondary)
-                VStack { Divider() }
+                        .foregroundColor(.accentColor)
             }
-            .padding(.vertical)
-
-            SignInWithAppleButton(
-                .signUp,
-                onRequest: { request in
-                    request.requestedScopes = [.fullName, .email]
-                },
-                onCompletion: { result in
-                    authManager.handleSignInWithApple(result: result)
+                    .padding(.bottom)
                 }
-            )
-            .signInWithAppleButtonStyle(.black)
-            .frame(height: 50)
-            .cornerRadius(8)
-
-            Spacer()
-            
-            Button(action: {
-                presentationMode.wrappedValue.dismiss()
-            }) {
-                HStack {
-                    Text("already_have_account")
-                    Text("login")
-                        .fontWeight(.bold)
-                }
-                .font(.footnote)
+                .padding()
+                .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+                .padding(.horizontal, 32)
             }
         }
-        .padding()
-        .background(Color("BackgroundColor").edgesIgnoringSafeArea(.all))
-        .navigationBarBackButtonHidden(true)
+        .navigationBarHidden(true)
     }
 } 

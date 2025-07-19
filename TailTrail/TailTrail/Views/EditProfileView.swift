@@ -3,155 +3,254 @@ import PhotosUI
 
 struct EditProfileView: View {
     @Environment(\.presentationMode) var presentationMode
-    @EnvironmentObject var authManager: AuthenticationManager
-    @EnvironmentObject var postService: PostService
+    @ObservedObject var authManager: AuthenticationManager
     
     // User profile state
-    @State private var email: String = ""
-    @State private var phone: String = ""
+    @State private var name: String
+    @State private var email: String
+    @State private var phone: String
+    
+    // Password state
+    @State private var currentPassword = ""
+    @State private var newPassword = ""
+    @State private var confirmNewPassword = ""
     
     // Image picker state
     @State private var selectedPhoto: PhotosPickerItem?
-    @State private var profileImage: Image?
+    @State private var profileUIImage: UIImage?
+    @State private var showingDeleteConfirmation = false
     
-    // My Posts state
-    @State private var myPosts: [Post] = []
+    // Loading State
+    @State private var isSaving = false
+
+    init(authManager: AuthenticationManager) {
+        self.authManager = authManager
+        _name = State(initialValue: authManager.currentUser?.name ?? "")
+        _email = State(initialValue: authManager.currentUser?.email ?? "")
+        _phone = State(initialValue: authManager.currentUser?.phone ?? "")
+    }
 
     var body: some View {
-        ZStack(alignment: .top) {
-            Color(hex: "#22A6A2").ignoresSafeArea() // Teal background
+        ZStack {
+            // Background from the image palette
+            LinearGradient(
+                gradient: Gradient(colors: [Color(hex: "#1FA6A2"), Color(hex: "#FBCF3A")]),
+                startPoint: .top,
+                endPoint: .bottom
+            ).edgesIgnoringSafeArea(.all)
 
             ScrollView {
-                VStack(spacing: 0) { // Removed spacing to have card connect
+                VStack(spacing: 30) {
                     profileHeader
-                    
-                    formCard
-                        .offset(y: -30)
-
-                    myPostsSection
-                        .padding() // Add padding around the posts section
+                    personalInfoSection
+                    passwordSection
+                    deleteButton
+                }
+                .padding()
+            }
+        }
+        .navigationTitle("Edit Profile")
+        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(true)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button(action: { presentationMode.wrappedValue.dismiss() }) {
+                    Image(systemName: "chevron.left")
+                        .foregroundColor(.white)
                 }
             }
         }
-        .navigationBarHidden(true)
-        .overlay(backButton, alignment: .topLeading)
-        .onAppear {
-            // Initialize state from authManager here
-            self.email = authManager.user?.email ?? ""
-            self.phone = authManager.user?.phone ?? ""
-            
+        .confirmationDialog(
+            "Are you sure you want to delete your account? This action cannot be undone.",
+            isPresented: $showingDeleteConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("Delete Account", role: .destructive) {
             Task {
-                if let userId = authManager.user?.id {
-                    myPosts = await postService.fetchPosts(forUserId: userId.uuidString)
+                    await authManager.deleteAccount()
                 }
             }
         }
     }
 
     private var profileHeader: some View {
-        VStack(spacing: 12) {
             PhotosPicker(selection: $selectedPhoto, matching: .images) {
                 VStack {
-                    if let profileImage {
-                        profileImage
+                ZStack(alignment: .bottomTrailing) {
+                    Group {
+                        if let image = profileUIImage {
+                            Image(uiImage: image)
                             .resizable()
-                            .aspectRatio(contentMode: .fill)
+                        } else if let imageUrlString = authManager.currentUser?.imageUrl, let url = URL(string: imageUrlString) {
+                            AsyncImage(url: url) { image in
+                                image.resizable()
+                            } placeholder: {
+                                ProgressView()
+                            }
                     } else {
-                        Image(systemName: "person.circle.fill")
+                            Image(systemName: "person.fill")
                             .resizable()
-                            .foregroundColor(.white.opacity(0.8))
+                                .foregroundColor(Color.white.opacity(0.8))
+                        }
                     }
-                }
-                .frame(width: 100, height: 100)
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: 130, height: 130)
                 .clipShape(Circle())
-                .overlay(Circle().stroke(Color.white, lineWidth: 3))
-                .overlay(alignment: .bottomTrailing) {
+                    .overlay(Circle().stroke(Color.white, lineWidth: 4))
+                    .shadow(radius: 10)
+                    
                     Image(systemName: "pencil.circle.fill")
-                        .font(.title)
-                        .foregroundColor(.white)
+                        .font(.system(size: 30))
+                        .foregroundColor(Color(hex: "#3E5A9A")) // Blue color for icon
+                        .background(Color.white)
+                        .clipShape(Circle())
+                }
                 }
             }
             .onChange(of: selectedPhoto) { newItem in
                 Task {
                     if let data = try? await newItem?.loadTransferable(type: Data.self), let uiImage = UIImage(data: data) {
-                        profileImage = Image(uiImage: uiImage)
+                    self.profileUIImage = uiImage
+                }
                     }
                 }
             }
             
-            Text(authManager.user?.email ?? "User Email")
-                .font(.title2.bold())
+    private var personalInfoSection: some View {
+        VStack(spacing: 20) {
+            Text("Personal Information")
+                .font(.title2).bold()
                 .foregroundColor(.white)
             
-            Spacer().frame(height: 40) // Increased space
-        }
-        .padding()
-    }
-
-    private var formCard: some View {
-        VStack(spacing: 20) { // Added spacing
-            VStack {
-                Section(header: Text("Personal Information").font(.headline).foregroundColor(.secondary)) {
-                    TextField("Email", text: $email)
-                        .textFieldStyle(ModernTextFieldStyle())
-                    TextField("Phone", text: $phone)
-                        .textFieldStyle(ModernTextFieldStyle())
-                        .keyboardType(.phonePad)
-                }
+            VStack(spacing: 15) {
+                InfoTextField(icon: "person.fill", placeholder: "Name", text: $name)
+                InfoTextField(icon: "phone.fill", placeholder: "Phone", text: $phone)
+                    .keyboardType(.phonePad)
             }
-            .padding()
-            .background(Color(.systemBackground))
-            .cornerRadius(20)
-            .shadow(radius: 5)
             
-            Button("Save Changes") {
-                // TODO: Implement save logic
-                print("Saving changes...")
-            }
-            .buttonStyle(ModernButtonStyle(backgroundColor: Color(hex: "#3E5A9A"))) // Blue button
+            ModernButton(title: "Save Changes", action: saveChanges)
         }
         .padding()
-        .background(Color(.systemGray6)) // Subtle background for the card section
-        .cornerRadius(30, corners: [.topLeft, .topRight])
+        .background(Color.white.opacity(0.1))
+        .cornerRadius(20)
     }
 
-    private var myPostsSection: some View {
-        VStack(alignment: .leading) {
-            Text("My Posts")
-                .font(.title.bold())
-                .foregroundColor(Color(hex: "#3E5A9A")) // Blue title
-                .padding(.bottom, 5)
-
-            if myPosts.isEmpty {
-                Text("You haven't posted anything yet.")
-                    .foregroundColor(.secondary)
-            } else {
-                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
-                    ForEach(myPosts) { post in
-                        NavigationLink(destination: PostDetailView(post: post)) {
-                            PetCardView(post: post)
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private var backButton: some View {
-        Button(action: {
-            presentationMode.wrappedValue.dismiss()
-        }) {
-            Image(systemName: "chevron.left")
-                .font(.title2.bold())
+    private var passwordSection: some View {
+        VStack(spacing: 20) {
+            Text("Change Password")
+                .font(.title2).bold()
                 .foregroundColor(.white)
+
+            VStack(spacing: 15) {
+                InfoTextField(icon: "lock.fill", placeholder: "Current Password", text: $currentPassword, isSecure: true)
+                InfoTextField(icon: "lock.fill", placeholder: "New Password", text: $newPassword, isSecure: true)
+                InfoTextField(icon: "lock.fill", placeholder: "Confirm New Password", text: $confirmNewPassword, isSecure: true)
+            }
+            
+            ModernButton(title: "Change Password", action: changePassword)
+                .disabled(newPassword.isEmpty || newPassword != confirmNewPassword)
+        }
+        .padding()
+        .background(Color.white.opacity(0.1))
+        .cornerRadius(20)
+    }
+
+    private var deleteButton: some View {
+        Button(action: { showingDeleteConfirmation = true }) {
+            Text("Delete Account")
+                .bold()
+                .frame(maxWidth: .infinity)
                 .padding()
+                .background(Color.red)
+                .foregroundColor(.white)
+                .cornerRadius(15)
+        }
+    }
+    
+    private func saveChanges() {
+        isSaving = true
+        Task {
+            let success = await authManager.updateUserProfile(name: name, phone: phone, image: profileUIImage)
+            if success {
+                await authManager.fetchUserProfile() // Refresh user data
+                presentationMode.wrappedValue.dismiss()
+            }
+            isSaving = false
+        }
+    }
+
+    private func changePassword() {
+        isSaving = true
+        Task {
+            let success = await authManager.updateUserProfile(
+                currentPassword: currentPassword,
+                newPassword: newPassword
+            )
+            if success {
+                currentPassword = ""
+                newPassword = ""
+                confirmNewPassword = ""
+                presentationMode.wrappedValue.dismiss()
+            }
+            isSaving = false
         }
     }
 }
 
-// Update the preview to pass the authManager
+// Custom TextField for this view
+struct InfoTextField: View {
+    let icon: String
+    let placeholder: String
+    @Binding var text: String
+    var isSecure = false
+    
+    var body: some View {
+        HStack {
+            Image(systemName: icon)
+                .foregroundColor(Color(hex: "#3E5A9A"))
+                .frame(width: 20)
+            
+            if isSecure {
+                SecureField(placeholder, text: $text)
+            } else {
+                TextField(placeholder, text: $text)
+            }
+        }
+        .padding()
+        .background(Color.white.opacity(0.8))
+        .cornerRadius(15)
+        .shadow(color: .black.opacity(0.1), radius: 5, y: 2)
+    }
+}
+
+// Custom button for this view
+struct ModernButton: View {
+    let title: String
+    let action: () -> Void
+    @Environment(\.isEnabled) private var isEnabled: Bool
+    
+    var body: some View {
+        Button(action: action) {
+            Text(title)
+                .bold()
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(
+                    LinearGradient(
+                        gradient: Gradient(colors: [Color(hex: "#3E5A9A"), Color(hex: "#1FA6A2")]),
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
+                .foregroundColor(.white)
+                .cornerRadius(15)
+                .opacity(isEnabled ? 1.0 : 0.5)
+        }
+    }
+}
+
 #Preview {
-    EditProfileView()
-        .environmentObject(PostService(authManager: AuthenticationManager()))
-        .environmentObject(AuthenticationManager())
+    NavigationView {
+        EditProfileView(authManager: AuthenticationManager())
+    }
 } 

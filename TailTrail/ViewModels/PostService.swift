@@ -112,7 +112,7 @@ class PostService: ObservableObject {
     }
 
     func fetchPosts(forUserId userId: String) async -> [Post] {
-        guard let currentUserId = authManager.user?.id else {
+        guard let currentUserId = authManager.currentUser?.id else {
             print("❌ Cannot fetch posts, user not logged in.")
             return []
         }
@@ -128,7 +128,7 @@ class PostService: ObservableObject {
     }
 
     func isPostOwnedByCurrentUser(_ post: Post) -> Bool {
-        guard let currentUserId = authManager.user?.id else { return false }
+        guard let currentUserId = authManager.currentUser?.id else { return false }
         return post.userId == currentUserId
     }
 } 

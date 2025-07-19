@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct ProfileView: View {
+    @State private var showSettings = false
     @EnvironmentObject var authManager: AuthenticationManager
     
     var body: some View {
@@ -11,49 +12,45 @@ struct ProfileView: View {
 
                 VStack {
                     // Top profile section
-                    profileHeader
+                    if let user = authManager.currentUser {
+                        UserProfileCard(
+                            authManager: authManager,
+                            name: user.name ?? "Anonymous",
+                            bio: "Pet lover from your city!", // Placeholder, can be a user property
+                            onEditProfile: {
+                                showSettings = true
+                            }
+                        )
+                        .padding(.top) // Add some padding at the top
+                    } else {
+                        // Show a loading state or placeholder
+                        ProgressView()
+                            .frame(height: 200) // Give it some space
+                    }
                     
-                    // White content card with a subtle shadow
+                    // Restore the settings list
                     settingsList
-                        .background(Color(.systemBackground)) // Adapts to light/dark mode
-                        .clipShape(RoundedRectangle(cornerRadius: 30))
-                        .shadow(color: .black.opacity(0.1), radius: 10, y: -5)
+                }
+                .sheet(isPresented: $showSettings) {
+                    // Present EditProfileView as a sheet
+                    EditProfileView(authManager: authManager)
                 }
             }
             .navigationBarHidden(true)
         }
-    }
-    
-    private var profileHeader: some View {
-        VStack(spacing: 12) {
-            HStack {
-                Spacer()
-                NavigationLink(destination: NotificationsView()) {
-                    Image(systemName: "bell")
-                        .font(.title2)
-                        .foregroundColor(Color(hex: "#3E5A9A")) // Blue Icon
-                        .padding(10)
-                        .background(Color(hex: "#FBCF3A").opacity(0.8)) // Yellow Accent
-                        .clipShape(Circle())
+        .onAppear {
+            if authManager.currentUser == nil {
+                Task {
+                    await authManager.fetchUserProfile()
                 }
             }
-            
-            Image(systemName: "person.circle.fill")
-                .font(.system(size: 80))
-                .foregroundColor(.white.opacity(0.9))
-            
-            Text(authManager.user?.email ?? "user@example.com")
-                .font(.title.bold())
-                .foregroundColor(.white)
-            
-            Spacer().frame(height: 20)
         }
-        .padding()
     }
     
     private var settingsList: some View {
         List {
-            SettingsRow(icon: "person.fill", title: "Profile", destination: EditProfileView())
+            // You can remove the "Profile" row if UserProfileCard handles navigation
+            // SettingsRow(icon: "person.fill", title: "Profile", destination: EditProfileView(authManager: authManager))
             SettingsRow(icon: "bell.fill", title: "Notification", destination: NotificationsView())
             SettingsRow(icon: "lock.fill", title: "Security", destination: SecuritySettingsView())
             SettingsRow(icon: "hand.raised.fill", title: "Blocked Users", destination: BlockedUsersView())
@@ -130,8 +127,11 @@ struct PlaceholderView: View {
     }
 }
 
-
-#Preview {
+struct ProfileView_Previews: PreviewProvider {
+    static var previews: some View {
+        NavigationView {
     ProfileView()
         .environmentObject(AuthenticationManager())
+        }
+    }
 } 

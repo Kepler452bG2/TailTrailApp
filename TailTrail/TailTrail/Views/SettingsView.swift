@@ -13,11 +13,9 @@ struct SettingsView: View {
                     }
                 }
 
-                Section(header: Text("account_management")) {
-                    Button(role: .destructive) {
-                        showingDeleteConfirmation = true
-                    } label: {
-                        Text("delete_account")
+                Section(header: Text("Legal")) {
+                    if let url = URL(string: "https://github.com/Kepler452bG2/tailtrail-support/blob/main/README.md") {
+                        Link("Privacy Policy", destination: url)
                     }
                 }
 
@@ -33,24 +31,14 @@ struct SettingsView: View {
                     }
                 }
             }
-            .navigationTitle("settings")
-            .alert(isPresented: $showingDeleteConfirmation) {
-                Alert(
-                    title: Text("are_you_sure"),
-                    message: Text("account_deletion_warning"),
-                    primaryButton: .destructive(Text("delete")) {
-                        Task {
-                            await authManager.deleteAccount()
-                        }
-                    },
-                    secondaryButton: .cancel()
-                )
-            }
+            .navigationTitle("Settings")
         }
     }
 }
 
-#Preview {
+struct SettingsView_Previews: PreviewProvider {
+    static var previews: some View {
     SettingsView()
         .environmentObject(AuthenticationManager())
+    }
 } 

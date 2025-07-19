@@ -2,43 +2,57 @@ import SwiftUI
 import PhotosUI
 
 struct UserProfileCard: View {
+    @ObservedObject var authManager: AuthenticationManager
     @State private var selectedPhotoItem: PhotosPickerItem?
     @State private var selectedImage: Image?
     @State private var showingSettings = false
     
-    // State to hold the profile data
-    @State private var name = "Ameliani"
-    @State private var bio = "Pet lover"
-    @State private var phone = "+1 (555) 123-4567"
+    let name: String
+    let bio: String
+    let onEditProfile: () -> Void
 
     var body: some View {
-        VStack(spacing: 16) {
+        VStack {
             ZStack(alignment: .bottomTrailing) {
                 if let selectedImage {
                     selectedImage
                         .resizable()
-                        .aspectRatio(contentMode: .fill)
+                        .scaledToFill()
+                        .frame(width: 120, height: 120)
+                        .clipShape(Circle())
+                } else if let imageUrl = authManager.currentUser?.imageUrl, let url = URL(string: imageUrl) {
+                    AsyncImage(url: url) { image in
+                        image.resizable()
+                    } placeholder: {
+                        ProgressView()
+                    }
+                    .scaledToFill()
                         .frame(width: 120, height: 120)
                         .clipShape(Circle())
                 } else {
-                    Image(systemName: "person.crop.circle.fill")
-                        .font(.system(size: 120))
-                        .foregroundColor(.gray.opacity(0.3))
+                    Image(systemName: "person.circle.fill")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 120, height: 120)
+                        .foregroundColor(.gray)
                 }
                 
                 PhotosPicker(selection: $selectedPhotoItem, matching: .images) {
-                    Image(systemName: "camera.circle.fill")
+                    Image(systemName: "pencil.circle.fill")
                         .font(.title)
-                        .foregroundColor(.orange)
+                        .foregroundColor(.blue)
                         .background(Color.white)
                         .clipShape(Circle())
                 }
             }
-            .onChange(of: selectedPhotoItem) {
+            .onChange(of: selectedPhotoItem) { _ in
                 Task {
-                    if let data = try? await selectedPhotoItem?.loadTransferable(type: Data.self),
-                       let uiImage = UIImage(data: data) {
+                    if let data = try? await selectedPhotoItem?.loadTransferable(type: Data.self) {
+                        if let uiImage = UIImage(data: data) {
                         selectedImage = Image(uiImage: uiImage)
+                            // Here you would typically call a method to upload the image
+                            // authManager.updateProfile(image: uiImage)
+                        }
                     }
                 }
             }
@@ -50,7 +64,7 @@ struct UserProfileCard: View {
                 .font(.headline)
                 .foregroundColor(.gray)
             
-            NavigationLink(destination: EditProfileView()) {
+            Button(action: onEditProfile) {
                 Text("Edit Profile")
                     .fontWeight(.bold)
                     .padding()
@@ -59,19 +73,28 @@ struct UserProfileCard: View {
                     .foregroundColor(.black)
                     .clipShape(Capsule())
             }
+            .padding(.horizontal)
         }
-        .padding(30)
-        .background(Color.white)
-        .clipShape(RoundedRectangle(cornerRadius: 30))
-        .overlay(
-            RoundedRectangle(cornerRadius: 30)
-                .stroke(Color.black, lineWidth: 2)
-        )
         .padding()
     }
 }
 
-#Preview {
-    UserProfileCard()
-        .background(Color.gray)
-} 
+#if DEBUG
+struct UserProfileCard_Previews: PreviewProvider {
+    static var previews: some View {
+        let authManager = AuthenticationManager()
+        // Manually set a user for previewing purposes
+        authManager.currentUser = User(id: UUID(), name: "Jane Doe", email: "jane.doe@example.com", phone: "123-456-7890", createdAt: "2023-01-01T12:00:00Z", imageUrl: nil)
+
+        return UserProfileCard(
+            authManager: authManager,
+            name: "Jane Doe",
+            bio: "Loves dogs and hiking.",
+            onEditProfile: {}
+        )
+        .padding()
+        .background(Color.gray.opacity(0.1))
+        .previewLayout(.sizeThatFits)
+    }
+}
+#endif

@@ -5,7 +5,7 @@ import AuthenticationServices
 
 class AuthenticationManager: ObservableObject {
     @Published var isLoggedIn: Bool = false
-    @Published var user: User? = nil
+    @Published var currentUser: User? = nil
     
     private let keychain = KeychainHelper.standard
 
@@ -27,26 +27,54 @@ class AuthenticationManager: ObservableObject {
     func logout() {
         keychain.deleteToken()
         isLoggedIn = false
-        user = nil
+        currentUser = nil
     }
     
     // MARK: - User Profile
     
     @MainActor
     func fetchUserProfile() async {
-        // Placeholder for actual profile fetching logic
-        // This would involve calling an API endpoint to get the user's details
-        // For now, we'll just simulate a successful fetch
         print("Fetching user profile...")
-        // In a real app, you'd decode the user data from keychain or an API response
-        // For example:
-        // let userData = keychain.getUserData()
-        // self.user = try? JSONDecoder().decode(User.self, from: userData)
+        guard let token = keychain.getToken() else {
+            print("❌ No token found, cannot fetch profile.")
+            return
+        }
+        
+        guard let url = URL(string: Config.apiBaseURL + "/api/v1/profile") else {
+            print("❌ Invalid URL for user profile")
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        
+        do {
+            let (data, response) = try await URLSession.shared.data(for: request)
+            
+            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+                print("❌ Error: Invalid response from server when fetching profile.")
+                if let httpResponse = response as? HTTPURLResponse {
+                    print("Received status code: \(httpResponse.statusCode)")
+                }
+                if let responseBody = String(data: data, encoding: .utf8) {
+                    print("Response body: \(responseBody)")
+                }
+                return
+            }
+            
+            let fetchedUser = try JSONDecoder().decode(User.self, from: data)
+            self.currentUser = fetchedUser
+            print("✅ User profile fetched successfully.")
+            
+        } catch {
+            print("❌ Failed to fetch or decode user profile: \(error.localizedDescription)")
+        }
     }
     
     @MainActor
     func loginUser(email: String, password: String) async -> Bool {
-        guard let url = URL(string: Config.apiBaseURL + "/api/v1/login") else {
+        guard let url = URL(string: Config.apiBaseURL + "/api/v1/auth/login") else {
             print("❌ Invalid URL for login")
             return false
         }
@@ -55,26 +83,45 @@ class AuthenticationManager: ObservableObject {
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         
-        let body = ["email": email, "password": password]
+        let trimmedEmail = email.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedPassword = password.trimmingCharacters(in: .whitespacesAndNewlines)
+        let body = ["email": trimmedEmail, "password": trimmedPassword]
         
         do {
             request.httpBody = try JSONEncoder().encode(body)
             
             let (data, response) = try await URLSession.shared.data(for: request)
             
-            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
-                print("❌ Error: Invalid response from server during login.")
+            guard let httpResponse = response as? HTTPURLResponse else {
+                print("❌ Error: Invalid response from server (not HTTP).")
                 return false
             }
             
-            let decodedResponse = try JSONDecoder().decode(TokenExchangeResponse.self, from: data)
+            guard httpResponse.statusCode == 200 else {
+                print("❌ Error: Invalid response from server during login.")
+                print("Received status code: \(httpResponse.statusCode)")
+                if let responseBody = String(data: data, encoding: .utf8) {
+                    print("Response body: \(responseBody)")
+                }
+                return false
+            }
             
-            keychain.save(token: decodedResponse.accessToken)
+            let decodedResponse = try JSONDecoder().decode(LoginResponse.self, from: data)
+            
+            keychain.save(token: decodedResponse.token)
             
             self.isLoggedIn = true
-            self.user = decodedResponse.user
             
-            print("✅ Email/Password login successful.")
+            print("✅ Email/Password login successful. Token received. Fetching profile...")
+            await fetchUserProfile()
+
+            // DEBUG: Check user state immediately after fetching
+            if let user = self.currentUser {
+                print("🔍 DEBUG: User is now set to: \(user.email)")
+            } else {
+                print("🔍 DEBUG: User is still nil after fetch.")
+            }
+            
             return true
             
         } catch {
@@ -85,7 +132,7 @@ class AuthenticationManager: ObservableObject {
     
     @MainActor
     func registerUser(email: String, password: String) async -> Bool {
-        guard let url = URL(string: Config.apiBaseURL + "/api/v1/signup") else {
+        guard let url = URL(string: Config.apiBaseURL + "/api/v1/auth/signup") else {
             print("❌ Invalid URL for signup")
             return false
         }
@@ -94,15 +141,26 @@ class AuthenticationManager: ObservableObject {
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         
-        let body = ["email": email, "password": password, "first_name": "New", "last_name": "User"]
+        let trimmedEmail = email.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedPassword = password.trimmingCharacters(in: .whitespacesAndNewlines)
+        let body = ["email": trimmedEmail, "password": trimmedPassword]
         
         do {
             request.httpBody = try JSONEncoder().encode(body)
             
-            let (_, response) = try await URLSession.shared.data(for: request)
+            let (data, response) = try await URLSession.shared.data(for: request)
             
-            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 201 else {
+            guard let httpResponse = response as? HTTPURLResponse else {
+                print("❌ Error: Invalid response from server (not HTTP) during signup.")
+                return false
+            }
+
+            guard httpResponse.statusCode == 201 else {
                 print("❌ Error: Invalid response from server during signup.")
+                print("Received status code: \(httpResponse.statusCode)")
+                if let responseBody = String(data: data, encoding: .utf8) {
+                    print("Response body: \(responseBody)")
+                }
                 return false
             }
             
@@ -115,76 +173,80 @@ class AuthenticationManager: ObservableObject {
             return false
         }
     }
-
-    // MARK: - Sign in with Apple
     
     @MainActor
-    func handleSignInWithApple(result: Result<ASAuthorization, Error>) {
-        switch result {
-        case .success(let authorization):
-            guard let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential else {
-                print("❌ Error: Could not get Apple ID Credential.")
-                return
-            }
-            
-            guard let appleIDToken = appleIDCredential.identityToken else {
-                print("❌ Error: Missing identity token.")
-                return
-            }
-            
-            guard let tokenString = String(data: appleIDToken, encoding: .utf8) else {
-                print("❌ Error: Unable to convert token to string.")
-                return
-            }
-            
-            // Отправляем токен на бэкенд
-            Task {
-                await exchangeAppleTokenForAPIToken(tokenString)
-            }
-            
-        case .failure(let error):
-            print("❌ Sign in with Apple failed: \(error.localizedDescription)")
+    func updateUserProfile(
+        name: String? = nil,
+        phone: String? = nil,
+        currentPassword: String? = nil,
+        newPassword: String? = nil,
+        image: UIImage? = nil
+    ) async -> Bool {
+        guard let token = keychain.getToken() else {
+            print("❌ No token found.")
+            return false
         }
-    }
-    
-    private func exchangeAppleTokenForAPIToken(_ appleToken: String) async {
-        guard let url = URL(string: Config.apiBaseURL + "/api/v1/auth/apple") else {
-            print("❌ Invalid URL for Apple auth")
-            return
+
+        var multipart = MultipartRequest()
+        
+        if let name = name, let nameData = name.data(using: .utf8) {
+            multipart.add(key: "name", value: name, data: nameData)
+        }
+        if let phone = phone, let phoneData = phone.data(using: .utf8) {
+            multipart.add(key: "phone", value: phone, data: phoneData)
+        }
+        if let currentPassword = currentPassword, let currentPasswordData = currentPassword.data(using: .utf8) {
+            multipart.add(key: "current_password", value: currentPassword, data: currentPasswordData)
+            }
+        if let newPassword = newPassword, let newPasswordData = newPassword.data(using: .utf8) {
+            multipart.add(key: "new_password", value: newPassword, data: newPasswordData)
+        }
+        if let image, let imageData = image.jpegData(compressionQuality: 0.8) {
+            multipart.add(
+                key: "profile_image",
+                fileName: "profile.jpg",
+                fileMimeType: "image/jpeg",
+                fileData: imageData
+            )
+        }
+        
+        guard let url = URL(string: Config.apiBaseURL + "/api/v1/profile") else {
+            print("❌ Invalid URL for profile update.")
+            return false
         }
         
         var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        
-        let body = ["token": appleToken]
+        request.httpMethod = "PATCH"
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        request.setValue(multipart.httpContentType, forHTTPHeaderField: "Content-Type")
+        request.httpBody = multipart.httpBody
         
         do {
-            request.httpBody = try JSONEncoder().encode(body)
-            
             let (data, response) = try await URLSession.shared.data(for: request)
             
             guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
-                print("❌ Error: Invalid response from server during Apple token exchange.")
-                return
+                print("❌ Failed to update profile on server.")
+                if let httpResponse = response as? HTTPURLResponse {
+                    print("Received status code: \(httpResponse.statusCode)")
+                }
+                if let responseBody = String(data: data, encoding: .utf8) {
+                    print("Response body: \(responseBody)")
+                }
+                return false
             }
             
-            let decodedResponse = try JSONDecoder().decode(TokenExchangeResponse.self, from: data)
-            
-            // Сохраняем токен и обновляем состояние
-            keychain.save(token: decodedResponse.accessToken)
-            
-            DispatchQueue.main.async {
-                self.isLoggedIn = true
-                self.user = decodedResponse.user
-            }
-            
-            print("✅ Apple Sign-In successful. App token received and saved.")
+            let updatedUser = try JSONDecoder().decode(User.self, from: data)
+            self.currentUser = updatedUser
+            print("✅ Profile updated successfully.")
+            return true
             
         } catch {
-            print("❌ Failed to exchange Apple token: \(error.localizedDescription)")
+            print("❌ Error during profile update request: \(error.localizedDescription)")
+            return false
         }
     }
+
+    // MARK: - Sign in with Apple logic removed
     
     @MainActor
     func deleteAccount() async {
@@ -193,7 +255,7 @@ class AuthenticationManager: ObservableObject {
             return
         }
         
-        guard let url = URL(string: Config.apiBaseURL + "/api/v1/users/me") else {
+        guard let url = URL(string: Config.apiBaseURL + "/api/v1/profile") else {
             print("❌ Invalid URL for account deletion.")
             return
         }
@@ -203,11 +265,16 @@ class AuthenticationManager: ObservableObject {
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         
         do {
-            let (_, response) = try await URLSession.shared.data(for: request)
+            let (data, response) = try await URLSession.shared.data(for: request)
             
-            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 204 else {
+            guard let httpResponse = response as? HTTPURLResponse, (httpResponse.statusCode == 200 || httpResponse.statusCode == 204) else {
                 print("❌ Failed to delete account on server.")
-                // Тут можно показать ошибку пользователю
+                if let httpResponse = response as? HTTPURLResponse {
+                    print("Received status code: \(httpResponse.statusCode)")
+                }
+                if let responseBody = String(data: data, encoding: .utf8) {
+                    print("Response body: \(responseBody)")
+                }
                 return
             }
             
@@ -222,6 +289,11 @@ class AuthenticationManager: ObservableObject {
 }
 
 // MARK: - Token Handling
+
+struct LoginResponse: Codable {
+    let token: String
+}
+
 struct TokenExchangeRequest: Codable {
     let token: String
 }

@@ -6,6 +6,7 @@ struct TailTrailApp: App {
     @StateObject private var authManager: AuthenticationManager
     @StateObject private var postService: PostService
     @StateObject private var languageManager: LanguageManager
+    @StateObject private var tabBarVisibility = TabBarVisibility()
 
     init() {
         let authManagerInstance = AuthenticationManager()
@@ -28,6 +29,7 @@ struct TailTrailApp: App {
             .environmentObject(authManager)
             .environmentObject(postService)
             .environmentObject(languageManager)
+            .environmentObject(tabBarVisibility)
             .onAppear {
                 languageManager.loadLanguage()
             }
