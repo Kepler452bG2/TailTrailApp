@@ -7,8 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		878682FB2E20C6FA009A5A59 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 878682FA2E20C6FA009A5A59 /* GoogleSignIn */; };
-		878682FD2E20C6FA009A5A59 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 878682FC2E20C6FA009A5A59 /* GoogleSignInSwift */; };
 		878683002E20CCF4009A5A59 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 878682FF2E20CCF4009A5A59 /* Kingfisher */; };
 /* End PBXBuildFile section */
 
@@ -43,8 +41,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				878683002E20CCF4009A5A59 /* Kingfisher in Frameworks */,
-				878682FB2E20C6FA009A5A59 /* GoogleSignIn in Frameworks */,
-				878682FD2E20C6FA009A5A59 /* GoogleSignInSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -87,8 +83,6 @@
 			);
 			name = TailTrail;
 			packageProductDependencies = (
-				878682FA2E20C6FA009A5A59 /* GoogleSignIn */,
-				878682FC2E20C6FA009A5A59 /* GoogleSignInSwift */,
 				878682FF2E20CCF4009A5A59 /* Kingfisher */,
 			);
 			productName = TailTrail;
@@ -122,7 +116,6 @@
 			mainGroup = 8707A1D92E12A38B004C2343;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				878682F92E20C6FA009A5A59 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
 				878682FE2E20CCF3009A5A59 /* XCRemoteSwiftPackageReference "Kingfisher" */,
 			);
 			preferredProjectObjectVersion = 77;
@@ -290,7 +283,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_ASSET_PATHS = "\"TailTrail/Preview Content\"";
 				DEVELOPMENT_TEAM = DJDVY4P58A;
 				ENABLE_PREVIEWS = YES;
@@ -385,14 +378,6 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		878682F92E20C6FA009A5A59 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/google/GoogleSignIn-iOS.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 9.0.0;
-			};
-		};
 		878682FE2E20CCF3009A5A59 /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/onevcat/Kingfisher.git";
@@ -404,16 +389,6 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		878682FA2E20C6FA009A5A59 /* GoogleSignIn */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 878682F92E20C6FA009A5A59 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
-			productName = GoogleSignIn;
-		};
-		878682FC2E20C6FA009A5A59 /* GoogleSignInSwift */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 878682F92E20C6FA009A5A59 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
-			productName = GoogleSignInSwift;
-		};
 		878682FF2E20CCF4009A5A59 /* Kingfisher */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 878682FE2E20CCF3009A5A59 /* XCRemoteSwiftPackageReference "Kingfisher" */;

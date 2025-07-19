@@ -79,6 +79,7 @@ class CreatePostViewModel: ObservableObject {
         isLoading = true
         
         do {
+            let formattedPhone = contactPhone.starts(with: "+") ? contactPhone : "+\(contactPhone)"
             try await postService.createPost(
                 petName: petName,
                 petSpecies: selectedSpecies.rawValue,
@@ -89,7 +90,7 @@ class CreatePostViewModel: ObservableObject {
                 color: petColor,
                 description: description,
                 locationName: locationName,
-                contactPhone: contactPhone,
+                contactPhone: formattedPhone,
                 lastSeenLocation: location.coordinate,
                 images: selectedImages
             )

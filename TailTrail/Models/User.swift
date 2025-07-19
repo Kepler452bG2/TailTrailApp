@@ -8,7 +8,15 @@
 import Foundation
 
 struct User: Identifiable, Codable {
-    var id: String
+    var id: UUID
     var email: String
     var phone: String?
+    var createdAt: Date?
+    var imageUrl: String?
+
+    enum CodingKeys: String, CodingKey {
+        case id, email, phone
+        case createdAt = "created_at"
+        case imageUrl = "image_url"
+    }
 } 

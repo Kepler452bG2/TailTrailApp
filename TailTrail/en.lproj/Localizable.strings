@@ -6,6 +6,13 @@
 // General
 "Back" = "Back";
 "Done" = "Done";
+"Cancel" = "Cancel";
+"Edit" = "Edit";
+"Save" = "Save";
+"Next" = "Next";
+"Previous" = "Previous";
+"Yes" = "Yes";
+"No" = "No";
 "Search" = "Search";
 "Pet" = "Pet";
 "Search pet" = "Search Pet";

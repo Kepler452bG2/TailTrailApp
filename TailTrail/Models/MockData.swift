@@ -4,7 +4,7 @@ import CoreLocation
 struct MockData {
     static let posts: [Post] = [
         Post(
-            id: "1",
+            id: UUID(),
             petName: "Buddy",
             species: "dog",
             breed: "Golden Retriever",
@@ -17,7 +17,7 @@ struct MockData {
             lastSeenLocation: CLLocationCoordinate2D(latitude: 40.785091, longitude: -73.968285),
             description: "Very friendly, was wearing a blue collar. Answers to Buddy.",
             contactPhone: "555-1234",
-            userId: "user101",
+            userId: UUID(),
             createdAt: Date().addingTimeInterval(-3600 * 4),
             updatedAt: Date().addingTimeInterval(-3600 * 4),
             likesCount: 12,
@@ -25,7 +25,7 @@ struct MockData {
             status: "lost"
         ),
         Post(
-            id: "2",
+            id: UUID(),
             petName: "Unknown",
             species: "cat",
             breed: "Siamese",
@@ -38,7 +38,7 @@ struct MockData {
             lastSeenLocation: CLLocationCoordinate2D(latitude: 40.706000, longitude: -73.997000),
             description: "A bit shy, but seems healthy. Found near the carousel.",
             contactPhone: "555-5678",
-            userId: "user102",
+            userId: UUID(),
             createdAt: Date().addingTimeInterval(-3600 * 24 * 2),
             updatedAt: Date().addingTimeInterval(-3600 * 24 * 2),
             likesCount: 3,
@@ -48,15 +48,15 @@ struct MockData {
     ]
     
     static let notifications: [AppNotification] = [
-        AppNotification(type: .newMessage, message: "Alex sent you a message about 'Buddy'.", date: "1h ago", postID: "1", chatID: MockData.chatSessions[0].id.uuidString),
-        AppNotification(type: .petFound, message: "A pet matching 'Buddy''s description was found near you.", date: "3h ago", postID: "1", chatID: nil),
-        AppNotification(type: .postLiked, message: "Someone liked your post about 'Buddy'.", date: "4h ago", postID: "1", chatID: nil),
+        AppNotification(type: .newMessage, message: "Alex sent you a message about 'Buddy'.", date: "1h ago", postID: MockData.posts[0].id.uuidString, chatID: MockData.chatSessions[0].id.uuidString),
+        AppNotification(type: .petFound, message: "A pet matching 'Buddy''s description was found near you.", date: "3h ago", postID: MockData.posts[0].id.uuidString, chatID: nil),
+        AppNotification(type: .postLiked, message: "Someone liked your post about 'Buddy'.", date: "4h ago", postID: MockData.posts[0].id.uuidString, chatID: nil),
     ]
 
     static let topHelpers: [Helper] = [
-        Helper(id: "user101", name: "John Doe", avatarName: "person.circle.fill", rating: 4.8, bio: "Animal lover and rescue volunteer.", isVerified: true),
-        Helper(id: "user102", name: "Jane Smith", avatarName: "person.circle.fill", rating: 4.9, bio: "Expert in finding lost dogs.", isVerified: false),
-        Helper(id: "user103", name: "Alex Johnson", avatarName: "person.circle.fill", rating: 4.7, bio: "I have two cats of my own and know the area well.", isVerified: true)
+        Helper(id: UUID(), name: "John Doe", avatarName: "person.circle.fill", rating: 4.8, bio: "Animal lover and rescue volunteer.", isVerified: true),
+        Helper(id: UUID(), name: "Jane Smith", avatarName: "person.circle.fill", rating: 4.9, bio: "Expert in finding lost dogs.", isVerified: false),
+        Helper(id: UUID(), name: "Alex Johnson", avatarName: "person.circle.fill", rating: 4.7, bio: "I have two cats of my own and know the area well.", isVerified: true)
     ]
 
     static var chatSessions: [ChatSession] = [

@@ -16,12 +16,12 @@ class NotificationsViewModel: ObservableObject {
         switch notification.type {
         case .petFound:
             if isPrimary { // View Location
-                guard let postId = notification.postID, let post = MockData.posts.first(where: { $0.id == postId }) else { return }
+                guard let postId = notification.postID, let post = MockData.posts.first(where: { $0.id.uuidString == postId }) else { return }
                 path.append(post)
             } else { // Contact Owner
                 guard let postId = notification.postID,
-                      let post = MockData.posts.first(where: { $0.id == postId }),
-                      let helper = MockData.topHelpers.first(where: { $0.id == post.userId }) else { return }
+                      let post = MockData.posts.first(where: { $0.id.uuidString == postId }),
+                      let helper = MockData.topHelpers.first(where: { $0.id.uuidString == post.userId.uuidString }) else { return }
                 path.append(helper)
             }
             
@@ -30,7 +30,7 @@ class NotificationsViewModel: ObservableObject {
             path.append(session)
             
         case .postLiked:
-            guard let postId = notification.postID, let post = MockData.posts.first(where: { $0.id == postId }) else { return }
+            guard let postId = notification.postID, let post = MockData.posts.first(where: { $0.id.uuidString == postId }) else { return }
             path.append(post)
         }
     }

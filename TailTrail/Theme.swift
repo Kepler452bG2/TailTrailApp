@@ -16,8 +16,8 @@ struct ColorTheme {
     let tabBarSelected = Color(hex: "#FFC300")   // Warm Yellow
 }
 
-extension Color {
-    init(hex: String) {
+extension UIColor {
+    convenience init(hex: String) {
         let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
         var int: UInt64 = 0
         Scanner(string: hex).scanHexInt64(&int)
@@ -33,12 +33,17 @@ extension Color {
             (a, r, g, b) = (255, 0, 0, 0)
         }
         self.init(
-            .sRGB,
-            red: Double(r) / 255,
-            green: Double(g) / 255,
-            blue: Double(b) / 255,
-            opacity: Double(a) / 255
+            red: CGFloat(r) / 255,
+            green: CGFloat(g) / 255,
+            blue: CGFloat(b) / 255,
+            alpha: CGFloat(a) / 255
         )
+    }
+}
+
+extension Color {
+    init(hex: String) {
+        self.init(UIColor(hex: hex))
     }
 }
 

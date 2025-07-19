@@ -1,7 +1,7 @@
 import Foundation
 
 struct Helper: Identifiable, Hashable {
-    let id: String
+    let id: UUID
     let name: String
     let avatarName: String // SFSymbol name for now
     let rating: Double

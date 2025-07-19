@@ -1,4 +1,6 @@
 import SwiftUI
+import Foundation
+import Combine
 
 class LanguageManager: ObservableObject {
     static let shared = LanguageManager()
@@ -8,8 +10,12 @@ class LanguageManager: ObservableObject {
             UserDefaults.standard.set(currentLanguage, forKey: "selectedLanguage")
         }
     }
+    
+    public init() {
+        loadLanguage()
+    }
 
-    private init() {
+    func loadLanguage() {
         self.currentLanguage = UserDefaults.standard.string(forKey: "selectedLanguage") ?? "en"
     }
 
