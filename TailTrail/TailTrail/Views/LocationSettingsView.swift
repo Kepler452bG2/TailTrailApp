@@ -1,14 +1,13 @@
 import SwiftUI
+import CoreLocation
 
 struct LocationSettingsView: View {
     @Environment(\.presentationMode) var presentationMode
+    @StateObject private var locationManager = LocationManager()
     
     // State for location
-    @State private var selectedCountry = "USA"
     @State private var locationServices = true
-    
-    // Hardcoded location data
-    private let countries = ["USA", "Kazakhstan", "Turkey", "Russia"]
+    @AppStorage("searchRadius") private var searchRadius: Double = 50.0 // km
 
     var body: some View {
         VStack {
@@ -28,15 +27,56 @@ struct LocationSettingsView: View {
             
             Form {
                 Section(header: Text("Location Permissions")) {
-                    Toggle("Enable Location Services", isOn: $locationServices).tint(.green)
+                    Toggle("Enable Location Services", isOn: $locationServices)
+                        .tint(.green)
+                        .onChange(of: locationServices) { oldValue, newValue in
+                            if newValue {
+                                locationManager.requestLocationUpdate()
+                            }
+                        }
                 }
                 
                 if locationServices {
-                    Section(header: Text("Region")) {
-                        Picker("Country", selection: $selectedCountry) {
-                            ForEach(countries, id: \.self) { Text($0) }
+                    Section(header: Text("Current Location")) {
+                        HStack {
+                            Text("Country")
+                            Spacer()
+                            Text(locationManager.currentCountry ?? "Detecting...")
+                                .foregroundColor(.gray)
                         }
-                        .pickerStyle(.menu)
+                        
+                        HStack {
+                            Text("City")
+                            Spacer()
+                            Text(locationManager.currentCity ?? "Detecting...")
+                                .foregroundColor(.gray)
+                        }
+                        
+                        if locationManager.authorizationStatus == .denied {
+                            Text("Please enable location access in Settings")
+                                .font(.caption)
+                                .foregroundColor(.red)
+                        }
+                    }
+                    
+                    Section(header: Text("Search Radius")) {
+                        VStack(alignment: .leading) {
+                            Text("Show pets within \(Int(searchRadius)) km")
+                                .font(.subheadline)
+                            
+                            Slider(value: $searchRadius, in: 10...100, step: 10)
+                                .tint(.orange)
+                            
+                            HStack {
+                                Text("10 km")
+                                    .font(.caption)
+                                    .foregroundColor(.gray)
+                                Spacer()
+                                Text("100 km")
+                                    .font(.caption)
+                                    .foregroundColor(.gray)
+                            }
+                        }
                     }
                 }
             }
@@ -44,6 +84,11 @@ struct LocationSettingsView: View {
         .foregroundColor(.black)
         .background(Color.theme.background.ignoresSafeArea())
         .navigationBarHidden(true)
+        .onAppear {
+            if locationServices {
+                locationManager.requestLocationUpdate()
+            }
+        }
     }
 }
 

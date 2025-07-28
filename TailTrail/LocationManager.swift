@@ -1,11 +1,15 @@
 import CoreLocation
 import Combine
 
+@MainActor
 class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     private let locationManager = CLLocationManager()
+    private let geocoder = CLGeocoder()
     
     @Published var location: CLLocation? = nil
     @Published var authorizationStatus: CLAuthorizationStatus
+    @Published var currentCity: String? = nil
+    @Published var currentCountry: String? = nil
 
     override init() {
         self.authorizationStatus = locationManager.authorizationStatus
@@ -13,6 +17,15 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
         locationManager.requestWhenInUseAuthorization()
+        
+        // Set default location for simulator (Almaty, Kazakhstan)
+        #if targetEnvironment(simulator)
+        // You can change these coordinates to your city
+        self.location = CLLocation(latitude: 43.2220, longitude: 76.8512)
+        Task {
+            await reverseGeocode(location: self.location!)
+        }
+        #endif
     }
 
     func requestLocationUpdate() {
@@ -33,22 +46,46 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         }
     }
 
-    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
-        authorizationStatus = manager.authorizationStatus
+    nonisolated func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+        let status = manager.authorizationStatus
         
-        if authorizationStatus == .authorizedWhenInUse || authorizationStatus == .authorizedAlways {
-            requestLocationUpdate()
+        Task { @MainActor in
+            authorizationStatus = status
+            
+            if status == .authorizedWhenInUse || status == .authorizedAlways {
+                requestLocationUpdate()
+            }
         }
     }
 
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+    nonisolated func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let location = locations.last else { return }
-        self.location = location
-        // Stop updating to save battery, we can re-request if needed
-        locationManager.stopUpdatingLocation()
+        
+        Task { @MainActor in
+            self.location = location
+            // Stop updating to save battery, we can re-request if needed
+            locationManager.stopUpdatingLocation()
+            
+            // Get city and country from coordinates
+            await reverseGeocode(location: location)
+        }
+    }
+    
+    @MainActor
+    private func reverseGeocode(location: CLLocation) async {
+        do {
+            let placemarks = try await geocoder.reverseGeocodeLocation(location)
+            if let placemark = placemarks.first {
+                self.currentCity = placemark.locality
+                self.currentCountry = placemark.country
+                print("📍 User location: \(currentCity ?? "Unknown"), \(currentCountry ?? "Unknown")")
+            }
+        } catch {
+            print("❌ Reverse geocoding failed: \(error)")
+        }
     }
 
-    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+    nonisolated func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         print("Error getting location: \(error.localizedDescription)")
     }
 } 

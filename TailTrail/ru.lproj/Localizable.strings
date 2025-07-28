@@ -6,30 +6,204 @@
 // General
 "Back" = "Назад";
 "Done" = "Готово";
-"Search" = "Search";
-"Pet" = "Pet";
-"Search pet" = "Search Pet";
+"Cancel" = "Отмена";
+"Edit" = "Редактировать";
+"Save" = "Сохранить";
+"Next" = "Далее";
+"Previous" = "Назад";
+"Yes" = "Да";
+"No" = "Нет";
+"search" = "Поиск";
+"pet" = "Питомец";
+"search_pet" = "Поиск питомцев...";
+"all" = "Все";
+"OK" = "ОК";
+"View" = "Просмотр";
+"View Details" = "Подробности";
+"Connect Me" = "Связаться со мной";
+"Contact Me" = "Связаться со мной";
+"Logout" = "Выйти";
+"Login" = "Войти";
+"Sign Up" = "Регистрация";
+"Sign Up to Continue" = "Зарегистрируйтесь для продолжения";
+"Already have an account?" = "Уже есть аккаунт?";
+"I agree to the" = "Я согласен с";
+"and" = "и";
+"Terms of Service" = "Условиями использования";
+"Privacy Policy" = "Политикой конфиденциальности";
+"Last updated: July 2025" = "Последнее обновление: Июль 2025";
+"© 2025 TailTrail. All rights reserved." = "© 2025 TailTrail. Все права защищены.";
 
 // Pet Species
 "Dog" = "Собаки";
 "Cat" = "Кошки";
 "Bird" = "Птицы";
 "Other" = "Другие";
+"Species" = "Вид";
+"Gender" = "Пол";
+"pets" = "питомцев";
 
 // Location
 "Country" = "Страна";
 "City" = "Город";
-"Select Location" = "Выберите локацию";
+"Select Location" = "Выбрать местоположение";
 
 // Language
-"Select Language" = "Выберите язык";
+"Select Language" = "Выбрать язык";
 
 // Feed
-// "All pet categories near you" = "Все категории питомцев рядом";
+"all_pet_categories_near_you" = "Все категории питомцев рядом с вами";
+"New Post" = "Новый пост";
+"Step %d of 2" = "Шаг %d из 2";
+"Publish" = "Опубликовать";
+"Photos (up to 5)" = "Фотографии (до 5)";
+"no_posts_found" = "Посты не найдены";
+"no_lost_pets_in_area" = "Нет потерянных питомцев в вашем районе";
+"no_found_pets_in_area" = "Нет найденных питомцев в вашем районе";
+"no_Dog_pets_found" = "Собаки не найдены";
+"no_Cat_pets_found" = "Кошки не найдены";
+"no_Bird_pets_found" = "Птицы не найдены";
+"no_Other_pets_found" = "Другие питомцы не найдены";
+"load_more" = "Загрузить еще";
+"you_are_offline" = "Вы не в сети";
+"error" = "Ошибка";
+"retry" = "Повторить";
 
 // Statuses
-"Lost" = "Потерянные";
-"Found" = "Найденные";
+"Lost" = "Потерян";
+"Found" = "Найден";
 "lost" = "потерян";
 "found" = "найден";
-"reunited" = "воссоединен"; 
+"reunited" = "воссоединен";
+"Missing %@" = "Пропал %@";
+
+// Navigation
+"Notifications" = "Уведомления";
+"Chats" = "Чаты";
+"No chats yet" = "Пока нет чатов";
+"Start a conversation by contacting a pet owner" = "Начните разговор, связавшись с владельцем питомца";
+"23 Mins" = "23 мин";
+
+// Profile
+"Edit Profile" = "Редактировать профиль";
+"Personal Information" = "Личная информация";
+"Change Password" = "Изменить пароль";
+"Delete Account" = "Удалить аккаунт";
+"Hello! My name is %@." = "Привет! Меня зовут %@.";
+"Rating" = "Рейтинг";
+"About Me" = "Обо мне";
+"My Posts" = "Мои посты";
+"No posts found." = "Посты не найдены.";
+"%@ screen coming soon!" = "Экран %@ скоро появится!";
+
+// Settings
+"general_settings" = "Общие настройки";
+"blocked_users" = "Заблокированные пользователи";
+"Legal" = "Правовая информация";
+"app" = "Приложение";
+"privacy_policy" = "Политика конфиденциальности";
+"logout" = "Выйти";
+
+// Landing
+"Made with ❤️\nfor Pet Families\neverywhere" = "Сделано с ❤️\nдля семей с питомцами\nпо всему миру";
+"Create Account" = "Создать аккаунт";
+
+// Messages
+"No messages yet" = "Пока нет сообщений";
+
+// Post Detail
+"Your report has been submitted and will be reviewed." = "Ваш отчет отправлен и будет рассмотрен.";
+"You will no longer see posts or receive messages from this user." = "Вы больше не будете видеть посты или получать сообщения от этого пользователя.";
+"Pet Story" = "История питомца";
+"Nannie Barker" = "Нэнни Баркер";
+
+// Privacy Policy
+"1. Information We Collect" = "1. Информация, которую мы собираем";
+"We collect information you provide directly to us, such as when you create an account, post about lost or found pets, or contact us for support. This may include:" = "Мы собираем информацию, которую вы предоставляете нам напрямую, например, при создании аккаунта, публикации о потерянных или найденных питомцах или обращении к нам за поддержкой. Это может включать:";
+"• Email address and password for account creation" = "• Email адрес и пароль для создания аккаунта";
+"• Pet information (name, breed, age, photos)" = "• Информация о питомце (имя, порода, возраст, фотографии)";
+"• Location data to show nearby pets" = "• Данные о местоположении для показа ближайших питомцев";
+"• Contact information for pet owners" = "• Контактная информация владельцев питомцев";
+"• Messages sent through the chat feature" = "• Сообщения, отправленные через функцию чата";
+"2. How We Use Your Information" = "2. Как мы используем вашу информацию";
+"We use the information we collect to:" = "Мы используем собранную информацию для:";
+"• Provide and maintain our pet finding service" = "• Предоставления и поддержки нашего сервиса поиска питомцев";
+"• Connect pet owners with people who found their pets" = "• Связывания владельцев питомцев с людьми, которые их нашли";
+"• Send notifications about relevant posts" = "• Отправки уведомлений о релевантных постах";
+"• Improve our app and user experience" = "• Улучшения нашего приложения и пользовательского опыта";
+"• Respond to your support requests" = "• Ответов на ваши запросы в поддержку";
+"3. Location Services" = "3. Службы геолокации";
+"TailTrail uses your device's location to show you nearby lost or found pets. You can control location access in your device settings. We only access location when the app is actively being used." = "TailTrail использует местоположение вашего устройства для показа ближайших потерянных или найденных питомцев. Вы можете контролировать доступ к местоположению в настройках устройства. Мы получаем доступ к местоположению только когда приложение активно используется.";
+"4. Photo and Media" = "4. Фотографии и медиа";
+"When you upload photos of pets, we store them securely on our servers to help identify lost pets. Photos are only shared with other users through the app's posting system." = "Когда вы загружаете фотографии питомцев, мы безопасно храним их на наших серверах для помощи в идентификации потерянных питомцев. Фотографии передаются другим пользователям только через систему публикаций приложения.";
+"5. Data Sharing" = "5. Передача данных";
+"We do not sell, trade, or rent your personal information to third parties. We may share information only in these limited circumstances:" = "Мы не продаем, не обмениваем и не сдаем в аренду вашу личную информацию третьим лицам. Мы можем передавать информацию только в этих ограниченных случаях:";
+"• With your explicit consent" = "• С вашего явного согласия";
+"• To comply with legal obligations" = "• Для соблюдения юридических обязательств";
+"• To protect our rights and safety" = "• Для защиты наших прав и безопасности";
+"• With service providers who help us operate the app" = "• С поставщиками услуг, которые помогают нам управлять приложением";
+"6. Data Security" = "6. Безопасность данных";
+"We implement appropriate security measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction. However, no method of transmission over the internet is 100% secure." = "Мы применяем соответствующие меры безопасности для защиты вашей личной информации от несанкционированного доступа, изменения, раскрытия или уничтожения. Однако ни один метод передачи через интернет не является на 100% безопасным.";
+"7. Your Rights" = "7. Ваши права";
+"You have the right to:" = "Вы имеете право:";
+"• Access your personal information" = "• Получить доступ к вашей личной информации";
+"• Update or correct your information" = "• Обновить или исправить вашу информацию";
+"• Delete your account and data" = "• Удалить ваш аккаунт и данные";
+"• Opt out of certain communications" = "• Отказаться от определенных сообщений";
+"• Request data portability" = "• Запросить переносимость данных";
+"8. Children's Privacy" = "8. Конфиденциальность детей";
+"TailTrail is not intended for children under 13. We do not knowingly collect personal information from children under 13. If you are a parent and believe your child has provided us with personal information, please contact us." = "TailTrail не предназначен для детей младше 13 лет. Мы не собираем намеренно личную информацию от детей младше 13 лет. Если вы являетесь родителем и считаете, что ваш ребенок предоставил нам личную информацию, пожалуйста, свяжитесь с нами.";
+"9. Changes to This Policy" = "9. Изменения в этой политике";
+"We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy in the app and updating the 'Last updated' date." = "Мы можем время от времени обновлять эту Политику конфиденциальности. Мы уведомим вас о любых изменениях, разместив новую Политику конфиденциальности в приложении и обновив дату 'Последнее обновление'.";
+"10. Contact Us" = "10. Свяжитесь с нами";
+"If you have any questions about this Privacy Policy, please contact us at:" = "Если у вас есть вопросы об этой Политике конфиденциальности, пожалуйста, свяжитесь с нами:";
+"Email: assellyzh@gmail.com" = "Email: assellyzh@gmail.com";
+
+// Terms of Service
+"1. Acceptance of Terms" = "1. Принятие условий";
+"By downloading, installing, or using the TailTrail mobile application, you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the app." = "Загружая, устанавливая или используя мобильное приложение TailTrail, вы соглашаетесь соблюдать эти Условия использования. Если вы не согласны с этими условиями, пожалуйста, не используйте приложение.";
+"2. Description of Service" = "2. Описание сервиса";
+"TailTrail is a social networking platform designed to help pet owners find their lost pets and connect with people who have found animals. The service allows users to:" = "TailTrail - это платформа социальных сетей, предназначенная для помощи владельцам питомцев найти своих потерянных питомцев и связаться с людьми, которые нашли животных. Сервис позволяет пользователям:";
+"• Create posts about lost or found pets" = "• Создавать посты о потерянных или найденных питомцах";
+"• Upload photos and information about pets" = "• Загружать фотографии и информацию о питомцах";
+"• Communicate with other users through chat" = "• Общаться с другими пользователями через чат";
+"• View posts from nearby locations" = "• Просматривать посты из ближайших мест";
+"• Report and block inappropriate content" = "• Сообщать о неподходящем контенте и блокировать его";
+"3. User Accounts" = "3. Аккаунты пользователей";
+"To use certain features of TailTrail, you must create an account. You are responsible for:" = "Для использования определенных функций TailTrail вы должны создать аккаунт. Вы несете ответственность за:";
+"• Maintaining the confidentiality of your account" = "• Сохранение конфиденциальности вашего аккаунта";
+"• All activities that occur under your account" = "• Все действия, которые происходят под вашим аккаунтом";
+"• Providing accurate and complete information" = "• Предоставление точной и полной информации";
+"• Notifying us immediately of any unauthorized use" = "• Немедленное уведомление нас о любом несанкционированном использовании";
+"4. User Content" = "4. Пользовательский контент";
+"You retain ownership of content you post, but grant TailTrail a license to use, display, and distribute your content for the purpose of providing the service. You agree not to post:" = "Вы сохраняете право собственности на контент, который публикуете, но предоставляете TailTrail лицензию на использование, отображение и распространение вашего контента для целей предоставления сервиса. Вы соглашаетесь не публиковать:";
+"• False or misleading information" = "• Ложную или вводящую в заблуждение информацию";
+"• Content that violates others' rights" = "• Контент, нарушающий права других";
+"• Inappropriate, offensive, or harmful content" = "• Неподходящий, оскорбительный или вредный контент";
+"• Spam or commercial advertisements" = "• Спам или коммерческую рекламу";
+"• Personal information of others without consent" = "• Личную информацию других без согласия";
+"5. Prohibited Activities" = "5. Запрещенные действия";
+"You agree not to:" = "Вы соглашаетесь не:";
+"• Use the service for illegal purposes" = "• Использовать сервис для незаконных целей";
+"• Harass, abuse, or harm other users" = "• Докучать, оскорблять или причинять вред другим пользователям";
+"• Attempt to gain unauthorized access to the service" = "• Пытаться получить несанкционированный доступ к сервису";
+"• Interfere with the proper functioning of the app" = "• Вмешиваться в правильное функционирование приложения";
+"• Use automated systems to access the service" = "• Использовать автоматизированные системы для доступа к сервису";
+"6. Privacy" = "6. Конфиденциальность";
+"Your privacy is important to us. Please review our Privacy Policy, which also governs your use of the service, to understand our practices." = "Ваша конфиденциальность важна для нас. Пожалуйста, ознакомьтесь с нашей Политикой конфиденциальности, которая также регулирует ваше использование сервиса, чтобы понять наши практики.";
+"7. Location Services" = "7. Службы геолокации";
+"TailTrail uses location services to show you relevant posts from your area. You can control location access in your device settings. By using the app, you consent to the collection and use of location data as described in our Privacy Policy." = "TailTrail использует службы геолокации для показа релевантных постов из вашего района. Вы можете контролировать доступ к местоположению в настройках устройства. Используя приложение, вы соглашаетесь на сбор и использование данных о местоположении, как описано в нашей Политике конфиденциальности.";
+"8. Intellectual Property" = "8. Интеллектуальная собственность";
+"The TailTrail app, including its design, features, and content, is owned by TailTrail and protected by intellectual property laws. You may not copy, modify, or distribute any part of the service without our permission." = "Приложение TailTrail, включая его дизайн, функции и контент, принадлежит TailTrail и защищено законами об интеллектуальной собственности. Вы не можете копировать, изменять или распространять любую часть сервиса без нашего разрешения.";
+"9. Disclaimers" = "9. Отказ от ответственности";
+"TailTrail is provided 'as is' without warranties of any kind. We do not guarantee that the service will be uninterrupted, secure, or error-free. We are not responsible for the accuracy of user-generated content." = "TailTrail предоставляется 'как есть' без каких-либо гарантий. Мы не гарантируем, что сервис будет бесперебойным, безопасным или безошибочным. Мы не несем ответственности за точность пользовательского контента.";
+"10. Limitation of Liability" = "10. Ограничение ответственности";
+"To the maximum extent permitted by law, TailTrail shall not be liable for any indirect, incidental, special, consequential, or punitive damages resulting from your use of the service." = "В максимальной степени, разрешенной законом, TailTrail не несет ответственности за любые косвенные, случайные, специальные, последующие или штрафные убытки, возникшие в результате вашего использования сервиса.";
+"11. Termination" = "11. Прекращение действия";
+"We may terminate or suspend your account at any time for violations of these terms. You may also delete your account at any time through the app settings." = "Мы можем прекратить или приостановить ваш аккаунт в любое время за нарушения этих условий. Вы также можете удалить свой аккаунт в любое время через настройки приложения.";
+"12. Changes to Terms" = "12. Изменения условий";
+"We may update these Terms of Service from time to time. We will notify you of any changes by posting the new terms in the app. Your continued use of the service after changes constitutes acceptance of the new terms." = "Мы можем время от времени обновлять эти Условия использования. Мы уведомим вас о любых изменениях, разместив новые условия в приложении. Ваше продолжение использования сервиса после изменений означает принятие новых условий.";
+"13. Governing Law" = "13. Применимое право";
+"These terms are governed by the laws of the jurisdiction where TailTrail operates. Any disputes will be resolved in the appropriate courts of that jurisdiction." = "Эти условия регулируются законами юрисдикции, где работает TailTrail. Любые споры будут разрешены в соответствующих судах этой юрисдикции.";
+"14. Contact Information" = "14. Контактная информация";
+"If you have any questions about these Terms of Service, please contact us at:" = "Если у вас есть вопросы об этих Условиях использования, пожалуйста, свяжитесь с нами:"; 

@@ -6,7 +6,33 @@ struct PetInfoStep1View: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
-                FormField(title: "Pet's Name", placeholder: "e.g., Bobby", text: $viewModel.petName)
+                // Post Type Selection
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("What happened?")
+                        .font(.headline)
+                    
+                    HStack(spacing: 12) {
+                        PostTypeButton(
+                            title: "I Lost My Pet",
+                            icon: "exclamationmark.triangle.fill",
+                            isSelected: viewModel.postType == .lost,
+                            color: .red
+                        ) {
+                            viewModel.postType = .lost
+                        }
+                        
+                        PostTypeButton(
+                            title: "I Found a Pet",
+                            icon: "heart.fill",
+                            isSelected: viewModel.postType == .found,
+                            color: .green
+                        ) {
+                            viewModel.postType = .found
+                        }
+                    }
+                }
+                
+                FormField(title: "Pet's Name", placeholder: viewModel.postType == .lost ? "e.g., Bobby" : "e.g., Unknown", text: $viewModel.petName)
 
                 Text("Species").font(.headline)
                 Picker("Species", selection: $viewModel.selectedSpecies) {
@@ -55,6 +81,37 @@ private struct FormField: View {
             TextField(placeholder, text: $text)
                 .textFieldStyle(ModernTextFieldStyle())
         }
+    }
+}
+
+// Post type selection button
+private struct PostTypeButton: View {
+    let title: String
+    let icon: String
+    let isSelected: Bool
+    let color: Color
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            VStack(spacing: 8) {
+                Image(systemName: icon)
+                    .font(.title2)
+                    .foregroundColor(isSelected ? .white : color)
+                
+                Text(title)
+                    .font(.caption)
+                    .fontWeight(isSelected ? .semibold : .regular)
+                    .foregroundColor(isSelected ? .white : .primary)
+            }
+            .frame(maxWidth: .infinity)
+            .padding()
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(isSelected ? color : Color(.systemGray6))
+            )
+        }
+        .buttonStyle(PlainButtonStyle())
     }
 }
 

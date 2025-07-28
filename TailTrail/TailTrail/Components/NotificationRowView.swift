@@ -40,10 +40,12 @@ struct NotificationRowView: View {
                     NavigationLink(destination: PostDetailView(post: post)) {
                         Text("View").font(.headline)
                     }
-                } else if let chatID = notification.chatID, let session = findChatSession(by: chatID) {
-                    NavigationLink(destination: ChatDetailView(session: session)) {
-                        Text("View").font(.headline)
-                    }
+                } else if notification.chatID != nil {
+                    // For now, we'll disable chat navigation from notifications
+                    // TODO: Implement proper chat lookup from notification
+                    Text("View")
+                        .font(.headline)
+                        .foregroundColor(.gray)
                 }
             }
             .padding()
@@ -59,10 +61,6 @@ struct NotificationRowView: View {
     
     private func findPost(by id: String) -> Post? {
         return MockData.posts.first { $0.id.uuidString == id }
-    }
-    
-    private func findChatSession(by id: String) -> ChatSession? {
-        return MockData.chatSessions.first { $0.id.uuidString == id }
     }
 }
 

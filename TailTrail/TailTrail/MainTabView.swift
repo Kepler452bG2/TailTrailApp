@@ -50,7 +50,7 @@ struct MainTabView: View {
         case 1:
             MapView()
         case 2:
-            MessagesView(selectedTab: $selectedTab)
+            MessagesView()
         case 3:
             AllCasesListView()
         case 4:

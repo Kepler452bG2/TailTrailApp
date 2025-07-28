@@ -6,7 +6,7 @@ struct PostDetailView: View {
     @EnvironmentObject var authManager: AuthenticationManager
     @EnvironmentObject var postService: PostService
     @State private var showFullScreenImage = false
-    @State private var chatToNavigate: ChatSession? = nil
+    @State private var chatToNavigate: Chat? = nil
     @State private var isLiked: Bool
     @State private var isShowingReportDialog = false
     @State private var showReportConfirmation = false
@@ -40,7 +40,7 @@ struct PostDetailView: View {
                     } placeholder: {
                         Color.gray.opacity(0.3)
                     }
-                    .frame(height: UIScreen.main.bounds.height / 3)
+                    .frame(height: max(UIScreen.main.bounds.height / 3, 200))
                     .clipped()
                     .onTapGesture { showFullScreenImage = true }
 
@@ -65,7 +65,8 @@ struct PostDetailView: View {
                     }
                     Spacer()
                 }
-                .padding()
+                .padding(.leading) // Added padding here
+                .padding(.top)
                 Spacer()
             }
         }
@@ -133,7 +134,7 @@ struct PostDetailView: View {
                 Button(role: .destructive) {
                     Task {
                         do {
-                            try await NetworkManager.shared.blockUser(userId: post.userId.uuidString, authManager: authManager)
+                            try await NetworkManager.shared.blockUser(userId: post.userId, authManager: authManager)
                             showBlockConfirmation = true
                         } catch {
                             print("❌ Failed to block user: \(error)")
@@ -236,7 +237,9 @@ struct PostDetailView: View {
             Spacer()
 
             Button(action: {
-                self.chatToNavigate = findOrCreateChatSession(with: post.userId)
+                if let userUUID = UUID(uuidString: post.userId) {
+                    self.chatToNavigate = findOrCreateChatSession(with: userUUID)
+                }
             }) {
                 Text("Contact Me")
                     .font(.subheadline.bold())
@@ -246,9 +249,9 @@ struct PostDetailView: View {
                     .background(Color(hex: "#3E5A9A")) // Blue button
                     .clipShape(Capsule())
             }
-            .background(
-                NavigationLink(destination: chatDestination, isActive: .constant(chatToNavigate != nil), label: { EmptyView() })
-            )
+            .navigationDestination(isPresented: .constant(chatToNavigate != nil)) {
+                chatDestination
+            }
         }
         .padding()
         .background(Color(white: 0.95))
@@ -257,21 +260,36 @@ struct PostDetailView: View {
     
     @ViewBuilder
     private var chatDestination: some View {
-        if let session = chatToNavigate {
-            ChatDetailView(session: session)
+        if let chat = chatToNavigate {
+            ChatDetailView(chat: chat)
+                .environmentObject(authManager)
         } else {
             EmptyView()
         }
     }
 
-    private func findOrCreateChatSession(with userId: UUID) -> ChatSession {
-        // This is still mock logic, would need to be updated for real chat functionality
-        if let existingSession = MockData.chatSessions.first(where: { $0.participantName == "Nannie Barker" }) {
-            return existingSession
-        } else {
-            let newSession = ChatSession(participantName: "Nannie Barker", participantAvatar: "dog1", messages: [], unreadCount: 0, isOnline: true)
-            return newSession
-        }
+    private func findOrCreateChatSession(with userId: UUID) -> Chat {
+        // TODO: Implement chat creation and navigation
+        // For now, create a temporary chat
+        let participant = Chat.Participant(
+            id: userId.uuidString,
+            email: "user@example.com",
+            imageUrl: nil,
+            isOnline: false,
+            lastSeen: nil
+        )
+        
+        return Chat(
+            id: UUID().uuidString,
+            name: post.petName ?? "Chat",
+            isGroup: false,
+            createdAt: Date(),
+            updatedAt: Date(),
+            participants: [participant],
+            lastMessage: nil,
+            lastMessageTime: nil,
+            unreadCount: 0
+        )
     }
 }
 

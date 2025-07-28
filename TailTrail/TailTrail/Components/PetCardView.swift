@@ -4,61 +4,72 @@ struct PetCardView: View {
     let post: Post
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 0) {
             imageSection
             
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: 6) {
                 Text(post.petName ?? "Unknown Name")
-                    .font(.headline)
-                    .foregroundColor(Color("PrimaryTextColor"))
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundColor(.primary)
+                    .lineLimit(1)
                 
                 Text(post.breed ?? "Unknown Breed")
-                    .font(.subheadline)
-                    .foregroundColor(Color("SecondaryTextColor"))
+                    .font(.system(size: 14))
+                    .foregroundColor(.secondary)
+                    .lineLimit(1)
                 
-                HStack {
-                    Image(systemName: "mappin.and.ellipse")
+                HStack(spacing: 4) {
+                    Image(systemName: "mappin.circle.fill")
+                        .font(.system(size: 12))
                     Text(post.locationName ?? "Unknown Location")
+                        .font(.system(size: 12))
+                        .lineLimit(1)
                 }
-                .font(.caption)
-                .foregroundColor(Color("SecondaryTextColor"))
+                .foregroundColor(.secondary)
             }
-            .padding([.horizontal, .bottom], 8)
+            .padding(12)
         }
-        .background(Color.background) // Use system background for better contrast
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-        .overlay( // Add a border
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(Color.black, lineWidth: 1.5)
-        )
-        .shadow(color: .black.opacity(0.1), radius: 5, x: 0, y: 2) // Add a shadow
+        .background(Color(.systemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .shadow(color: .black.opacity(0.08), radius: 8, x: 0, y: 2)
     }
     
     private var imageSection: some View {
         AsyncImage(url: URL(string: post.images.first ?? "")) { phase in
             switch phase {
             case .empty:
-                ProgressView()
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 120)
-                    .background(Color.gray.opacity(0.1))
+                Rectangle()
+                    .fill(Color(.systemGray6))
+                    .frame(height: 140)
+                    .overlay(
+                        ProgressView()
+                            .tint(.gray)
+                    )
             case .success(let image):
                 image
                     .resizable()
                     .aspectRatio(contentMode: .fill)
-                    .frame(height: 120)
+                    .frame(height: 140)
                     .clipped()
-            case .failure:
-                Image(systemName: "photo.fill")
-                    .font(.largeTitle)
-                    .foregroundColor(.gray)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 120)
-                    .background(Color.gray.opacity(0.1))
+            case .failure(_):
+                Rectangle()
+                    .fill(Color(.systemGray6))
+                    .frame(height: 140)
+                    .overlay(
+                        VStack {
+                            Image(systemName: "photo")
+                                .font(.system(size: 30))
+                                .foregroundColor(.gray)
+                            Text("Image unavailable")
+                                .font(.caption)
+                                .foregroundColor(.gray)
+                        }
+                    )
             @unknown default:
                 EmptyView()
             }
         }
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 }
 

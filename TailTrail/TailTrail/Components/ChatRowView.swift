@@ -1,11 +1,20 @@
 import SwiftUI
 
 struct ChatRowView: View {
-    let session: ChatSession
+    let chat: Chat
+    let currentUserId: String
+    
+    private var otherParticipant: Chat.Participant? {
+        chat.participants.first { $0.id != currentUserId }
+    }
+    
+    private var participantName: String {
+        otherParticipant?.email ?? "Unknown User"
+    }
 
     private var shadowColor: Color {
         let colors: [Color] = [.blue.opacity(0.6), .green.opacity(0.6), .pink.opacity(0.6)]
-        let hash = abs(session.participantName.hashValue)
+        let hash = abs(participantName.hashValue)
         let index = hash % colors.count
         return colors[index]
     }
@@ -18,29 +27,66 @@ struct ChatRowView: View {
                 .offset(x: 4, y: 4)
 
             HStack(spacing: 16) {
-                Image(systemName: session.participantAvatar)
-                    .resizable()
-                    .scaledToFill()
+                // Avatar or placeholder
+                if let imageUrl = otherParticipant?.imageUrl,
+                   let url = URL(string: imageUrl) {
+                    AsyncImage(url: url) { image in
+                        image
+                            .resizable()
+                            .scaledToFill()
+                    } placeholder: {
+                        Image(systemName: "person.circle.fill")
+                            .resizable()
+                            .foregroundColor(.gray)
+                    }
                     .frame(width: 60, height: 60)
                     .clipShape(Circle())
+                } else {
+                    Image(systemName: "person.circle.fill")
+                        .resizable()
+                        .foregroundColor(.gray)
+                        .frame(width: 60, height: 60)
+                        .clipShape(Circle())
+                }
                 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(session.participantName)
+                    Text(participantName)
                         .font(.headline)
                         .fontWeight(.bold)
                     
-                    Text(session.lastMessageSnippet)
-                        .font(.subheadline)
-                        .foregroundColor(.gray)
-                        .lineLimit(1)
+                    if let lastMessage = chat.lastMessage {
+                        Text(lastMessage)
+                            .font(.subheadline)
+                            .foregroundColor(.gray)
+                            .lineLimit(1)
+                    } else {
+                        Text("No messages yet")
+                            .font(.subheadline)
+                            .foregroundColor(.gray)
+                            .italic()
+                    }
                 }
                 
                 Spacer()
                 
-                if let timestamp = session.lastMessageTimestamp {
-                    Text(timestamp.timeAgo())
-                        .font(.caption)
-                        .foregroundColor(.gray)
+                VStack(alignment: .trailing, spacing: 4) {
+                    if let timestamp = chat.lastMessageTime {
+                        Text(timestamp.timeAgo())
+                            .font(.caption)
+                            .foregroundColor(.gray)
+                    }
+                    
+                    if chat.unreadCount > 0 {
+                        Text("\(chat.unreadCount)")
+                            .font(.caption2)
+                            .fontWeight(.bold)
+                            .foregroundColor(.white)
+                            .frame(minWidth: 20)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 2)
+                            .background(Color.red)
+                            .clipShape(Capsule())
+                    }
                 }
             }
             .padding()
@@ -48,9 +94,10 @@ struct ChatRowView: View {
             .clipShape(RoundedRectangle(cornerRadius: 25)) // Rounded corners
             .overlay(
                 RoundedRectangle(cornerRadius: 25)
-                    .stroke(Color.black, lineWidth: 1.5) // Black border
+                    .stroke(Color.gray.opacity(0.2), lineWidth: 1)
             )
         }
+        .padding(.horizontal, 4)
     }
 }
 
@@ -64,6 +111,6 @@ extension Date {
 }
 
 #Preview {
-    ChatRowView(session: MockData.chatSessions.first!)
+    ChatRowView(chat: MockData.chats.first!, currentUserId: "currentUser")
         .padding()
 } 

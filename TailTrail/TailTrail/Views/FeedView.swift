@@ -3,16 +3,18 @@ import SwiftUI
 struct FeedView: View {
     @EnvironmentObject var languageManager: LanguageManager
     @EnvironmentObject var postService: PostService
+    @StateObject private var locationManager = LocationManager()
     
     @State private var selectedSpecies: PetSpecies? = nil
     @State private var selectedStatus: PostStatus = .lost
     @State private var searchText = ""
     @State private var autoScrollIndex = 0
     private let timer = Timer.publish(every: 3, on: .main, in: .common).autoconnect()
+    @AppStorage("searchRadius") private var searchRadius: Double = 50.0
 
     var filteredPosts: [Post] {
         return postService.posts.filter { post in
-            // Updated status matching logic to include "active" posts in the "lost" tab
+            // Updated status matching logic - active posts show in lost tab
             let statusMatch: Bool
             if selectedStatus == .lost {
                 statusMatch = post.status == "lost" || post.status == "active"
@@ -43,22 +45,84 @@ struct FeedView: View {
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 24) {
-                    navigationHeader
-                    searchBar
-                    speciesFilter
-                    lostFoundSegmentedControl
-                    nearbyPetsSection
-                    mainPostList
+            ZStack {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 24) {
+                        navigationHeader
+                        searchBar
+                        speciesFilter
+                        lostFoundSegmentedControl
+                        nearbyPetsSection
+                        
+                        // Recent Posts section
+                        Text("Recent Posts")
+                            .font(.title2.bold())
+                            .padding(.horizontal)
+                            .padding(.top, 8)
+                        
+                        mainPostList
+                    }
+                    .padding(.vertical)
+                    .frame(maxWidth: UIDevice.current.userInterfaceIdiom == .pad ? 800 : .infinity)
+                    .frame(maxWidth: .infinity)
                 }
-                .padding(.vertical)
-            }
-            .background(Color("BackgroundColor").ignoresSafeArea())
-            .navigationBarHidden(true)
-            .onAppear {
-                Task {
-                    await postService.refreshPosts()
+                .background(Color("BackgroundColor").ignoresSafeArea())
+                .navigationBarHidden(true)
+                .onAppear {
+                    // Request location and load posts
+                    locationManager.requestLocationUpdate()
+                    
+                    // Clear any previous errors
+                    postService.clearError()
+                    
+                    Task {
+                        // First try to load all posts
+                        await postService.refreshPosts()
+                        
+                        // Then filter by location if available
+                        if let location = locationManager.location {
+                            await postService.loadPostsNearLocation(location, radius: searchRadius)
+                        }
+                    }
+                }
+                .onChange(of: searchRadius) { oldValue, newRadius in
+                    // Reload posts when search radius changes
+                    if let location = locationManager.location {
+                        Task {
+                            await postService.loadPostsNearLocation(location, radius: newRadius)
+                        }
+                    }
+                }
+                .onAppear {
+                    Task {
+                        await postService.refreshPosts()
+                    }
+                }
+                
+                // Offline indicator
+                if postService.isOffline {
+                    VStack {
+                        Spacer()
+                        OfflineBanner()
+                    }
+                }
+                
+                // Error alert
+                if postService.showError {
+                    VStack {
+                        Spacer()
+                        ErrorBanner(
+                            message: postService.errorMessage ?? "An error occurred",
+                            onRetry: {
+                                Task {
+                                    await postService.retry()
+                                }
+                            },
+                            onDismiss: {
+                                postService.clearError()
+                            }
+                        )
+                    }
                 }
             }
         }
@@ -97,90 +161,133 @@ struct FeedView: View {
                         .foregroundColor(Color(hex: "#3E5A9A")) // Blue icon
                 }
             }
+            .padding(.trailing)
         }
-        .padding(.horizontal)
     }
 
     private var searchBar: some View {
         HStack {
             Image(systemName: "magnifyingglass")
-                .foregroundColor(Color(hex: "#3E5A9A")) // Blue icon
-            TextField("Search pet...", text: $searchText)
-                .foregroundColor(.primary)
+                .foregroundColor(.gray)
+            TextField("Search pets...", text: $searchText)
+                .textFieldStyle(PlainTextFieldStyle())
         }
         .padding()
-        .background(Color(.systemBackground))
-        .clipShape(Capsule())
-        .overlay(Capsule().stroke(Color(hex: "#3E5A9A"), lineWidth: 1.5)) // Blue border
-        .padding(.horizontal)
-    }
-
-    private var mainPostList: some View {
-        let columns: [GridItem] = [
-            GridItem(.flexible()),
-            GridItem(.flexible())
-        ]
-        
-        return LazyVGrid(columns: columns, spacing: 0) {
-            ForEach(filteredPosts) { post in
-                NavigationLink(destination: PostDetailView(post: post)) {
-                    PetCardView(post: post)
-                }
-                .buttonStyle(.plain)
-                .padding(8)
-                .onAppear {
-                    if post == postService.posts.last {
-                        Task {
-                            await postService.loadMorePosts()
-                        }
-                    }
-                }
-            }
-        }
-        .padding(.horizontal, 8)
-    }
-
-    private var lostFoundSegmentedControl: some View {
-        HStack(spacing: 0) {
-            SegmentedControlButton(title: "Lost", count: lostCount, status: .lost, selection: $selectedStatus)
-            SegmentedControlButton(title: "Found", count: foundCount, status: .found, selection: $selectedStatus)
-        }
-        .padding(4)
-        .background(Color.white.opacity(0.5)) // Semi-transparent white
-        .clipShape(Capsule())
+        .background(Capsule().fill(Color.white))
+        .overlay(Capsule().stroke(Color.black, lineWidth: 1.5))
         .padding(.horizontal)
     }
 
     private var speciesFilter: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 12) {
-                FilterButton(species: nil, selection: $selectedSpecies)
-                ForEach(PetSpecies.allCases) { species in
-                    FilterButton(species: species, selection: $selectedSpecies)
+                SpeciesFilterButton(
+                    title: "All",
+                    isSelected: selectedSpecies == nil,
+                    action: { selectedSpecies = nil }
+                )
+                
+                ForEach(PetSpecies.allCases, id: \.self) { species in
+                    SpeciesFilterButton(
+                        title: species.rawValue.capitalized,
+                        isSelected: selectedSpecies == species,
+                        action: { selectedSpecies = species }
+                    )
                 }
             }
             .padding(.horizontal)
         }
     }
 
+    private var lostFoundSegmentedControl: some View {
+        HStack(spacing: 0) {
+            SegmentedControlButton(
+                title: "Lost",
+                count: lostCount,
+                isSelected: selectedStatus == .lost,
+                action: { withAnimation(.bouncy) { selectedStatus = .lost } }
+            )
+            
+            SegmentedControlButton(
+                title: "Found",
+                count: foundCount,
+                isSelected: selectedStatus == .found,
+                action: { withAnimation(.bouncy) { selectedStatus = .found } }
+            )
+        }
+        .padding(4)
+        .background(Color("CardBackgroundColor").cornerRadius(12))
+        .padding(.horizontal)
+    }
+
     private var nearbyPetsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("All pet categories near you")
-                .font(.title3.weight(.bold))
-                .foregroundColor(Color(hex: "#3E5A9A")) // Blue title
-                .padding(.horizontal)
+            HStack {
+                Text("All pet categories near")
+                    .font(.title3.weight(.bold))
+                if let city = locationManager.currentCity {
+                    Text(city)
+                        .font(.title3.weight(.bold))
+                        .foregroundColor(.orange)
+                } else {
+                    Text("you")
+                        .font(.title3.weight(.bold))
+                }
+            }
+            .padding(.horizontal)
             
             ScrollViewReader { proxy in
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 16) {
-                        ForEach(postService.posts.prefix(10)) { post in
-                            NavigationLink(destination: PostDetailView(post: post)) {
-                                NearbyPetCardView(post: post)
+                        if postService.posts.isEmpty && postService.isLoading {
+                            // Show loading placeholders
+                            ForEach(0..<4, id: \.self) { index in
+                                SimplePetCardView(
+                                    color: cardColors[index % cardColors.count],
+                                    count: 0
+                                )
+                                .redacted(reason: .placeholder)
+                                .id("loading-\(index)")
                             }
-                            .id(post.id)
-                            .scrollTransition { content, phase in
-                                content
-                                    .scaleEffect(phase.isIdentity ? 1.0 : 0.85)
+                        } else if postService.posts.isEmpty {
+                            // Show default cards when no posts
+                            ForEach(0..<4, id: \.self) { index in
+                                SimplePetCardView(
+                                    color: cardColors[index % cardColors.count],
+                                    count: [20, 17, 15, 12][index]
+                                )
+                                .id("empty-\(index)")
+                                .scrollTransition { content, phase in
+                                    content
+                                        .scaleEffect(phase.isIdentity ? 1.0 : 0.85)
+                                }
+                            }
+                        } else {
+                            // Show actual posts
+                            ForEach(postService.posts.prefix(10)) { post in
+                                NavigationLink(destination: PostDetailView(post: post)) {
+                                    NearbyPetCardView(post: post)
+                                }
+                                .id(post.id)
+                                .scrollTransition { content, phase in
+                                    content
+                                        .scaleEffect(phase.isIdentity ? 1.0 : 0.85)
+                                }
+                            }
+                            
+                            // Add placeholders if less than 4 posts
+                            if postService.posts.count < 4 {
+                                ForEach(0..<(4 - postService.posts.count), id: \.self) { index in
+                                    SimplePetCardView(
+                                        color: cardColors[index % cardColors.count],
+                                        count: Int.random(in: 5...20)
+                                    )
+                                    .id("placeholder-\(index)")
+                                    .scrollTransition { content, phase in
+                                        content
+                                            .scaleEffect(phase.isIdentity ? 1.0 : 0.85)
+                                    }
+                                }
                             }
                         }
                     }
@@ -202,64 +309,176 @@ struct FeedView: View {
             }
         }
     }
-}
 
-private struct SegmentedControlButton: View {
-    let title: String
-    let count: Int
-    let status: PostStatus
-    @Binding var selection: PostStatus
-    
-    var body: some View {
-        Button(action: { withAnimation(.bouncy) { selection = status } }) {
-            HStack(spacing: 8) {
-                Text(title)
-                Text("\(count)")
-                    .font(.caption.bold())
-                    .padding(6)
-                    .background(selection == status ? Color.white.opacity(0.3) : Color(hex: "#3E5A9A").opacity(0.1)) // Subtle blue
-                    .clipShape(Circle())
-            }
-            .foregroundColor(selection == status ? .white : Color(hex: "#3E5A9A")) // Blue text
-            .padding(.horizontal)
-            .padding(.vertical, 10)
-            .frame(maxWidth: .infinity)
-            .background(selection == status ? Color(hex: "#FBCF3A") : Color.clear) // Yellow selected
-            .clipShape(Capsule())
-        }
-    }
-}
-
-private struct FilterButton: View {
-    let species: PetSpecies?
-    @Binding var selection: PetSpecies?
-    
-    var isSelected: Bool {
-        species == selection
-    }
-    
-    var body: some View {
-        Button(action: {
-            withAnimation {
-                selection = species
-            }
-        }) {
-            Text(species?.rawValue.capitalized ?? "All")
-                .font(.subheadline.weight(.medium))
-                .padding(.horizontal, 20)
-                .padding(.vertical, 10)
-                .background(isSelected ? Color(hex: "#3E5A9A") : Color(.systemBackground)) // Blue selected
-                .foregroundColor(isSelected ? .white : Color(hex: "#3E5A9A")) // Blue text
-                .clipShape(Capsule())
-                .overlay(
-                    Capsule().stroke(Color(hex: "#3E5A9A"), lineWidth: 1.5) // Blue border
+    private var mainPostList: some View {
+        LazyVGrid(
+            columns: [
+                GridItem(.flexible(), spacing: 20),
+                GridItem(.flexible(), spacing: 20)
+            ],
+            spacing: 20
+        ) {
+            if postService.isLoading && postService.posts.isEmpty {
+                ForEach(0..<4) { _ in
+                    PostCardSkeleton()
+                }
+            } else if filteredPosts.isEmpty {
+                EmptyStateView(
+                    title: "No posts found",
+                    message: selectedSpecies == nil ? 
+                        "No \(selectedStatus.rawValue) pets in your area" :
+                        "No \(selectedSpecies?.rawValue ?? "") pets found",
+                    iconName: "pawprint"
                 )
+                .gridCellColumns(2)
+            } else {
+                ForEach(filteredPosts) { post in
+                    NavigationLink(destination: PostDetailView(post: post)) {
+                        PetCardView(post: post)
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                    .onAppear {
+                        if post == postService.posts.last {
+                            Task {
+                                await postService.loadMorePosts()
+                            }
+                        }
+                    }
+                }
+            }
+            
+            if postService.isLoading && !postService.posts.isEmpty {
+                ProgressView()
+                    .gridCellColumns(2)
+                    .padding()
+            }
         }
+        .padding(.horizontal, 16)
     }
 }
 
-#Preview {
-    FeedView()
-        .environmentObject(LanguageManager.shared)
-        .environmentObject(PostService(authManager: AuthenticationManager()))
+// MARK: - Supporting Views
+
+struct OfflineBanner: View {
+    var body: some View {
+        HStack {
+            Image(systemName: "wifi.slash")
+                .foregroundColor(.white)
+            Text("You're offline")
+                .foregroundColor(.white)
+                .font(.subheadline)
+            Spacer()
+        }
+        .padding()
+        .background(Color.orange)
+        .cornerRadius(8)
+        .padding(.horizontal)
+        .padding(.bottom, 100) // Avoid tab bar
+    }
+}
+
+struct ErrorBanner: View {
+    let message: String
+    let onRetry: () -> Void
+    let onDismiss: () -> Void
+    
+    var body: some View {
+        VStack(spacing: 8) {
+            HStack {
+                Image(systemName: "exclamationmark.triangle")
+                    .foregroundColor(.white)
+                Text("Error")
+                    .foregroundColor(.white)
+                    .font(.headline)
+                Spacer()
+                Button(action: onDismiss) {
+                    Image(systemName: "xmark")
+                        .foregroundColor(.white)
+                }
+            }
+            
+            Text(message)
+                .foregroundColor(.white)
+                .font(.subheadline)
+                .multilineTextAlignment(.leading)
+            
+            HStack {
+                Button("Retry") {
+                    onRetry()
+                }
+                .foregroundColor(.white)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
+                .background(Color.white.opacity(0.2))
+                .cornerRadius(6)
+                
+                Spacer()
+            }
+        }
+        .padding()
+        .background(Color.red)
+        .cornerRadius(8)
+        .padding(.horizontal)
+        .padding(.bottom, 100) // Avoid tab bar
+    }
+}
+
+struct EmptyStateView: View {
+    let title: String
+    let message: String
+    let iconName: String
+    
+    var body: some View {
+        VStack(spacing: 16) {
+            Image(systemName: iconName)
+                .font(.system(size: 48))
+                .foregroundColor(.gray)
+            
+            Text(title)
+                .font(.title2.bold())
+                .foregroundColor(.primary)
+            
+            Text(message)
+                .font(.body)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+        }
+        .padding()
+        .frame(maxWidth: .infinity)
+    }
+}
+
+struct PostCardSkeleton: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            // Image placeholder
+            Rectangle()
+                .fill(Color(.systemGray6))
+                .frame(height: 100)
+            
+            // Info section
+            VStack(alignment: .leading, spacing: 4) {
+                Rectangle()
+                    .fill(Color.gray.opacity(0.3))
+                    .frame(height: 16)
+                    .frame(maxWidth: 100)
+                
+                Rectangle()
+                    .fill(Color.gray.opacity(0.3))
+                    .frame(height: 12)
+                    .frame(maxWidth: 70)
+                
+                Rectangle()
+                    .fill(Color.gray.opacity(0.3))
+                    .frame(height: 10)
+                    .frame(maxWidth: 50)
+            }
+            .padding(12)
+            .background(Color.white)
+        }
+        .background(Color.white)
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .shadow(color: .black.opacity(0.08), radius: 4, x: 0, y: 2)
+        .redacted(reason: .placeholder)
+    }
 } 

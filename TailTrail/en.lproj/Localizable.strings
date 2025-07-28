@@ -13,15 +13,35 @@
 "Previous" = "Previous";
 "Yes" = "Yes";
 "No" = "No";
-"Search" = "Search";
-"Pet" = "Pet";
-"Search pet" = "Search Pet";
+"search" = "Search";
+"pet" = "Pet";
+"search_pet" = "Search pets...";
+"all" = "All";
+"OK" = "OK";
+"View" = "View";
+"View Details" = "View Details";
+"Connect Me" = "Connect Me";
+"Contact Me" = "Contact Me";
+"Logout" = "Logout";
+"Login" = "Login";
+"Sign Up" = "Sign Up";
+"Sign Up to Continue" = "Sign Up to Continue";
+"Already have an account?" = "Already have an account?";
+"I agree to the" = "I agree to the";
+"and" = "and";
+"Terms of Service" = "Terms of Service";
+"Privacy Policy" = "Privacy Policy";
+"Last updated: July 2025" = "Last updated: July 2025";
+"© 2025 TailTrail. All rights reserved." = "© 2025 TailTrail. All rights reserved.";
 
 // Pet Species
 "Dog" = "Dogs";
 "Cat" = "Cats";
 "Bird" = "Birds";
 "Other" = "Other";
+"Species" = "Species";
+"Gender" = "Gender";
+"pets" = "pets";
 
 // Location
 "Country" = "Country";
@@ -32,11 +52,158 @@
 "Select Language" = "Select Language";
 
 // Feed
-"All pet categories near you" = "All pet categories near you";
+"all_pet_categories_near_you" = "All pet categories near you";
+"New Post" = "New Post";
+"Step %d of 2" = "Step %d of 2";
+"Publish" = "Publish";
+"Photos (up to 5)" = "Photos (up to 5)";
+"no_posts_found" = "No posts found";
+"no_lost_pets_in_area" = "No lost pets in your area";
+"no_found_pets_in_area" = "No found pets in your area";
+"no_Dog_pets_found" = "No dogs found";
+"no_Cat_pets_found" = "No cats found";
+"no_Bird_pets_found" = "No birds found";
+"no_Other_pets_found" = "No other pets found";
+"load_more" = "Load More";
+"you_are_offline" = "You're offline";
+"error" = "Error";
+"retry" = "Retry";
 
 // Statuses
 "Lost" = "Lost";
 "Found" = "Found";
 "lost" = "lost";
 "found" = "found";
-"reunited" = "reunited"; 
+"reunited" = "reunited";
+"Missing %@" = "Missing %@";
+
+// Navigation
+"Notifications" = "Notifications";
+"Chats" = "Chats";
+"No chats yet" = "No chats yet";
+"Start a conversation by contacting a pet owner" = "Start a conversation by contacting a pet owner";
+"23 Mins" = "23 Mins";
+
+// Profile
+"Edit Profile" = "Edit Profile";
+"Personal Information" = "Personal Information";
+"Change Password" = "Change Password";
+"Delete Account" = "Delete Account";
+"Hello! My name is %@." = "Hello! My name is %@.";
+"Rating" = "Rating";
+"About Me" = "About Me";
+"My Posts" = "My Posts";
+"No posts found." = "No posts found.";
+"%@ screen coming soon!" = "%@ screen coming soon!";
+
+// Settings
+"general_settings" = "General Settings";
+"blocked_users" = "Blocked Users";
+"Legal" = "Legal";
+"app" = "App";
+"privacy_policy" = "Privacy Policy";
+"logout" = "Logout";
+
+// Landing
+"Made with ❤️\nfor Pet Families\neverywhere" = "Made with ❤️\nfor Pet Families\neverywhere";
+"Create Account" = "Create Account";
+
+// Messages
+"No messages yet" = "No messages yet";
+
+// Post Detail
+"Your report has been submitted and will be reviewed." = "Your report has been submitted and will be reviewed.";
+"You will no longer see posts or receive messages from this user." = "You will no longer see posts or receive messages from this user.";
+"Pet Story" = "Pet Story";
+"Nannie Barker" = "Nannie Barker";
+
+// Privacy Policy
+"1. Information We Collect" = "1. Information We Collect";
+"We collect information you provide directly to us, such as when you create an account, post about lost or found pets, or contact us for support. This may include:" = "We collect information you provide directly to us, such as when you create an account, post about lost or found pets, or contact us for support. This may include:";
+"• Email address and password for account creation" = "• Email address and password for account creation";
+"• Pet information (name, breed, age, photos)" = "• Pet information (name, breed, age, photos)";
+"• Location data to show nearby pets" = "• Location data to show nearby pets";
+"• Contact information for pet owners" = "• Contact information for pet owners";
+"• Messages sent through the chat feature" = "• Messages sent through the chat feature";
+"2. How We Use Your Information" = "2. How We Use Your Information";
+"We use the information we collect to:" = "We use the information we collect to:";
+"• Provide and maintain our pet finding service" = "• Provide and maintain our pet finding service";
+"• Connect pet owners with people who found their pets" = "• Connect pet owners with people who found their pets";
+"• Send notifications about relevant posts" = "• Send notifications about relevant posts";
+"• Improve our app and user experience" = "• Improve our app and user experience";
+"• Respond to your support requests" = "• Respond to your support requests";
+"3. Location Services" = "3. Location Services";
+"TailTrail uses your device's location to show you nearby lost or found pets. You can control location access in your device settings. We only access location when the app is actively being used." = "TailTrail uses your device's location to show you nearby lost or found pets. You can control location access in your device settings. We only access location when the app is actively being used.";
+"4. Photo and Media" = "4. Photo and Media";
+"When you upload photos of pets, we store them securely on our servers to help identify lost pets. Photos are only shared with other users through the app's posting system." = "When you upload photos of pets, we store them securely on our servers to help identify lost pets. Photos are only shared with other users through the app's posting system.";
+"5. Data Sharing" = "5. Data Sharing";
+"We do not sell, trade, or rent your personal information to third parties. We may share information only in these limited circumstances:" = "We do not sell, trade, or rent your personal information to third parties. We may share information only in these limited circumstances:";
+"• With your explicit consent" = "• With your explicit consent";
+"• To comply with legal obligations" = "• To comply with legal obligations";
+"• To protect our rights and safety" = "• To protect our rights and safety";
+"• With service providers who help us operate the app" = "• With service providers who help us operate the app";
+"6. Data Security" = "6. Data Security";
+"We implement appropriate security measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction. However, no method of transmission over the internet is 100% secure." = "We implement appropriate security measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction. However, no method of transmission over the internet is 100% secure.";
+"7. Your Rights" = "7. Your Rights";
+"You have the right to:" = "You have the right to:";
+"• Access your personal information" = "• Access your personal information";
+"• Update or correct your information" = "• Update or correct your information";
+"• Delete your account and data" = "• Delete your account and data";
+"• Opt out of certain communications" = "• Opt out of certain communications";
+"• Request data portability" = "• Request data portability";
+"8. Children's Privacy" = "8. Children's Privacy";
+"TailTrail is not intended for children under 13. We do not knowingly collect personal information from children under 13. If you are a parent and believe your child has provided us with personal information, please contact us." = "TailTrail is not intended for children under 13. We do not knowingly collect personal information from children under 13. If you are a parent and believe your child has provided us with personal information, please contact us.";
+"9. Changes to This Policy" = "9. Changes to This Policy";
+"We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy in the app and updating the 'Last updated' date." = "We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy in the app and updating the 'Last updated' date.";
+"10. Contact Us" = "10. Contact Us";
+"If you have any questions about this Privacy Policy, please contact us at:" = "If you have any questions about this Privacy Policy, please contact us at:";
+"Email: assellyzh@gmail.com" = "Email: assellyzh@gmail.com";
+
+// Terms of Service
+"1. Acceptance of Terms" = "1. Acceptance of Terms";
+"By downloading, installing, or using the TailTrail mobile application, you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the app." = "By downloading, installing, or using the TailTrail mobile application, you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the app.";
+"2. Description of Service" = "2. Description of Service";
+"TailTrail is a social networking platform designed to help pet owners find their lost pets and connect with people who have found animals. The service allows users to:" = "TailTrail is a social networking platform designed to help pet owners find their lost pets and connect with people who have found animals. The service allows users to:";
+"• Create posts about lost or found pets" = "• Create posts about lost or found pets";
+"• Upload photos and information about pets" = "• Upload photos and information about pets";
+"• Communicate with other users through chat" = "• Communicate with other users through chat";
+"• View posts from nearby locations" = "• View posts from nearby locations";
+"• Report and block inappropriate content" = "• Report and block inappropriate content";
+"3. User Accounts" = "3. User Accounts";
+"To use certain features of TailTrail, you must create an account. You are responsible for:" = "To use certain features of TailTrail, you must create an account. You are responsible for:";
+"• Maintaining the confidentiality of your account" = "• Maintaining the confidentiality of your account";
+"• All activities that occur under your account" = "• All activities that occur under your account";
+"• Providing accurate and complete information" = "• Providing accurate and complete information";
+"• Notifying us immediately of any unauthorized use" = "• Notifying us immediately of any unauthorized use";
+"4. User Content" = "4. User Content";
+"You retain ownership of content you post, but grant TailTrail a license to use, display, and distribute your content for the purpose of providing the service. You agree not to post:" = "You retain ownership of content you post, but grant TailTrail a license to use, display, and distribute your content for the purpose of providing the service. You agree not to post:";
+"• False or misleading information" = "• False or misleading information";
+"• Content that violates others' rights" = "• Content that violates others' rights";
+"• Inappropriate, offensive, or harmful content" = "• Inappropriate, offensive, or harmful content";
+"• Spam or commercial advertisements" = "• Spam or commercial advertisements";
+"• Personal information of others without consent" = "• Personal information of others without consent";
+"5. Prohibited Activities" = "5. Prohibited Activities";
+"You agree not to:" = "You agree not to:";
+"• Use the service for illegal purposes" = "• Use the service for illegal purposes";
+"• Harass, abuse, or harm other users" = "• Harass, abuse, or harm other users";
+"• Attempt to gain unauthorized access to the service" = "• Attempt to gain unauthorized access to the service";
+"• Interfere with the proper functioning of the app" = "• Interfere with the proper functioning of the app";
+"• Use automated systems to access the service" = "• Use automated systems to access the service";
+"6. Privacy" = "6. Privacy";
+"Your privacy is important to us. Please review our Privacy Policy, which also governs your use of the service, to understand our practices." = "Your privacy is important to us. Please review our Privacy Policy, which also governs your use of the service, to understand our practices.";
+"7. Location Services" = "7. Location Services";
+"TailTrail uses location services to show you relevant posts from your area. You can control location access in your device settings. By using the app, you consent to the collection and use of location data as described in our Privacy Policy." = "TailTrail uses location services to show you relevant posts from your area. You can control location access in your device settings. By using the app, you consent to the collection and use of location data as described in our Privacy Policy.";
+"8. Intellectual Property" = "8. Intellectual Property";
+"The TailTrail app, including its design, features, and content, is owned by TailTrail and protected by intellectual property laws. You may not copy, modify, or distribute any part of the service without our permission." = "The TailTrail app, including its design, features, and content, is owned by TailTrail and protected by intellectual property laws. You may not copy, modify, or distribute any part of the service without our permission.";
+"9. Disclaimers" = "9. Disclaimers";
+"TailTrail is provided 'as is' without warranties of any kind. We do not guarantee that the service will be uninterrupted, secure, or error-free. We are not responsible for the accuracy of user-generated content." = "TailTrail is provided 'as is' without warranties of any kind. We do not guarantee that the service will be uninterrupted, secure, or error-free. We are not responsible for the accuracy of user-generated content.";
+"10. Limitation of Liability" = "10. Limitation of Liability";
+"To the maximum extent permitted by law, TailTrail shall not be liable for any indirect, incidental, special, consequential, or punitive damages resulting from your use of the service." = "To the maximum extent permitted by law, TailTrail shall not be liable for any indirect, incidental, special, consequential, or punitive damages resulting from your use of the service.";
+"11. Termination" = "11. Termination";
+"We may terminate or suspend your account at any time for violations of these terms. You may also delete your account at any time through the app settings." = "We may terminate or suspend your account at any time for violations of these terms. You may also delete your account at any time through the app settings.";
+"12. Changes to Terms" = "12. Changes to Terms";
+"We may update these Terms of Service from time to time. We will notify you of any changes by posting the new terms in the app. Your continued use of the service after changes constitutes acceptance of the new terms." = "We may update these Terms of Service from time to time. We will notify you of any changes by posting the new terms in the app. Your continued use of the service after changes constitutes acceptance of the new terms.";
+"13. Governing Law" = "13. Governing Law";
+"These terms are governed by the laws of the jurisdiction where TailTrail operates. Any disputes will be resolved in the appropriate courts of that jurisdiction." = "These terms are governed by the laws of the jurisdiction where TailTrail operates. Any disputes will be resolved in the appropriate courts of that jurisdiction.";
+"14. Contact Information" = "14. Contact Information";
+"If you have any questions about these Terms of Service, please contact us at:" = "If you have any questions about these Terms of Service, please contact us at:"; 

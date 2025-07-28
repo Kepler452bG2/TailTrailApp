@@ -8,7 +8,31 @@ struct PetInfoStep2View: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 15) {
                 FormField(title: "Description", placeholder: "e.g., Very friendly, wearing a red collar", text: $viewModel.description)
-                FormField(title: "Last Known Location", placeholder: "e.g., Near Central Park", text: $viewModel.locationName)
+                
+                // Location section
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(viewModel.postType == .lost ? "Last Seen Location" : "Found Location")
+                        .font(.headline)
+                    
+                    HStack {
+                        Image(systemName: "location.fill")
+                            .foregroundColor(.orange)
+                        Text(viewModel.locationName.isEmpty ? "Getting current location..." : viewModel.locationName)
+                            .foregroundColor(viewModel.locationName.isEmpty ? .gray : .primary)
+                        Spacer()
+                        Button(action: {
+                            viewModel.showLocationPicker = true
+                        }) {
+                            Text("Change")
+                                .font(.caption)
+                                .foregroundColor(.blue)
+                        }
+                    }
+                    .padding()
+                    .background(Color(.systemGray6))
+                    .cornerRadius(12)
+                }
+                
                 FormField(title: "Contact Phone", placeholder: "Your phone number for contact", text: $viewModel.contactPhone)
                     .keyboardType(.phonePad)
 
@@ -43,6 +67,12 @@ struct PetInfoStep2View: View {
                 }
             }
             .padding()
+        }
+        .sheet(isPresented: $viewModel.showLocationPicker) {
+            LocationPickerView(
+                selectedLocation: $viewModel.selectedLocation,
+                locationName: $viewModel.locationName
+            )
         }
     }
 }

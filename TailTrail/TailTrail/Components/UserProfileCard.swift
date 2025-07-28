@@ -45,9 +45,9 @@ struct UserProfileCard: View {
                         .clipShape(Circle())
                 }
             }
-            .onChange(of: selectedPhotoItem) { _ in
+            .onChange(of: selectedPhotoItem) { oldValue, newValue in
                 Task {
-                    if let data = try? await selectedPhotoItem?.loadTransferable(type: Data.self) {
+                    if let data = try? await newValue?.loadTransferable(type: Data.self) {
                         if let uiImage = UIImage(data: data) {
                         selectedImage = Image(uiImage: uiImage)
                             // Here you would typically call a method to upload the image
@@ -84,7 +84,7 @@ struct UserProfileCard_Previews: PreviewProvider {
     static var previews: some View {
         let authManager = AuthenticationManager()
         // Manually set a user for previewing purposes
-        authManager.currentUser = User(id: UUID(), name: "Jane Doe", email: "jane.doe@example.com", phone: "123-456-7890", createdAt: "2023-01-01T12:00:00Z", imageUrl: nil)
+        authManager.currentUser = User(id: UUID().uuidString, name: "Jane Doe", email: "jane.doe@example.com", phone: "123-456-7890", createdAt: "2023-01-01T12:00:00Z", imageUrl: nil)
 
         return UserProfileCard(
             authManager: authManager,

@@ -9,13 +9,25 @@ private let defaultRegion = MKCoordinateRegion(
 
 struct MapView: View {
     @EnvironmentObject var postService: PostService
+    @StateObject private var locationManager = LocationManager()
     
     @State private var selectedPost: Post?
     @State private var cameraPosition: MapCameraPosition = .region(defaultRegion)
+    @State private var showUserLocation = true
 
     var body: some View {
         ZStack(alignment: .bottom) {
             Map(position: $cameraPosition) {
+                // User location
+                if showUserLocation, let userLocation = locationManager.location {
+                    Annotation("You", coordinate: userLocation.coordinate) {
+                        Image(systemName: "location.circle.fill")
+                            .font(.title)
+                            .foregroundColor(.blue)
+                            .background(Circle().fill(.white))
+                    }
+                }
+                
                 // Filter posts to only show those with valid coordinates
                 ForEach(postService.posts.filter { $0.coordinate != nil }) { post in
                     Annotation(post.petName ?? "Pet", coordinate: post.coordinate!) {
@@ -28,10 +40,30 @@ struct MapView: View {
             }
             .ignoresSafeArea()
             .onAppear {
-                // When the map appears, center it on the first available post
-                if let firstPostCoordinate = postService.posts.compactMap(\.coordinate).first {
-                    cameraPosition = .region(MKCoordinateRegion(center: firstPostCoordinate, span: defaultRegion.span))
+                // Request location updates
+                locationManager.requestLocationUpdate()
+            }
+            .onChange(of: locationManager.location) { oldValue, newLocation in
+                // Center map on user location when it's first obtained
+                if oldValue == nil, let location = newLocation {
+                    let userRegion = MKCoordinateRegion(
+                        center: location.coordinate,
+                        span: MKCoordinateSpan(latitudeDelta: 0.1, longitudeDelta: 0.1)
+                    )
+                    cameraPosition = .region(userRegion)
                 }
+            }
+            .overlay(alignment: .topTrailing) {
+                // Location button
+                Button(action: centerOnUserLocation) {
+                    Image(systemName: "location.fill")
+                        .font(.title2)
+                        .padding(12)
+                        .background(.regularMaterial)
+                        .clipShape(Circle())
+                        .shadow(radius: 4)
+                }
+                .padding()
             }
             
             // Show detail card if a post is selected
@@ -40,6 +72,18 @@ struct MapView: View {
                     .padding()
                     .transition(.move(edge: .bottom))
                     .animation(.spring(), value: selectedPost)
+            }
+        }
+    }
+    
+    private func centerOnUserLocation() {
+        if let location = locationManager.location {
+            let userRegion = MKCoordinateRegion(
+                center: location.coordinate,
+                span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
+            )
+            withAnimation {
+                cameraPosition = .region(userRegion)
             }
         }
     }

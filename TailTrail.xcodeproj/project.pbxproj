@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		877D28852E2FD5020068447E /* Starscream in Frameworks */ = {isa = PBXBuildFile; productRef = 877D28842E2FD5020068447E /* Starscream */; };
 		878683002E20CCF4009A5A59 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 878682FF2E20CCF4009A5A59 /* Kingfisher */; };
 /* End PBXBuildFile section */
 
@@ -41,6 +42,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				878683002E20CCF4009A5A59 /* Kingfisher in Frameworks */,
+				877D28852E2FD5020068447E /* Starscream in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -84,6 +86,7 @@
 			name = TailTrail;
 			packageProductDependencies = (
 				878682FF2E20CCF4009A5A59 /* Kingfisher */,
+				877D28842E2FD5020068447E /* Starscream */,
 			);
 			productName = TailTrail;
 			productReference = 8707A1E22E12A38B004C2343 /* TailTrail.app */;
@@ -117,6 +120,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				878682FE2E20CCF3009A5A59 /* XCRemoteSwiftPackageReference "Kingfisher" */,
+				877D28832E2FD5020068447E /* XCRemoteSwiftPackageReference "Starscream" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 8707A1E32E12A38B004C2343 /* Products */;
@@ -286,19 +290,23 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_ENTITLEMENTS = TailTrail/TailTrail.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"TailTrail/Preview Content\"";
 				DEVELOPMENT_TEAM = DJDVY4P58A;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = TailTrail/Info.plist;
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "We need your location to show you nearby pets.";
+				INFOPLIST_KEY_CFBundleDisplayName = TailTrail;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
+				INFOPLIST_KEY_NSCameraUsageDescription = "TailTrail needs access to your camera to take photos of lost or found pets to help identify them.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "TailTrail needs access to your location to show you nearby lost or found pets and help you find your pet in your area.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "TailTrail needs access to your photo library to select existing photos of pets for posting about lost or found animals.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UIRequiredDeviceCapabilities = "arm64 telephony";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -327,19 +335,23 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_ENTITLEMENTS = TailTrail/TailTrail.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 13;
 				DEVELOPMENT_ASSET_PATHS = "\"TailTrail/Preview Content\"";
 				DEVELOPMENT_TEAM = DJDVY4P58A;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = TailTrail/Info.plist;
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "We need your location to show you nearby pets.";
+				INFOPLIST_KEY_CFBundleDisplayName = TailTrail;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
+				INFOPLIST_KEY_NSCameraUsageDescription = "TailTrail needs access to your camera to take photos of lost or found pets to help identify them.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "TailTrail needs access to your location to show you nearby lost or found pets and help you find your pet in your area.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "TailTrail needs access to your photo library to select existing photos of pets for posting about lost or found animals.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UIRequiredDeviceCapabilities = "arm64 telephony";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -382,6 +394,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		877D28832E2FD5020068447E /* XCRemoteSwiftPackageReference "Starscream" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/daltoniam/Starscream.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.0.8;
+			};
+		};
 		878682FE2E20CCF3009A5A59 /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/onevcat/Kingfisher.git";
@@ -393,6 +413,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		877D28842E2FD5020068447E /* Starscream */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 877D28832E2FD5020068447E /* XCRemoteSwiftPackageReference "Starscream" */;
+			productName = Starscream;
+		};
 		878682FF2E20CCF4009A5A59 /* Kingfisher */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 878682FE2E20CCF3009A5A59 /* XCRemoteSwiftPackageReference "Kingfisher" */;

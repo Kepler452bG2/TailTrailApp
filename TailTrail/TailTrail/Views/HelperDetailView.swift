@@ -5,7 +5,7 @@ struct HelperDetailView: View {
     
     // Find all posts by this helper from the mock data
     private var helperPosts: [Post] {
-        MockData.posts.filter { $0.userId == helper.id }
+        MockData.posts.filter { $0.userId == helper.id.uuidString }
     }
     
     // Find a chat session to navigate to. This is a simple simulation.
@@ -63,8 +63,9 @@ struct HelperDetailView: View {
                 
                 Spacer()
                 
-                if let session = chatSession {
-                    NavigationLink(destination: ChatDetailView(session: session)) {
+                if chatSession != nil {
+                    // TODO: Convert session to Chat model
+                    Button(action: {}) {
                         Text("Connect Me")
                             .fontWeight(.bold)
                             .padding(.horizontal)

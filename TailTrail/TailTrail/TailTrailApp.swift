@@ -41,7 +41,14 @@ struct TailTrailApp: App {
         KingfisherManager.shared.defaultOptions = [
             .processor(processor),
             .scaleFactor(UIScreen.main.scale),
-            .cacheOriginalImage
+            .cacheOriginalImage,
+            .downloadPriority(0.5),
+            .transition(.fade(0.2)),
+            .retryStrategy(DelayRetryStrategy(maxRetryCount: 2, retryInterval: .seconds(3))),
+            .callbackQueue(.mainAsync)
         ]
+        
+        // Set timeout for downloads
+        KingfisherManager.shared.downloader.downloadTimeout = 30.0
     }
 } 

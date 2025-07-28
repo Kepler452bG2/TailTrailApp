@@ -18,7 +18,7 @@ struct BlockedUsersView: View {
                             Task {
                                 do {
                                     try await NetworkManager.shared
-                                        .unblockUser(userId: user.id.uuidString, authManager: authManager)
+                                        .unblockUser(userId: user.id, authManager: authManager)
                                     // Remove the user from the local list upon successful unblock
                                     blockedUsers.removeAll { $0.id == user.id }
                                 } catch {

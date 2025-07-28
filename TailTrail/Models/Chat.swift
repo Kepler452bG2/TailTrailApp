@@ -1,7 +1,48 @@
 import Foundation
 import SwiftUI
 
-// Represents a single message within a chat
+// API-compatible Chat model
+struct Chat: Identifiable, Codable {
+    let id: String
+    let name: String?
+    let isGroup: Bool
+    let createdAt: Date
+    let updatedAt: Date
+    let participants: [Participant]
+    let lastMessage: String?
+    let lastMessageTime: Date?
+    let unreadCount: Int
+    
+    enum CodingKeys: String, CodingKey {
+        case id
+        case name
+        case isGroup = "is_group"
+        case createdAt = "created_at"
+        case updatedAt = "updated_at"
+        case participants
+        case lastMessage = "last_message"
+        case lastMessageTime = "last_message_time"
+        case unreadCount = "unread_count"
+    }
+    
+    struct Participant: Codable {
+        let id: String
+        let email: String
+        let imageUrl: String?
+        let isOnline: Bool
+        let lastSeen: Date?  // Made optional since it can be null
+        
+        enum CodingKeys: String, CodingKey {
+            case id
+            case email
+            case imageUrl = "image_url"
+            case isOnline = "is_online"
+            case lastSeen = "last_seen"
+        }
+    }
+}
+
+// Legacy models for MockData compatibility
 struct ChatMessage: Identifiable, Hashable {
     let id = UUID()
     let text: String
@@ -9,11 +50,10 @@ struct ChatMessage: Identifiable, Hashable {
     let isFromCurrentUser: Bool
 }
 
-// Represents a single chat conversation thread
 struct ChatSession: Identifiable, Hashable {
     let id = UUID()
     let participantName: String
-    let participantAvatar: String // Placeholder for image name
+    let participantAvatar: String
     var messages: [ChatMessage]
     
     var lastMessageSnippet: String {
@@ -24,7 +64,6 @@ struct ChatSession: Identifiable, Hashable {
         messages.last?.timestamp
     }
     
-    // In a real app, this would be calculated based on read receipts
     var unreadCount: Int
     var isOnline: Bool
 } 

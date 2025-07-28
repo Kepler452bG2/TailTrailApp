@@ -17,7 +17,7 @@ struct MockData {
             lastSeenLocation: CLLocationCoordinate2D(latitude: 40.785091, longitude: -73.968285),
             description: "Very friendly, was wearing a blue collar. Answers to Buddy.",
             contactPhone: "555-1234",
-            userId: UUID(),
+            userId: "mock-user-1",
             createdAt: Date().addingTimeInterval(-3600 * 4),
             updatedAt: Date().addingTimeInterval(-3600 * 4),
             likesCount: 12,
@@ -37,9 +37,9 @@ struct MockData {
             locationName: "Brooklyn Bridge Park",
             lastSeenLocation: CLLocationCoordinate2D(latitude: 40.706000, longitude: -73.997000),
             description: "A bit shy, but seems healthy. Found near the carousel.",
-            contactPhone: "555-5678",
-            userId: UUID(),
-            createdAt: Date().addingTimeInterval(-3600 * 24 * 2),
+            contactPhone: "555-8888",
+            userId: "mock-user-1",
+            createdAt: Date().addingTimeInterval(-86400 * 3),
             updatedAt: Date().addingTimeInterval(-3600 * 24 * 2),
             likesCount: 3,
             isLiked: false,
@@ -79,6 +79,44 @@ struct MockData {
             ],
             unreadCount: 0,
             isOnline: false
+        )
+    ]
+
+    static let helper1 = Helper(id: UUID(), name: "Sarah Johnson", avatarName: "person.fill", rating: 4.8, bio: "Experienced dog walker and pet sitter. Available in Downtown area.", isVerified: true)
+    
+    static let helper2 = Helper(id: UUID(), name: "Mike Wilson", avatarName: "person.fill", rating: 4.9, bio: "Professional dog trainer with 5 years experience.", isVerified: true)
+    
+    static let helper3 = Helper(id: UUID(), name: "Alex Chen", avatarName: "person.fill", rating: 4.9, bio: "Certified pet care specialist. Dog training and pet sitting services.", isVerified: false)
+    
+    static let helpers = [helper1, helper2, helper3]
+    
+    // Mock data for new Chat model
+    static let chats: [Chat] = [
+        Chat(
+            id: "mock-chat-1",
+            name: nil,
+            isGroup: false,
+            createdAt: Date().addingTimeInterval(-86400),
+            updatedAt: Date(),
+            participants: [
+                Chat.Participant(
+                    id: "user1",
+                    email: "jane.smith@example.com",
+                    imageUrl: nil,
+                    isOnline: true,
+                    lastSeen: Date()
+                ),
+                Chat.Participant(
+                    id: "current-user",
+                    email: "current@example.com",
+                    imageUrl: nil,
+                    isOnline: true,
+                    lastSeen: Date()
+                )
+            ],
+            lastMessage: "I've shared your post with the local community group. Hope you find him soon!",
+            lastMessageTime: Date().addingTimeInterval(-3600),
+            unreadCount: 0
         )
     ]
 } 

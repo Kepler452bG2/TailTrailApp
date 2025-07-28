@@ -1,2 +1,2 @@
 SLASH = /
-API_BASE_URL = http:$(SLASH)$(SLASH)localhost:8080 // Адрес для локального тестового сервера 
+API_BASE_URL = http:$(SLASH)$(SLASH)209.38.237.102:8080 

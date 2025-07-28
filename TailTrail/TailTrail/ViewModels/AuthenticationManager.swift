@@ -4,6 +4,8 @@ import SwiftUI
 import AuthenticationServices
 
 class AuthenticationManager: ObservableObject {
+    static let shared = AuthenticationManager()
+    
     @Published var isLoggedIn: Bool = false
     @Published var currentUser: User? = nil
     
@@ -40,7 +42,7 @@ class AuthenticationManager: ObservableObject {
             return
         }
         
-        guard let url = URL(string: Config.apiBaseURL + "/api/v1/profile") else {
+        guard let url = URL(string: "\(Config.backendURL)/api/v1/users/profile") else {
             print("❌ Invalid URL for user profile")
             return
         }
@@ -74,7 +76,7 @@ class AuthenticationManager: ObservableObject {
     
     @MainActor
     func loginUser(email: String, password: String) async -> Bool {
-        guard let url = URL(string: Config.apiBaseURL + "/api/v1/auth/login") else {
+        guard let url = URL(string: "\(Config.backendURL)/api/v1/auth/login") else {
             print("❌ Invalid URL for login")
             return false
         }
@@ -113,6 +115,8 @@ class AuthenticationManager: ObservableObject {
             self.isLoggedIn = true
             
             print("✅ Email/Password login successful. Token received. Fetching profile...")
+            print("🔑 Your token: \(decodedResponse.token)")
+            print("📧 Logged in as: \(email)")
             await fetchUserProfile()
 
             // DEBUG: Check user state immediately after fetching
@@ -132,7 +136,7 @@ class AuthenticationManager: ObservableObject {
     
     @MainActor
     func registerUser(email: String, password: String) async -> Bool {
-        guard let url = URL(string: Config.apiBaseURL + "/api/v1/auth/signup") else {
+        guard let url = URL(string: "\(Config.backendURL)/api/v1/auth/signup") else {
             print("❌ Invalid URL for signup")
             return false
         }
@@ -210,7 +214,7 @@ class AuthenticationManager: ObservableObject {
             )
         }
         
-        guard let url = URL(string: Config.apiBaseURL + "/api/v1/profile") else {
+        guard let url = URL(string: "\(Config.backendURL)/api/v1/users/profile") else {
             print("❌ Invalid URL for profile update.")
             return false
         }
@@ -255,7 +259,7 @@ class AuthenticationManager: ObservableObject {
             return
         }
         
-        guard let url = URL(string: Config.apiBaseURL + "/api/v1/profile") else {
+        guard let url = URL(string: "\(Config.backendURL)/api/v1/users/profile") else {
             print("❌ Invalid URL for account deletion.")
             return
         }

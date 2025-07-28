@@ -16,7 +16,7 @@ struct Post: Identifiable, Codable, Equatable, Hashable {
     let lastSeenLocation: CLLocationCoordinate2D?
     let description: String?
     let contactPhone: String?
-    let userId: UUID // Renamed from authorId, changed type to UUID
+    let userId: String // User ID from API
     let createdAt: Date // Renamed from timestamp
     let updatedAt: Date
     let likesCount: Int
@@ -47,7 +47,7 @@ struct Post: Identifiable, Codable, Equatable, Hashable {
 
     // We need a memberwise initializer because the custom Codable init below removes the automatic one.
     // This is primarily for MockData and previews.
-    init(id: UUID, petName: String?, species: String?, breed: String?, age: Double?, gender: String?, weight: Double?, color: String?, images: [String], locationName: String?, lastSeenLocation: CLLocationCoordinate2D?, description: String?, contactPhone: String?, userId: UUID, createdAt: Date, updatedAt: Date, likesCount: Int, isLiked: Bool, status: String) {
+    init(id: UUID, petName: String?, species: String?, breed: String?, age: Double?, gender: String?, weight: Double?, color: String?, images: [String], locationName: String?, lastSeenLocation: CLLocationCoordinate2D?, description: String?, contactPhone: String?, userId: String, createdAt: Date, updatedAt: Date, likesCount: Int, isLiked: Bool, status: String) {
         self.id = id
         self.petName = petName
         self.species = species
@@ -91,7 +91,7 @@ struct Post: Identifiable, Codable, Equatable, Hashable {
 
         description = try container.decodeIfPresent(String.self, forKey: .description)
         contactPhone = try container.decodeIfPresent(String.self, forKey: .contactPhone)
-        userId = try container.decode(UUID.self, forKey: .userId)
+        userId = try container.decode(String.self, forKey: .userId)
         createdAt = try container.decode(Date.self, forKey: .createdAt)
         updatedAt = try container.decode(Date.self, forKey: .updatedAt)
         likesCount = try container.decode(Int.self, forKey: .likesCount)

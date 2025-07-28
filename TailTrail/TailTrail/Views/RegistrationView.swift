@@ -8,6 +8,8 @@ struct RegistrationView: View {
     @State private var agreeToTerms = false
     @State private var isPasswordVisible = false
     @State private var isSigningUp = false
+    @State private var showingTerms = false
+    @State private var showingPrivacy = false
     @EnvironmentObject var authManager: AuthenticationManager
     @Environment(\.presentationMode) var presentationMode
 
@@ -73,9 +75,29 @@ struct RegistrationView: View {
                                 .foregroundColor(agreeToTerms ? .yellow : .gray)
                         }
                         
-                        Text("I agree to the [Terms & Privacy Policy](https://github.com/Kepler452bG2/tailtrail-support/blob/main/README.md)")
-                            .font(.footnote)
-                            .foregroundColor(.secondary)
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("I agree to the")
+                                .font(.footnote)
+                                .foregroundColor(.secondary)
+                            
+                            HStack(spacing: 4) {
+                                Button("Terms of Service") {
+                                    showingTerms = true
+                                }
+                                .font(.footnote)
+                                .foregroundColor(.blue)
+                                
+                                Text("and")
+                                    .font(.footnote)
+                                    .foregroundColor(.secondary)
+                                
+                                Button("Privacy Policy") {
+                                    showingPrivacy = true
+                                }
+                                .font(.footnote)
+                                .foregroundColor(.blue)
+                            }
+                        }
                     }
 
                     if isSigningUp {
@@ -119,5 +141,21 @@ struct RegistrationView: View {
             }
         }
         .navigationBarHidden(true)
+        .sheet(isPresented: $showingTerms) {
+            NavigationView {
+                TermsOfServiceView()
+                    .navigationBarItems(trailing: Button("Done") {
+                        showingTerms = false
+                    })
+            }
+        }
+        .sheet(isPresented: $showingPrivacy) {
+            NavigationView {
+                PrivacyPolicyView()
+                    .navigationBarItems(trailing: Button("Done") {
+                        showingPrivacy = false
+                    })
+            }
+        }
     }
 } 

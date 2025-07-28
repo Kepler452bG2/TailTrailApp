@@ -8,6 +8,7 @@ class CreatePostViewModel: ObservableObject {
     @Published var currentStep = 1
     
     // Step 1
+    @Published var postType: PostStatus = .lost // lost or found
     @Published var petName: String = ""
     @Published var selectedSpecies: PetSpecies = .dog
     @Published var petBreed: String = ""
@@ -21,6 +22,11 @@ class CreatePostViewModel: ObservableObject {
     @Published var description: String = ""
     @Published var locationName: String = ""
     @Published var contactPhone: String = ""
+    
+    // Location
+    @Published var selectedLocation: CLLocation? = nil
+    @Published var showLocationPicker = false
+    @Published var useCurrentLocation = true
     
     // Photos Picker
     @Published var selectedPhotoItems: [PhotosPickerItem] = [] {
@@ -48,6 +54,34 @@ class CreatePostViewModel: ObservableObject {
 
     init(postService: PostService) {
         self.postService = postService
+        
+        // Get current location when view model is created
+        Task {
+            await getCurrentLocation()
+        }
+    }
+    
+    func getCurrentLocation() async {
+        locationManager.requestLocationUpdate()
+        
+        // Wait a bit for location update
+        try? await Task.sleep(nanoseconds: 1_000_000_000) // 1 second
+        
+        if let location = locationManager.location {
+            selectedLocation = location
+            
+            // Get location name
+            let geocoder = CLGeocoder()
+            if let placemarks = try? await geocoder.reverseGeocodeLocation(location),
+               let placemark = placemarks.first {
+                let street = placemark.thoroughfare ?? ""
+                let city = placemark.locality ?? ""
+                locationName = "\(street), \(city)".trimmingCharacters(in: .whitespaces)
+                if locationName.hasPrefix(", ") {
+                    locationName = city
+                }
+            }
+        }
     }
     
     func goToNextStep() {
@@ -67,7 +101,10 @@ class CreatePostViewModel: ObservableObject {
     }
     
     func publishPost() async {
-        guard let location = locationManager.location else {
+        // Use selected location or current location
+        let location = selectedLocation ?? locationManager.location
+        
+        guard let location = location else {
             presentAlert(title: "Location Error", message: "Could not determine location. Please enable location services.")
             return
         }
@@ -92,7 +129,8 @@ class CreatePostViewModel: ObservableObject {
                 locationName: locationName,
                 contactPhone: formattedPhone,
                 lastSeenLocation: location.coordinate,
-                images: selectedImages
+                images: selectedImages,
+                status: postType
             )
             presentAlert(title: "Success", message: "Your post has been published!")
         } catch {

@@ -6,30 +6,204 @@
 // General
 "Back" = "Артқа";
 "Done" = "Дайын";
-"Search" = "Search";
-"Pet" = "Friend";
-"Search pet" = "Search friend";
+"Cancel" = "Бас тарту";
+"Edit" = "Өңдеу";
+"Save" = "Сақтау";
+"Next" = "Келесі";
+"Previous" = "Алдыңғы";
+"Yes" = "Иә";
+"No" = "Жоқ";
+"search" = "Іздеу";
+"pet" = "Үй жануары";
+"search_pet" = "Үй жануарларын іздеу...";
+"all" = "Барлығы";
+"OK" = "Жарайды";
+"View" = "Көру";
+"View Details" = "Толығырақ";
+"Connect Me" = "Менімен байланысу";
+"Contact Me" = "Менімен байланысу";
+"Logout" = "Шығу";
+"Login" = "Кіру";
+"Sign Up" = "Тіркелу";
+"Sign Up to Continue" = "Жалғастыру үшін тіркеліңіз";
+"Already have an account?" = "Аккаунтыңыз бар ма?";
+"I agree to the" = "Мен келісемін";
+"and" = "және";
+"Terms of Service" = "Қызмет көрсету шарттары";
+"Privacy Policy" = "Құпиялылық саясаты";
+"Last updated: July 2025" = "Соңғы жаңарту: Шілде 2025";
+"© 2025 TailTrail. All rights reserved." = "© 2025 TailTrail. Барлық құқықтар қорғалған.";
 
 // Pet Species
 "Dog" = "Иттер";
 "Cat" = "Мысықтар";
 "Bird" = "Құстар";
-"Other" = "Басқа";
+"Other" = "Басқалар";
+"Species" = "Түрі";
+"Gender" = "Жынысы";
+"pets" = "үй жануарлары";
 
 // Location
 "Country" = "Ел";
 "City" = "Қала";
-"Select Location" = "Орынды таңдаңыз";
+"Select Location" = "Орналасқан жерді таңдау";
 
 // Language
-"Select Language" = "Тілді таңдаңыз";
+"Select Language" = "Тілді таңдау";
 
 // Feed
-// "All pet categories near you" = "Жаныңыздағы барлық жануарлар санаттары";
+"all_pet_categories_near_you" = "Сіздің аймағыңыздағы барлық үй жануарлары категориялары";
+"New Post" = "Жаңа жазба";
+"Step %d of 2" = "2-ден %d қадам";
+"Publish" = "Жариялау";
+"Photos (up to 5)" = "Фотосуреттер (5-ке дейін)";
+"no_posts_found" = "Жазбалар табылмады";
+"no_lost_pets_in_area" = "Сіздің аймағыңызда жоғалған үй жануарлары жоқ";
+"no_found_pets_in_area" = "Сіздің аймағыңызда табылған үй жануарлары жоқ";
+"no_Dog_pets_found" = "Иттер табылмады";
+"no_Cat_pets_found" = "Мысықтар табылмады";
+"no_Bird_pets_found" = "Құстар табылмады";
+"no_Other_pets_found" = "Басқа үй жануарлары табылмады";
+"load_more" = "Көбірек жүктеу";
+"you_are_offline" = "Сіз желіде емессіз";
+"error" = "Қате";
+"retry" = "Қайталау";
 
 // Statuses
-"Lost" = "Жоғалғандар";
-"Found" = "Табылғандар";
+"Lost" = "Жоғалған";
+"Found" = "Табылған";
 "lost" = "жоғалған";
 "found" = "табылған";
-"reunited" = "қайта қауышты"; 
+"reunited" = "қайта біріктірілген";
+"Missing %@" = "Жоғалған %@";
+
+// Navigation
+"Notifications" = "Хабарландырулар";
+"Chats" = "Чаттар";
+"No chats yet" = "Әзірше чаттар жоқ";
+"Start a conversation by contacting a pet owner" = "Үй жануарының иесімен байланысу арқылы сөйлесу бастаңыз";
+"23 Mins" = "23 мин";
+
+// Profile
+"Edit Profile" = "Профильді өңдеу";
+"Personal Information" = "Жеке ақпарат";
+"Change Password" = "Құпия сөзді өзгерту";
+"Delete Account" = "Аккаунтты жою";
+"Hello! My name is %@." = "Сәлем! Менің атым %@.";
+"Rating" = "Рейтинг";
+"About Me" = "Мен туралы";
+"My Posts" = "Менің жазбаларым";
+"No posts found." = "Жазбалар табылмады.";
+"%@ screen coming soon!" = "%@ экраны жақында келеді!";
+
+// Settings
+"general_settings" = "Жалпы параметрлер";
+"blocked_users" = "Блокталған пайдаланушылар";
+"Legal" = "Заңды";
+"app" = "Қосымша";
+"privacy_policy" = "Құпиялылық саясаты";
+"logout" = "Шығу";
+
+// Landing
+"Made with ❤️\nfor Pet Families\neverywhere" = "❤️-мен жасалған\nүй жануарлары бар отбасылар үшін\nбарлық жерде";
+"Create Account" = "Аккаунт жасау";
+
+// Messages
+"No messages yet" = "Әзірше хабарламалар жоқ";
+
+// Post Detail
+"Your report has been submitted and will be reviewed." = "Сіздің есептіңіз жіберілді және қарастырылады.";
+"You will no longer see posts or receive messages from this user." = "Сіз бұл пайдаланушының жазбаларын көрмейсіз немесе одан хабарлама алмайсыз.";
+"Pet Story" = "Үй жануарының тарихы";
+"Nannie Barker" = "Нэнни Баркер";
+
+// Privacy Policy
+"1. Information We Collect" = "1. Біз жинайтын ақпарат";
+"We collect information you provide directly to us, such as when you create an account, post about lost or found pets, or contact us for support. This may include:" = "Біз сіз бізге тікелей берген ақпаратты жинаймыз, мысалы, аккаунт жасағанда, жоғалған немесе табылған үй жануарлары туралы жазба жасағанда немесе бізге көмек сұрағанда. Бұған мыналар кіруі мүмкін:";
+"• Email address and password for account creation" = "• Аккаунт жасау үшін email мекенжайы мен құпия сөз";
+"• Pet information (name, breed, age, photos)" = "• Үй жануары туралы ақпарат (аты, тұқымы, жасы, фотосуреттер)";
+"• Location data to show nearby pets" = "• Жақындағы үй жануарларын көрсету үшін орналасу деректері";
+"• Contact information for pet owners" = "• Үй жануарларының иелерінің байланыс ақпараты";
+"• Messages sent through the chat feature" = "• Чат функциясы арқылы жіберілген хабарламалар";
+"2. How We Use Your Information" = "2. Біз сіздің ақпаратыңызды қалай пайдаланамыз";
+"We use the information we collect to:" = "Біз жинаған ақпаратты мыналар үшін пайдаланамыз:";
+"• Provide and maintain our pet finding service" = "• Үй жануарын табу қызметін көрсету және сақтау";
+"• Connect pet owners with people who found their pets" = "• Үй жануарларының иелерін оларды тапқан адамдармен байланыстыру";
+"• Send notifications about relevant posts" = "• Сәйкес жазбалар туралы хабарландырулар жіберу";
+"• Improve our app and user experience" = "• Біздің қосымшамызды және пайдаланушы тәжірибесін жақсарту";
+"• Respond to your support requests" = "• Сіздің көмек сұрауларыңызға жауап беру";
+"3. Location Services" = "3. Орналасу қызметтері";
+"TailTrail uses your device's location to show you nearby lost or found pets. You can control location access in your device settings. We only access location when the app is actively being used." = "TailTrail сізге жақындағы жоғалған немесе табылған үй жануарларын көрсету үшін құрылғыңыздың орналасуын пайдаланады. Сіз құрылғы параметрлерінде орналасуға қол жеткізуді бақылай аласыз. Біз орналасуға қол жеткізуді тек қосымша белсенді пайдаланылған кезде ғана жасаймыз.";
+"4. Photo and Media" = "4. Фотосуреттер және медиа";
+"When you upload photos of pets, we store them securely on our servers to help identify lost pets. Photos are only shared with other users through the app's posting system." = "Сіз үй жануарларының фотосуреттерін жүктегенде, біз оларды жоғалған үй жануарларын анықтауға көмектесу үшін серверлерімізде қауіпсіз сақтаймыз. Фотосуреттер тек қосымшаның жазба жүйесі арқылы басқа пайдаланушылармен бөлісіледі.";
+"5. Data Sharing" = "5. Деректерді бөлісу";
+"We do not sell, trade, or rent your personal information to third parties. We may share information only in these limited circumstances:" = "Біз сіздің жеке ақпаратыңызды үшінші тараптарға сатпаймыз, саудаласпаймыз немесе жалға бермейміз. Біз ақпаратты тек осы шектеулі жағдайларда ғана бөлісе аламыз:";
+"• With your explicit consent" = "• Сіздің анық келісіміңізбен";
+"• To comply with legal obligations" = "• Заңды міндеттемелерді орындау үшін";
+"• To protect our rights and safety" = "• Біздің құқықтарымызды және қауіпсіздігімізді қорғау үшін";
+"• With service providers who help us operate the app" = "• Қосымшаны жұмыс істетуге көмектесетін қызмет көрсетушілермен";
+"6. Data Security" = "6. Деректер қауіпсіздігі";
+"We implement appropriate security measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction. However, no method of transmission over the internet is 100% secure." = "Біз сіздің жеке ақпаратыңызды рұқсатсыз кіру, өзгерту, ашу немесе жоюдан қорғау үшін сәйкес қауіпсіздік шараларын қолданамыз. Алайда, интернет арқылы берудің ешқандай әдісі 100% қауіпсіз емес.";
+"7. Your Rights" = "7. Сіздің құқықтарыңыз";
+"You have the right to:" = "Сізде мыналарға құқық бар:";
+"• Access your personal information" = "• Жеке ақпаратыңызға қол жеткізу";
+"• Update or correct your information" = "• Ақпаратыңызды жаңарту немесе түзету";
+"• Delete your account and data" = "• Аккаунтыңызды және деректеріңізді жою";
+"• Opt out of certain communications" = "• Белгілі бір хабарламалардан бас тарту";
+"• Request data portability" = "• Деректерді тасымалдауды сұрау";
+"8. Children's Privacy" = "8. Балалардың құпиялылығы";
+"TailTrail is not intended for children under 13. We do not knowingly collect personal information from children under 13. If you are a parent and believe your child has provided us with personal information, please contact us." = "TailTrail 13 жастан кіші балаларға арналмаған. Біз 13 жастан кіші балалардан жеке ақпаратты біле отырып жинамаймыз. Егер сіз ата-ана болсаңыз және сіздің балаңыз бізге жеке ақпарат берген деп ойласаңыз, бізге хабарласыңыз.";
+"9. Changes to This Policy" = "9. Бұл саясаттағы өзгерістер";
+"We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy in the app and updating the 'Last updated' date." = "Біз бұл Құпиялылық саясатын уақыт өте келе жаңарта аламыз. Біз кез келген өзгерістер туралы сізді хабардар етеміз, жаңа Құпиялылық саясатын қосымшада орналастыру және 'Соңғы жаңарту' күнін жаңарту арқылы.";
+"10. Contact Us" = "10. Бізбен байланысу";
+"If you have any questions about this Privacy Policy, please contact us at:" = "Егер сізде бұл Құпиялылық саясаты туралы сұрақтар болса, бізбен мына мекенжай бойынша байланысыңыз:";
+"Email: assellyzh@gmail.com" = "Email: assellyzh@gmail.com";
+
+// Terms of Service
+"1. Acceptance of Terms" = "1. Шарттарды қабылдау";
+"By downloading, installing, or using the TailTrail mobile application, you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the app." = "TailTrail мобильді қосымшасын жүктеу, орнату немесе пайдалану арқылы сіз осы Қызмет көрсету шарттарына байланысты боласыз. Егер сіз осы шарттармен келіспесеңіз, қосымшаны пайдаланбаңыз.";
+"2. Description of Service" = "2. Қызмет сипаттамасы";
+"TailTrail is a social networking platform designed to help pet owners find their lost pets and connect with people who have found animals. The service allows users to:" = "TailTrail - бұл үй жануарларының иелеріне жоғалған үй жануарларын табуға және оларды тапқан адамдармен байланысуға көмектесуге арналған әлеуметтік желі платформасы. Қызмет пайдаланушыларға мыналарды мүмкіндік береді:";
+"• Create posts about lost or found pets" = "• Жоғалған немесе табылған үй жануарлары туралы жазбалар жасау";
+"• Upload photos and information about pets" = "• Үй жануарлары туралы фотосуреттер мен ақпарат жүктеу";
+"• Communicate with other users through chat" = "• Чат арқылы басқа пайдаланушылармен байланысу";
+"• View posts from nearby locations" = "• Жақындағы орындардан жазбаларды көру";
+"• Report and block inappropriate content" = "• Сәйкес емес мазмұн туралы хабарлау және оны блоктау";
+"3. User Accounts" = "3. Пайдаланушы аккаунттары";
+"To use certain features of TailTrail, you must create an account. You are responsible for:" = "TailTrail-дің белгілі бір функцияларын пайдалану үшін сіз аккаунт жасауыңыз керек. Сіз мыналар үшін жауаптысыз:";
+"• Maintaining the confidentiality of your account" = "• Аккаунтыңыздың құпиялылығын сақтау";
+"• All activities that occur under your account" = "• Аккаунтыңыз бойынша орын алатын барлық әрекеттер";
+"• Providing accurate and complete information" = "• Дәл және толық ақпарат беру";
+"• Notifying us immediately of any unauthorized use" = "• Кез келген рұқсатсыз пайдалану туралы бізді дереу хабардар ету";
+"4. User Content" = "4. Пайдаланушы мазмұны";
+"You retain ownership of content you post, but grant TailTrail a license to use, display, and distribute your content for the purpose of providing the service. You agree not to post:" = "Сіз жазған мазмұнның меншігін сақтайсыз, бірақ TailTrail-ге қызмет көрсету мақсатында сіздің мазмұныңызды пайдалану, көрсету және тарату лицензиясын берісіз. Сіз мыналарды жазбайтыныңызға келісесіз:";
+"• False or misleading information" = "• Жалған немесе алдайтын ақпарат";
+"• Content that violates others' rights" = "• Басқалардың құқықтарын бұзатын мазмұн";
+"• Inappropriate, offensive, or harmful content" = "• Сәйкес емес, қорлайтын немесе зиянды мазмұн";
+"• Spam or commercial advertisements" = "• Спам немесе коммерциялық жарнамалар";
+"• Personal information of others without consent" = "• Келісімсіз басқалардың жеке ақпараты";
+"5. Prohibited Activities" = "5. Тыйым салынған әрекеттер";
+"You agree not to:" = "Сіз мыналарды жасамайтыныңызға келісесіз:";
+"• Use the service for illegal purposes" = "• Қызметті заңсыз мақсаттар үшін пайдалану";
+"• Harass, abuse, or harm other users" = "• Басқа пайдаланушыларды қорлау, зорлау немесе зиян келтіру";
+"• Attempt to gain unauthorized access to the service" = "• Қызметке рұқсатсыз кіруге тырысу";
+"• Interfere with the proper functioning of the app" = "• Қосымшаның дұрыс жұмыс істеуіне кедергі келтіру";
+"• Use automated systems to access the service" = "• Қызметке кіру үшін автоматтандырылған жүйелерді пайдалану";
+"6. Privacy" = "6. Құпиялылық";
+"Your privacy is important to us. Please review our Privacy Policy, which also governs your use of the service, to understand our practices." = "Сіздің құпиялылығыңыз біз үшін маңызды. Біздің тәжірибемізді түсіну үшін қызметті пайдалануыңызды да реттейтін Құпиялылық саясатымызды қараңыз.";
+"7. Location Services" = "7. Орналасу қызметтері";
+"TailTrail uses location services to show you relevant posts from your area. You can control location access in your device settings. By using the app, you consent to the collection and use of location data as described in our Privacy Policy." = "TailTrail сізге ауданыңыздан сәйкес жазбаларды көрсету үшін орналасу қызметтерін пайдаланады. Сіз құрылғы параметрлерінде орналасуға қол жеткізуді бақылай аласыз. Қосымшаны пайдалану арқылы сіз Құпиялылық саясатымызда сипатталған орналасу деректерін жинауға және пайдалануға келісесіз.";
+"8. Intellectual Property" = "8. Зияткерлік меншік";
+"The TailTrail app, including its design, features, and content, is owned by TailTrail and protected by intellectual property laws. You may not copy, modify, or distribute any part of the service without our permission." = "TailTrail қосымшасы, оның дизайны, функциялары және мазмұны қоса, TailTrail-ге тиесілі және зияткерлік меншік заңдарымен қорғалған. Сіз біздің рұқсатымызсыз қызметтің кез келген бөлігін көшіре, өзгерте немесе тарата алмайсыз.";
+"9. Disclaimers" = "9. Жауапкершіліктен бас тарту";
+"TailTrail is provided 'as is' without warranties of any kind. We do not guarantee that the service will be uninterrupted, secure, or error-free. We are not responsible for the accuracy of user-generated content." = "TailTrail кез келген кепілдіктерсіз 'қандай болса сондай' беріледі. Біз қызметтің үзіліссіз, қауіпсіз немесе қатесіз болатынын кепілдемейміз. Біз пайдаланушы жасаған мазмұнның дәлдігі үшін жауапты емеспіз.";
+"10. Limitation of Liability" = "10. Жауапкершілікті шектеу";
+"To the maximum extent permitted by law, TailTrail shall not be liable for any indirect, incidental, special, consequential, or punitive damages resulting from your use of the service." = "Заңмен рұқсат етілген максималды шекке дейін, TailTrail қызметті пайдалануыңыздан туындайтын кез келген жанама, кездейсоқ, арнайы, салдарлы немесе айыппұлдық залалдар үшін жауапты болмайды.";
+"11. Termination" = "11. Тоқтату";
+"We may terminate or suspend your account at any time for violations of these terms. You may also delete your account at any time through the app settings." = "Біз осы шарттарды бұзғаны үшін кез келген уақытта сіздің аккаунтыңызды тоқтата немесе тоқтата аламыз. Сіз де қосымша параметрлері арқылы кез келген уақытта аккаунтыңызды жоя аласыз.";
+"12. Changes to Terms" = "12. Шарттардағы өзгерістер";
+"We may update these Terms of Service from time to time. We will notify you of any changes by posting the new terms in the app. Your continued use of the service after changes constitutes acceptance of the new terms." = "Біз осы Қызмет көрсету шарттарын уақыт өте келе жаңарта аламыз. Біз кез келген өзгерістер туралы сізді хабардар етеміз, жаңа шарттарды қосымшада орналастыру арқылы. Өзгерістерден кейін қызметті жалғастыруыңыз жаңа шарттарды қабылдау болып табылады.";
+"13. Governing Law" = "13. Басқарушы заң";
+"These terms are governed by the laws of the jurisdiction where TailTrail operates. Any disputes will be resolved in the appropriate courts of that jurisdiction." = "Бұл шарттар TailTrail жұмыс істейтін юрисдикцияның заңдарымен басқарылады. Кез келген даулар сол юрисдикцияның сәйкес соттарында шешіледі.";
+"14. Contact Information" = "14. Байланыс ақпараты";
+"If you have any questions about these Terms of Service, please contact us at:" = "Егер сізде осы Қызмет көрсету шарттары туралы сұрақтар болса, бізбен мына мекенжай бойынша байланысыңыз:"; 

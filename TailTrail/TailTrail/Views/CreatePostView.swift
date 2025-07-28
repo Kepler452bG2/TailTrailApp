@@ -22,7 +22,7 @@ struct CreatePostView: View {
                         Spacer()
                     }
                     HStack {
-                        Text("New Post")
+                        Text(viewModel.postType == .lost ? "Lost Pet Report" : "Found Pet Report")
                             .font(.largeTitle.bold())
                             .foregroundColor(Color(hex: "#3E5A9A"))
                         Spacer()
