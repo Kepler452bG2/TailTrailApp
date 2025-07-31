@@ -17,7 +17,7 @@
 
     function connect() {
       try {
-        ws = new WebSocket('ws://209.38.237.102:8667/listen');
+        ws = new WebSocket('ws://209.38.237.102:8080/ws/test');
 
         ws.onopen = function (event) {
           addMessage('✅ Connected to WebSocket');

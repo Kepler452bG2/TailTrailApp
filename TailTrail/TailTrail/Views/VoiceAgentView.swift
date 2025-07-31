@@ -181,7 +181,7 @@ struct VoiceAgentView: View {
                 
                 // Current URL info
                 #if targetEnvironment(simulator)
-                Text(useLocalhost ? "localhost:8667" : "209.38.237.102:8667")
+                Text(useLocalhost ? "localhost:8080" : "209.38.237.102:8080")
                     .font(.custom("Poppins-Regular", size: 10))
                     .foregroundColor(.black.opacity(0.5))
                     .padding(.top, 2)
@@ -319,10 +319,10 @@ struct VoiceAgentView: View {
         // Use the correct WebSocket URL format - same as React app
         #if targetEnvironment(simulator)
         // For simulator, allow switching between localhost and external IP
-        let wsURL = useLocalhost ? "ws://localhost:8667/listen" : "ws://209.38.237.102:8667/listen"
+        let wsURL = useLocalhost ? "ws://localhost:8080/ws/test" : "ws://209.38.237.102:8080/ws/test"
         #else
         // For real device, use external IP
-        let wsURL = "ws://209.38.237.102:8667/listen"
+        let wsURL = "ws://209.38.237.102:8080/ws/test"
         #endif
         
         guard let url = URL(string: wsURL) else {
@@ -617,9 +617,9 @@ struct VoiceAgentView: View {
     
     private func testAlternativeConnection() {
         #if targetEnvironment(simulator)
-        let wsURL = useLocalhost ? "ws://localhost:8667/listen" : "ws://209.38.237.102:8667/listen"
+        let wsURL = useLocalhost ? "ws://localhost:8080/ws/test" : "ws://209.38.237.102:8080/ws/test"
         #else
-        let wsURL = "ws://209.38.237.102:8667/listen"
+        let wsURL = "ws://209.38.237.102:8080/ws/test"
         #endif
         
         guard let url = URL(string: wsURL) else {
@@ -670,8 +670,8 @@ struct VoiceAgentView: View {
         let host = "209.38.237.102"
         #endif
         
-        let port: UInt16 = 8667
-        let testURL = "http://\(host):\(port)/health"
+        let port: UInt16 = 8080
+        let testURL = "http://\(host):\(port)/"
         
         guard let url = URL(string: testURL) else {
             status = "Invalid HTTP test URL"
@@ -712,7 +712,7 @@ struct VoiceAgentView: View {
         let host = "209.38.237.102"
         #endif
         
-        let port: UInt16 = 8667
+        let port: UInt16 = 8080
         
         // Try health check endpoint first
         let healthURL = "http://\(host):\(port)/health"
