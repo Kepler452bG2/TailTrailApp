@@ -72,15 +72,40 @@ class CreatePostViewModel: ObservableObject {
             
             // Get location name
             let geocoder = CLGeocoder()
-            if let placemarks = try? await geocoder.reverseGeocodeLocation(location),
-               let placemark = placemarks.first {
+            do {
+                let placemarks = try await geocoder.reverseGeocodeLocation(location)
+                if let placemark = placemarks.first {
                 let street = placemark.thoroughfare ?? ""
                 let city = placemark.locality ?? ""
                 locationName = "\(street), \(city)".trimmingCharacters(in: .whitespaces)
                 if locationName.hasPrefix(", ") {
                     locationName = city
                 }
+                } else {
+                    // No placemarks found, set fallback
+                    #if targetEnvironment(simulator)
+                    locationName = "Almaty, Kazakhstan"
+                    #else
+                    locationName = "Unknown Location"
+                    #endif
+                }
+            } catch {
+                print("❌ Reverse geocoding failed in CreatePostViewModel: \(error)")
+                
+                // Set fallback location name
+                #if targetEnvironment(simulator)
+                locationName = "Almaty, Kazakhstan"
+                #else
+                locationName = "Unknown Location"
+                #endif
             }
+        } else {
+            // No location available, set fallback
+            #if targetEnvironment(simulator)
+            locationName = "Almaty, Kazakhstan"
+            #else
+            locationName = "Unknown Location"
+            #endif
         }
     }
     

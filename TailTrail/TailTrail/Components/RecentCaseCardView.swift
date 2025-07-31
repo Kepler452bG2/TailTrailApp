@@ -26,8 +26,28 @@ struct RecentCaseCardView: View {
 }
 
 #Preview {
-    RecentCaseCardView(post: MockData.posts[0])
-        .padding()
-        .background(Color.theme.background)
-        .preferredColorScheme(.dark)
+    RecentCaseCardView(post: Post(
+        id: UUID(),
+        petName: "Sample Pet",
+        species: "dog",
+        breed: "Golden Retriever",
+        age: 3,
+        gender: "male",
+        weight: 25.0,
+        color: "Golden",
+        images: [],
+        locationName: "Sample Location",
+        lastSeenLocation: nil,
+        description: "Sample description",
+        contactPhone: "123-456-7890",
+        userId: "sample-user",
+        createdAt: Date(),
+        updatedAt: Date(),
+        likesCount: 0,
+        isLiked: false,
+        status: "lost"
+    ))
+    .padding()
+    .background(Color.theme.background)
+    .preferredColorScheme(.dark)
 } 

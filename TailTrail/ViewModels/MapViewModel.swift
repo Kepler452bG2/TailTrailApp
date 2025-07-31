@@ -13,9 +13,15 @@ class MapViewModel: ObservableObject {
     @Published var isFilterViewPresented = false
     @Published var searchText = ""
 
-    private let allPosts = MockData.posts
+    private let postService: PostService
+    
+    init(postService: PostService) {
+        self.postService = postService
+    }
 
     var filteredPosts: [Post] {
+        let allPosts = postService.posts
+        
         // First, filter by the main filter selection (panel)
         let panelFilteredPosts: [Post]
         switch selectedFilter {
@@ -42,10 +48,10 @@ class MapViewModel: ObservableObject {
     }
 
     var lostCount: Int {
-        allPosts.filter { $0.status == PostStatus.lost.rawValue }.count
+        postService.posts.filter { $0.status == PostStatus.lost.rawValue }.count
     }
 
     var foundCount: Int {
-        allPosts.filter { $0.status == PostStatus.found.rawValue }.count
+        postService.posts.filter { $0.status == PostStatus.found.rawValue }.count
     }
 } 

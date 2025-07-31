@@ -60,7 +60,8 @@ struct NotificationRowView: View {
     }
     
     private func findPost(by id: String) -> Post? {
-        return MockData.posts.first { $0.id.uuidString == id }
+        // In real app, would fetch from PostService or API
+        return nil
     }
 }
 

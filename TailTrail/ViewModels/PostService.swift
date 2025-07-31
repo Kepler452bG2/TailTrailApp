@@ -29,12 +29,37 @@ class PostService: ObservableObject {
     @Published var errorMessage: String?
     @Published var showError = false
     @Published var isOffline = false
+    @Published var selectedSpecies: PetSpecies? = nil
+    @Published var searchText: String = ""
+    @Published var likedPosts: [Post] = []
+    @Published var likedPostIds: Set<String> = []
     
     private var currentPage = 1
     private let postsPerPage = 5
     @Published var canLoadMorePages = true
     private let authManager: AuthenticationManager
     private let networkManager: NetworkManager
+    
+    // Computed property for filtered posts
+    var filteredPosts: [Post] {
+        var filtered = posts
+        
+        // Filter by species if selected
+        if let selectedSpecies = selectedSpecies {
+            filtered = filtered.filter { $0.species == selectedSpecies.rawValue }
+        }
+        
+        // Filter by search text if not empty
+        if !searchText.isEmpty {
+            filtered = filtered.filter { post in
+                let petName = post.petName?.lowercased() ?? ""
+                let searchQuery = searchText.lowercased()
+                return petName.contains(searchQuery)
+            }
+        }
+        
+        return filtered
+    }
     
     init(authManager: AuthenticationManager) {
         self.authManager = authManager
@@ -45,7 +70,7 @@ class PostService: ObservableObject {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] isConnected in
                 self?.isOffline = !isConnected
-                if isConnected && self?.posts.isEmpty == true {
+                if isConnected && self?.posts.isEmpty == true && authManager.isLoggedIn {
                     Task {
                         await self?.refreshPosts()
                     }
@@ -57,7 +82,7 @@ class PostService: ObservableObject {
     private var cancellables = Set<AnyCancellable>()
 
     func loadMorePosts() async {
-        guard !isLoading && canLoadMorePages else {
+        guard !isLoading && canLoadMorePages && authManager.isLoggedIn else {
             return
         }
 
@@ -66,23 +91,31 @@ class PostService: ObservableObject {
 
         do {
             let endpoint = "/api/v1/posts/?page=\(currentPage)&size=\(postsPerPage)"
+            print("🌐 Fetching posts from: \(endpoint)")
             let response: PostsResponse = try await networkManager.fetchData(from: endpoint, authManager: authManager)
+            
+            print("📥 Received \(response.posts.count) posts from server")
             
             if !response.posts.isEmpty {
                 posts.append(contentsOf: response.posts)
                 currentPage += 1
+                print("✅ Added posts to list. Total posts: \(posts.count)")
             } else {
                 canLoadMorePages = false
+                print("📭 No more posts available")
             }
         } catch let networkError as NetworkError {
+            print("❌ Network error: \(networkError)")
             // Don't show error for unauthorized when not logged in
             if case .unauthorized = networkError, !authManager.isLoggedIn {
                 // Silently fail - user is not logged in
                 canLoadMorePages = false
+                print("🔒 User not logged in, silently failing")
             } else {
                 handleNetworkError(networkError)
             }
         } catch {
+            print("❌ Generic error: \(error)")
             handleGenericError(error)
         }
 
@@ -203,5 +236,65 @@ class PostService: ObservableObject {
     func retry() async {
         clearError()
         await refreshPosts()
+    }
+    
+    // MARK: - Like functionality
+    
+    func toggleLike(for post: Post) {
+        let postId = post.id.uuidString
+        
+        // Optimistically update UI
+        if likedPostIds.contains(postId) {
+            likedPostIds.remove(postId)
+            likedPosts.removeAll { $0.id.uuidString == postId }
+        } else {
+            likedPostIds.insert(postId)
+            likedPosts.append(post)
+        }
+        
+        // Send API request
+        toggleLikeAPI(postId: postId)
+    }
+    
+    func isLiked(post: Post) -> Bool {
+        let postId = post.id.uuidString
+        return likedPostIds.contains(postId)
+    }
+    
+    func loadLikedPosts() {
+        // For now, we'll use local storage
+        // In a real app, you'd fetch from backend
+        likedPosts = posts.filter { post in
+            let postId = post.id.uuidString
+            return likedPostIds.contains(postId)
+        }
+    }
+    
+
+    
+    private func toggleLikeAPI(postId: String) {
+        Task {
+            do {
+                let endpoint = "/api/v1/posts/\(postId)/like"
+                let emptyBody = [String: String]()
+                try await networkManager.postData(to: endpoint, body: emptyBody, authManager: authManager)
+                print("✅ Post \(postId) like toggled successfully")
+            } catch {
+                print("❌ Failed to toggle like for post \(postId): \(error)")
+                // Revert local state if API call fails
+                DispatchQueue.main.async {
+                    // Toggle back the state
+                    if self.likedPostIds.contains(postId) {
+                        self.likedPostIds.remove(postId)
+                        self.likedPosts.removeAll { $0.id.uuidString == postId }
+                    } else {
+                        self.likedPostIds.insert(postId)
+                        if let post = self.posts.first(where: { $0.id.uuidString == postId }) {
+                            self.likedPosts.append(post)
+                        }
+                    }
+                }
+            }
+        }
     }
 } 

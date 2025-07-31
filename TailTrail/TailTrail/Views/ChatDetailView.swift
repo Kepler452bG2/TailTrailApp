@@ -56,7 +56,10 @@ struct ChatDetailView: View {
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button(action: { presentationMode.wrappedValue.dismiss() }) {
-                    Image(systemName: "chevron.left")
+                    Image("backicon")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 24, height: 24)
                         .foregroundColor(.orange)
                 }
             }
@@ -348,7 +351,25 @@ struct MessageBubble: View {
 
 #Preview {
     NavigationStack {
-        ChatDetailView(chat: MockData.chats[0])
+        ChatDetailView(chat: Chat(
+            id: "sample-chat",
+            name: "Sample Chat",
+            isGroup: false,
+            createdAt: Date(),
+            updatedAt: Date(),
+            participants: [
+                Chat.Participant(
+                    id: "user1",
+                    email: "user1@example.com",
+                    imageUrl: nil,
+                    isOnline: true,
+                    lastSeen: nil
+                )
+            ],
+            lastMessage: nil,
+            lastMessageTime: nil,
+            unreadCount: 0
+        ))
     }
     .environmentObject(TabBarVisibility())
     .environmentObject(AuthenticationManager())

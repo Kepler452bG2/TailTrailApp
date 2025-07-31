@@ -39,8 +39,14 @@ struct HelperCircleView: View {
 }
 
 #Preview {
-    HelperCircleView(helper: MockData.topHelpers[0])
-        .padding()
-        .background(Color.theme.background)
-        .preferredColorScheme(.dark)
+    HelperCircleView(
+        helper: Helper(
+            id: UUID(),
+            name: "Sample Helper",
+            avatarName: "person.fill",
+            rating: 4.5,
+            bio: "Sample bio",
+            isVerified: true
+        )
+    )
 } 

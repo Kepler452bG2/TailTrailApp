@@ -5,12 +5,14 @@ struct HelperDetailView: View {
     
     // Find all posts by this helper from the mock data
     private var helperPosts: [Post] {
-        MockData.posts.filter { $0.userId == helper.id.uuidString }
+        // In real app, would fetch from PostService or API
+        []
     }
     
     // Find a chat session to navigate to. This is a simple simulation.
     private var chatSession: ChatSession? {
-        MockData.chatSessions.first { $0.participantName.contains(helper.name) }
+        // In real app, would fetch from API
+        nil
     }
     
     var body: some View {
@@ -111,8 +113,14 @@ struct HelperDetailView: View {
 }
 
 #Preview {
-    NavigationView {
-        HelperDetailView(helper: MockData.topHelpers[1])
-            .preferredColorScheme(.dark)
-    }
+    HelperDetailView(
+        helper: Helper(
+            id: UUID(),
+            name: "Sample Helper",
+            avatarName: "person.fill",
+            rating: 4.5,
+            bio: "Sample bio",
+            isVerified: true
+        )
+    )
 } 

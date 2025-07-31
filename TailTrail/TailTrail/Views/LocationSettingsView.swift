@@ -10,84 +10,145 @@ struct LocationSettingsView: View {
     @AppStorage("searchRadius") private var searchRadius: Double = 50.0 // km
 
     var body: some View {
-        VStack {
-            HStack {
-                Button(action: {
-                    presentationMode.wrappedValue.dismiss()
-                }) {
-                    Image(systemName: "chevron.left")
-                }
-                .font(.title2.bold())
-                Spacer()
-                Text("Location Settings")
-                    .font(.headline.bold())
-                Spacer()
-            }
-            .padding()
+        ZStack {
+            // Background like FeedView
+            Color.clear.ignoresSafeArea()
             
-            Form {
-                Section(header: Text("Location Permissions")) {
-                    Toggle("Enable Location Services", isOn: $locationServices)
-                        .tint(.green)
-                        .onChange(of: locationServices) { oldValue, newValue in
-                            if newValue {
-                                locationManager.requestLocationUpdate()
-                            }
-                        }
+            VStack {
+                HStack {
+                    Button(action: {
+                        presentationMode.wrappedValue.dismiss()
+                    }) {
+                        Image("backicon")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 24, height: 24)
+                            .foregroundColor(.black)
+                    }
+                    Spacer()
+                    Text("Location Settings")
+                        .font(.custom("Poppins-Bold", size: 18))
+                        .foregroundColor(.black)
+                    Spacer()
                 }
+                .padding()
                 
-                if locationServices {
-                    Section(header: Text("Current Location")) {
-                        HStack {
-                            Text("Country")
-                            Spacer()
-                            Text(locationManager.currentCountry ?? "Detecting...")
-                                .foregroundColor(.gray)
-                        }
-                        
-                        HStack {
-                            Text("City")
-                            Spacer()
-                            Text(locationManager.currentCity ?? "Detecting...")
-                                .foregroundColor(.gray)
-                        }
-                        
-                        if locationManager.authorizationStatus == .denied {
-                            Text("Please enable location access in Settings")
-                                .font(.caption)
-                                .foregroundColor(.red)
-                        }
-                    }
-                    
-                    Section(header: Text("Search Radius")) {
-                        VStack(alignment: .leading) {
-                            Text("Show pets within \(Int(searchRadius)) km")
-                                .font(.subheadline)
+                ScrollView {
+                    VStack(spacing: 20) {
+                        // Location Permissions Section
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("LOCATION PERMISSIONS")
+                                .font(.custom("Poppins-SemiBold", size: 14))
+                                .foregroundColor(.black)
+                                .padding(.horizontal, 20)
                             
-                            Slider(value: $searchRadius, in: 10...100, step: 10)
-                                .tint(.orange)
-                            
-                            HStack {
-                                Text("10 km")
-                                    .font(.caption)
-                                    .foregroundColor(.gray)
-                                Spacer()
-                                Text("100 km")
-                                    .font(.caption)
-                                    .foregroundColor(.gray)
+                            VStack(spacing: 0) {
+                                HStack {
+                                    Text("Enable Location Services")
+                                        .font(.custom("Poppins-Regular", size: 16))
+                                        .foregroundColor(.black)
+                                    Spacer()
+                                    Toggle("", isOn: $locationServices)
+                                        .tint(.green)
+                                        .onChange(of: locationServices) { oldValue, newValue in
+                                            if newValue {
+                                                locationManager.requestLocationUpdate()
+                                            }
+                                        }
+                                }
+                                .padding(.horizontal, 20)
+                                .padding(.vertical, 16)
+                                .background(Color.white.opacity(0.3))
                             }
+                            .cornerRadius(12)
+                            .padding(.horizontal, 20)
+                        }
+                        
+                        // Current Location Section
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("CURRENT LOCATION")
+                                .font(.custom("Poppins-SemiBold", size: 14))
+                                .foregroundColor(.black)
+                                .padding(.horizontal, 20)
+                            
+                            VStack(spacing: 0) {
+                                HStack {
+                                    Text("Country")
+                                        .font(.custom("Poppins-Regular", size: 16))
+                                        .foregroundColor(.black)
+                                    Spacer()
+                                    Text(locationManager.currentCountry ?? "Detecting...")
+                                        .font(.custom("Poppins-Regular", size: 16))
+                                        .foregroundColor(.gray)
+                                }
+                                .padding(.horizontal, 20)
+                                .padding(.vertical, 16)
+                                .background(Color.white.opacity(0.3))
+                                
+                                Divider()
+                                    .padding(.horizontal, 20)
+                                
+                                HStack {
+                                    Text("City")
+                                        .font(.custom("Poppins-Regular", size: 16))
+                                        .foregroundColor(.black)
+                                    Spacer()
+                                    Text(locationManager.currentCity ?? "Detecting...")
+                                        .font(.custom("Poppins-Regular", size: 16))
+                                        .foregroundColor(.gray)
+                                }
+                                .padding(.horizontal, 20)
+                                .padding(.vertical, 16)
+                                .background(Color.white.opacity(0.3))
+                            }
+                            .cornerRadius(12)
+                            .padding(.horizontal, 20)
+                        }
+                        
+                        // Search Radius Section
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("SEARCH RADIUS")
+                                .font(.custom("Poppins-SemiBold", size: 14))
+                                .foregroundColor(.black)
+                                .padding(.horizontal, 20)
+                            
+                            VStack(spacing: 16) {
+                                Text("Show pets within \(Int(searchRadius)) km")
+                                    .font(.custom("Poppins-Regular", size: 16))
+                                    .foregroundColor(.black)
+                                    .padding(.horizontal, 20)
+                                
+                                VStack(spacing: 8) {
+                                    Slider(value: $searchRadius, in: 10...100, step: 1)
+                                        .accentColor(.blue)
+                                        .padding(.horizontal, 20)
+                                    
+                                    HStack {
+                                        Text("10 km")
+                                            .font(.custom("Poppins-Regular", size: 12))
+                                            .foregroundColor(.gray)
+                                        Spacer()
+                                        Text("100 km")
+                                            .font(.custom("Poppins-Regular", size: 12))
+                                            .foregroundColor(.gray)
+                                    }
+                                    .padding(.horizontal, 20)
+                                }
+                            }
+                            .padding(.vertical, 20)
+                            .background(Color.white.opacity(0.3))
+                            .cornerRadius(12)
+                            .padding(.horizontal, 20)
                         }
                     }
+                    .padding(.top, 20)
+                    .padding(.bottom, 100) // Account for tab bar
                 }
             }
         }
-        .foregroundColor(.black)
-        .background(Color.theme.background.ignoresSafeArea())
         .navigationBarHidden(true)
         .onAppear {
-            if locationServices {
-                locationManager.requestLocationUpdate()
-            }
+            locationManager.requestLocationUpdate()
         }
     }
 }

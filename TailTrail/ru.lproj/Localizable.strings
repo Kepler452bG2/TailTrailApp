@@ -15,7 +15,7 @@
 "No" = "Нет";
 "search" = "Поиск";
 "pet" = "Питомец";
-"search_pet" = "Поиск питомцев...";
+"search_pet" = "Поиск питомцев";
 "all" = "Все";
 "OK" = "ОК";
 "View" = "Просмотр";
@@ -51,8 +51,16 @@
 // Language
 "Select Language" = "Выбрать язык";
 
+// Filters
+"filters" = "Фильтры";
+"search_filters" = "Фильтры поиска";
+"animal_type" = "Вид животного";
+"search_radius" = "Радиус поиска";
+"km" = "км";
+
 // Feed
 "all_pet_categories_near_you" = "Все категории питомцев рядом с вами";
+"all_pet_categories_near" = "Все питомцы рядом с вами";
 "New Post" = "Новый пост";
 "Step %d of 2" = "Шаг %d из 2";
 "Publish" = "Опубликовать";
@@ -206,4 +214,36 @@
 "13. Governing Law" = "13. Применимое право";
 "These terms are governed by the laws of the jurisdiction where TailTrail operates. Any disputes will be resolved in the appropriate courts of that jurisdiction." = "Эти условия регулируются законами юрисдикции, где работает TailTrail. Любые споры будут разрешены в соответствующих судах этой юрисдикции.";
 "14. Contact Information" = "14. Контактная информация";
-"If you have any questions about these Terms of Service, please contact us at:" = "Если у вас есть вопросы об этих Условиях использования, пожалуйста, свяжитесь с нами:"; 
+"If you have any questions about these Terms of Service, please contact us at:" = "Если у вас есть вопросы об этих Условиях использования, пожалуйста, свяжитесь с нами:";
+
+/* Language Selection */
+"language" = "Язык";
+"back" = "Назад";
+"language_change_instant" = "Выберите предпочитаемый язык. Изменения будут применены мгновенно.";
+
+/* Settings */
+"notification" = "Уведомления";
+"security" = "Безопасность";
+"location" = "Местоположение";
+"help_support" = "Помощь и поддержка";
+"edit_profile" = "Редактировать профиль";
+
+/* Feed */
+"recent_posts" = "Недавние посты";
+"search" = "Поиск";
+"pet" = "питомца";
+"search_pets_title" = "Поиск питомцев";
+"search_pets_placeholder" = "Поиск питомцев...";
+"lost" = "Потерянные";
+"found" = "Найденные";
+"all" = "Все";
+"dog" = "Собаки";
+"cat" = "Кошки";
+"bird" = "Птицы";
+"other" = "Другие"; 
+
+// Splash Screen
+"welcome_to_tailtrail" = "Добро пожаловать в TailTrail: Поиск питомцев";
+"login" = "Войти";
+"register" = "Регистрация";
+"terms_support" = "Условия и поддержка";

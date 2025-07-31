@@ -11,7 +11,7 @@ struct AllCasesListView: View {
                 LazyVStack(spacing: 16) {
                     ForEach(postService.posts) { post in
                         NavigationLink(destination: PostDetailView(post: post)) {
-                            PostCardView(post: post)
+                            PostCardView(post: post, postService: postService)
                         }
                         .buttonStyle(.plain)
                     }

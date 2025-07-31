@@ -5,24 +5,46 @@ struct ActivityReportMapView: View {
     let posts: [Post]
     
     @State private var position: MapCameraPosition = .automatic
+    @State private var selectedStatus: PostStatus? = nil
     
     var body: some View {
         // Filter posts to only include those with valid coordinates
-        let postsWithCoordinates = posts.filter { $0.coordinate != nil }
+        let postsWithCoordinates = filteredPosts
         
         Map(position: $position) {
             ForEach(postsWithCoordinates) { post in
                 if let coordinate = post.coordinate {
                     Annotation(post.petName ?? "Pet", coordinate: coordinate) {
-                        Image(systemName: "mappin.circle.fill")
-                            .font(.title)
-                            .foregroundColor(post.status == PostStatus.lost.rawValue ? .red : .green)
-                            .overlay(
-                                Circle().stroke(Color.white, lineWidth: 2)
-                            )
+                        MapAnnotationView(
+                            isSelected: false,
+                            status: PostStatus(rawValue: post.status) ?? .lost
+                        )
                     }
                 }
             }
+        }
+        .overlay(alignment: .topTrailing) {
+            // Status filter
+            Menu {
+                Button("All Posts") {
+                    selectedStatus = nil
+                }
+                ForEach(PostStatus.allCases, id: \.self) { status in
+                    Button(status.displayName) {
+                        selectedStatus = status
+                    }
+                }
+            } label: {
+                HStack {
+                    Image(systemName: "line.3.horizontal.decrease.circle")
+                    Text(selectedStatus?.displayName ?? "All Posts")
+                    Image(systemName: "chevron.down")
+                }
+                .padding(8)
+                .background(.regularMaterial)
+                .clipShape(Capsule())
+            }
+            .padding()
         }
         .onAppear {
             // Set initial camera position
@@ -34,10 +56,18 @@ struct ActivityReportMapView: View {
             }
         }
     }
+    
+    private var filteredPosts: [Post] {
+        if let status = selectedStatus {
+            return posts.filter { $0.coordinate != nil && $0.status == status.rawValue }
+        } else {
+            return posts.filter { $0.coordinate != nil }
+        }
+    }
 }
 
 struct ActivityReportMapView_Previews: PreviewProvider {
     static var previews: some View {
-        ActivityReportMapView(posts: MockData.posts)
+        ActivityReportMapView(posts: [])
     }
 } 

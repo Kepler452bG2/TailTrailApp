@@ -4,6 +4,7 @@ import CoreLocation
 struct PostCardView: View {
     let post: Post
     @StateObject private var locationManager = LocationManager()
+    @ObservedObject var postService: PostService
     
     private var distanceText: String? {
         guard let userLocation = locationManager.location,
@@ -24,33 +25,35 @@ struct PostCardView: View {
             // Image section
             AsyncImage(url: URL(string: post.images.first ?? "")) { phase in
                 switch phase {
-                case .empty:
-                    Rectangle()
-                        .fill(Color(.systemGray6))
-                        .frame(height: 100)
-                        .overlay(
-                            ProgressView()
-                                .tint(.gray)
-                        )
-                case .success(let image):
-                    image
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(height: 100)
-                        .clipped()
-                case .failure:
-                    Rectangle()
-                        .fill(Color(.systemGray6))
-                        .frame(height: 100)
-                        .overlay(
-                            Image(systemName: "photo")
-                                .font(.system(size: 20))
-                                .foregroundColor(.gray)
-                        )
+                                    case .empty:
+                        Rectangle()
+                            .fill(Color(.systemGray6))
+                            .frame(height: 100) // Уменьшаем высоту изображения еще больше
+                            .overlay(
+                                ProgressView()
+                                    .tint(.gray)
+                            )
+                                    case .success(let image):
+                        image
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(height: 100) // Уменьшаем высоту изображения еще больше
+                            .clipped()
+                            .scaleEffect(1.0) // Убираем масштабирование
+                                    case .failure:
+                        Rectangle()
+                            .fill(Color(.systemGray6))
+                            .frame(height: 100) // Уменьшаем высоту изображения еще больше
+                            .overlay(
+                                Image(systemName: "photo")
+                                    .font(.system(size: 20))
+                                    .foregroundColor(.gray)
+                            )
                 @unknown default:
                     EmptyView()
                 }
             }
+            .id(post.images.first ?? "") // Принудительное обновление при изменении URL
 
             // Info section
             VStack(alignment: .leading, spacing: 4) {
@@ -80,15 +83,39 @@ struct PostCardView: View {
                 }
             }
             .padding(12)
-            .background(Color.white)
+            .background(Color.clear) // Убираем белый фон
         }
-        .background(Color.white)
+        .frame(height: 160) // Уменьшаем высоту карточки еще больше
+        .background(Color.clear) // Убираем белый фон
         .clipShape(RoundedRectangle(cornerRadius: 12))
         .shadow(color: .black.opacity(0.08), radius: 4, x: 0, y: 2)
     }
 }
 
 #Preview {
-    PostCardView(post: MockData.posts.first!)
-        .padding()
+    PostCardView(
+        post: Post(
+            id: UUID(),
+            petName: "Sample Pet",
+            species: "dog",
+            breed: "Golden Retriever",
+            age: 3,
+            gender: "male",
+            weight: 25.0,
+            color: "Golden",
+            images: [],
+            locationName: "Sample Location",
+            lastSeenLocation: nil,
+            description: "Sample description",
+            contactPhone: "123-456-7890",
+            userId: "sample-user",
+            createdAt: Date(),
+            updatedAt: Date(),
+            likesCount: 0,
+            isLiked: false,
+            status: "lost"
+        ),
+        postService: PostService(authManager: AuthenticationManager())
+    )
+    .padding()
 } 

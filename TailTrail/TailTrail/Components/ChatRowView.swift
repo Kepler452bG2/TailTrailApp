@@ -111,6 +111,33 @@ extension Date {
 }
 
 #Preview {
-    ChatRowView(chat: MockData.chats.first!, currentUserId: "currentUser")
-        .padding()
+    ChatRowView(
+        chat: Chat(
+            id: "sample-chat-id",
+            name: "Sample Chat",
+            isGroup: false,
+            createdAt: Date(),
+            updatedAt: Date(),
+            participants: [
+                Chat.Participant(
+                    id: "user1",
+                    email: "user1@example.com",
+                    imageUrl: nil,
+                    isOnline: true,
+                    lastSeen: Date()
+                ),
+                Chat.Participant(
+                    id: "user2",
+                    email: "user2@example.com",
+                    imageUrl: nil,
+                    isOnline: false,
+                    lastSeen: Date()
+                )
+            ],
+            lastMessage: "Sample message",
+            lastMessageTime: Date(),
+            unreadCount: 0
+        ),
+        currentUserId: "user1"
+    )
 } 

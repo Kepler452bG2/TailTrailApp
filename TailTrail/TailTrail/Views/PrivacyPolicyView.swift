@@ -1,12 +1,37 @@
 import SwiftUI
 
 struct PrivacyPolicyView: View {
+    @Environment(\.dismiss) private var dismiss
+    
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
+        VStack {
+            // Custom header with back button
+            HStack {
+                Button(action: { 
+                    dismiss()
+                }) {
+                    Image("backicon")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 24, height: 24)
+                        .foregroundColor(.black)
+                }
+                
+                Spacer()
+                
                 Text("Privacy Policy")
-                    .font(.largeTitle.bold())
-                    .padding(.bottom, 10)
+                    .font(.headline)
+                    .fontWeight(.bold)
+                
+                Spacer()
+            }
+            .padding()
+            
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    Text("Privacy Policy")
+                        .font(.largeTitle.bold())
+                        .padding(.bottom, 10)
                 
                 Group {
                     Text("Last updated: July 2025")
@@ -121,11 +146,11 @@ struct PrivacyPolicyView: View {
                         .foregroundColor(.secondary)
                         .padding(.top, 20)
                 }
+                }
+                .padding()
             }
-            .padding()
         }
-        .navigationTitle("Privacy Policy")
-        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarHidden(true)
     }
 }
 

@@ -15,7 +15,7 @@
 "No" = "No";
 "search" = "Search";
 "pet" = "Pet";
-"search_pet" = "Search pets...";
+"search_pet" = "Search pets";
 "all" = "All";
 "OK" = "OK";
 "View" = "View";
@@ -51,8 +51,16 @@
 // Language
 "Select Language" = "Select Language";
 
+// Filters
+"filters" = "Filters";
+"search_filters" = "Search Filters";
+"animal_type" = "Animal Type";
+"search_radius" = "Search radius";
+"km" = "km";
+
 // Feed
 "all_pet_categories_near_you" = "All pet categories near you";
+"all_pet_categories_near" = "All pet categories near";
 "New Post" = "New Post";
 "Step %d of 2" = "Step %d of 2";
 "Publish" = "Publish";
@@ -206,4 +214,36 @@
 "13. Governing Law" = "13. Governing Law";
 "These terms are governed by the laws of the jurisdiction where TailTrail operates. Any disputes will be resolved in the appropriate courts of that jurisdiction." = "These terms are governed by the laws of the jurisdiction where TailTrail operates. Any disputes will be resolved in the appropriate courts of that jurisdiction.";
 "14. Contact Information" = "14. Contact Information";
-"If you have any questions about these Terms of Service, please contact us at:" = "If you have any questions about these Terms of Service, please contact us at:"; 
+"If you have any questions about these Terms of Service, please contact us at:" = "If you have any questions about these Terms of Service, please contact us at:";
+
+/* Language Selection */
+"language" = "Language";
+"back" = "Back";
+"language_change_instant" = "Choose your preferred language. Changes will be applied instantly.";
+
+/* Settings */
+"notification" = "Notification";
+"security" = "Security";
+"location" = "Location";
+"help_support" = "Help & Support";
+"edit_profile" = "Edit Profile";
+
+/* Feed */
+"recent_posts" = "Recent Posts";
+"search" = "Search";
+"pet" = "pet";
+"search_pets_title" = "Search Pets";
+"search_pets_placeholder" = "Search pets...";
+"lost" = "Lost";
+"found" = "Found";
+"all" = "All";
+"dog" = "Dogs";
+"cat" = "Cats";
+"bird" = "Birds";
+"other" = "Other"; 
+
+// Splash Screen
+"welcome_to_tailtrail" = "Welcome To TailTrail: Pet Finder";
+"login" = "Login";
+"register" = "Register";
+"terms_support" = "Terms & Support";

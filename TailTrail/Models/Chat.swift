@@ -66,4 +66,11 @@ struct ChatSession: Identifiable, Hashable {
     
     var unreadCount: Int
     var isOnline: Bool
+}
+
+// MARK: - Equatable
+extension Chat: Equatable {
+    static func == (lhs: Chat, rhs: Chat) -> Bool {
+        return lhs.id == rhs.id
+    }
 } 

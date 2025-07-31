@@ -52,9 +52,9 @@ struct MainTabView: View {
         case 2:
             MessagesView()
         case 3:
-            AllCasesListView()
+            VoiceAgentView()
         case 4:
-            ProfileView()
+            ProfileView(postService: postService)
         default:
             FeedView()
         }

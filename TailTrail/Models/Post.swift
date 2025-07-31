@@ -127,8 +127,18 @@ struct Post: Identifiable, Codable, Equatable, Hashable {
     // We don't need a custom encoder right now as we are not sending this full model back.
     // But if we did, it would go here.
     
+    // MARK: - Computed Properties
+    
     var coordinate: CLLocationCoordinate2D? {
-        lastSeenLocation
+        return lastSeenLocation
+    }
+    
+    var statusEnum: PostStatus {
+        return PostStatus(rawValue: status) ?? .lost
+    }
+    
+    var speciesEnum: PetSpecies {
+        return PetSpecies(rawValue: species ?? "") ?? .dog
     }
 
     var imageURLs: [URL] {
@@ -183,6 +193,10 @@ enum PetSpecies: String, Codable, CaseIterable, Identifiable {
         case .other:
             return "questionmark.circle.fill"
         }
+    }
+    
+    var localizedName: String {
+        return self.rawValue.localized()
     }
 }
 

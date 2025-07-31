@@ -22,9 +22,10 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         #if targetEnvironment(simulator)
         // You can change these coordinates to your city
         self.location = CLLocation(latitude: 43.2220, longitude: 76.8512)
-        Task {
-            await reverseGeocode(location: self.location!)
-        }
+        // Set default city and country for simulator
+        self.currentCity = "Almaty"
+        self.currentCountry = "Kazakhstan"
+        print("📍 Simulator location: \(currentCity ?? "Unknown"), \(currentCountry ?? "Unknown")")
         #endif
     }
 
@@ -82,10 +83,41 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
             }
         } catch {
             print("❌ Reverse geocoding failed: \(error)")
+            
+            // Set fallback values based on coordinates
+            #if targetEnvironment(simulator)
+            // For simulator, use default values
+            self.currentCity = "Almaty"
+            self.currentCountry = "Kazakhstan"
+            print("📍 Using fallback location for simulator: \(currentCity ?? "Unknown"), \(currentCountry ?? "Unknown")")
+            #else
+            // For real device, try to determine approximate location
+            if location.coordinate.latitude > 0 {
+                self.currentCity = "Unknown City"
+                self.currentCountry = "Unknown Country"
+            } else {
+                self.currentCity = "Unknown City"
+                self.currentCountry = "Unknown Country"
+            }
+            print("📍 Using fallback location: \(currentCity ?? "Unknown"), \(currentCountry ?? "Unknown")")
+            #endif
         }
     }
 
     nonisolated func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        print("Error getting location: \(error.localizedDescription)")
+        print("❌ Error getting location: \(error.localizedDescription)")
+        
+        // Set fallback values if location fails
+        Task { @MainActor in
+            #if targetEnvironment(simulator)
+            self.currentCity = "Almaty"
+            self.currentCountry = "Kazakhstan"
+            print("📍 Using fallback location for simulator after error: \(currentCity ?? "Unknown"), \(currentCountry ?? "Unknown")")
+            #else
+            self.currentCity = "Unknown City"
+            self.currentCountry = "Unknown Country"
+            print("📍 Using fallback location after error: \(currentCity ?? "Unknown"), \(currentCountry ?? "Unknown")")
+            #endif
+        }
     }
 } 

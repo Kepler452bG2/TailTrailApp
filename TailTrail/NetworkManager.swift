@@ -405,6 +405,12 @@ class NetworkManager: ObservableObject {
     }
 
     func fetchBlockedUsers(authManager: AuthenticationManager) async throws -> [User] {
+        // Temporarily return empty array since backend doesn't have block functionality implemented
+        print("⚠️ Blocked users functionality not implemented on backend yet")
+        return []
+        
+        // Original implementation (commented out until backend is ready)
+        /*
         try checkConnectivity()
         
         let endpoint = "/api/v1/users/block/"
@@ -443,9 +449,16 @@ class NetworkManager: ObservableObject {
                 throw NetworkError.serverUnavailable
             }
         }
+        */
     }
 
     func unblockUser(userId: String, authManager: AuthenticationManager) async throws {
+        // Temporarily do nothing since backend doesn't have block functionality implemented
+        print("⚠️ Unblock user functionality not implemented on backend yet")
+        return
+        
+        // Original implementation (commented out until backend is ready)
+        /*
         try checkConnectivity()
         
         let endpoint = "/api/v1/users/block/\(userId)"
@@ -483,6 +496,7 @@ class NetworkManager: ObservableObject {
                 throw NetworkError.serverUnavailable
             }
         }
+        */
     }
 
     // MARK: - Delete Chat

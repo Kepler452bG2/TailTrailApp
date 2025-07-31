@@ -29,7 +29,7 @@ struct NotificationsView: View {
                 filterButtons
                 notificationList
             }
-            .background(Color.theme.background.ignoresSafeArea())
+            .background(Color.clear.ignoresSafeArea())
             .navigationBarHidden(true)
         }
     }
@@ -37,14 +37,18 @@ struct NotificationsView: View {
     private var header: some View {
         HStack {
             Button(action: { presentationMode.wrappedValue.dismiss() }) {
-                Image(systemName: "chevron.left")
-                    .font(.title2.bold())
+                Image("backicon")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 24, height: 24)
             }
             
             Spacer()
             
-            Text("Notifications")
-                .font(.largeTitle.bold())
+            Image("Notifications")
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(height: 40)
             
             Spacer()
         }
@@ -94,7 +98,7 @@ private struct FilterButton: View {
                 .fontWeight(.bold)
                 .padding(.horizontal, 20)
                 .padding(.vertical, 10)
-                .background(isSelected ? .black : Color.white)
+                .background(isSelected ? Color.black : Color(hex: "#FED3A4"))
                 .foregroundColor(isSelected ? .white : .black)
                 .clipShape(Capsule())
                 .overlay(Capsule().stroke(Color.black, lineWidth: 1.5))

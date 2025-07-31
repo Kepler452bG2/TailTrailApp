@@ -11,14 +11,16 @@ struct SecuritySettingsView: View {
                 // Custom Header
                 HStack {
                     Button(action: { presentationMode.wrappedValue.dismiss() }) {
-                        Image(systemName: "chevron.left")
-                            .font(.title2.bold())
+                        Image("backicon")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 24, height: 24)
                     }
                     Spacer()
                     Text("Security")
                         .font(.title2.bold())
                     Spacer()
-                    Image(systemName: "chevron.left").opacity(0) // For balance
+                    Image("backicon").opacity(0) // For balance
                 }
                 .padding()
                 .background(Color.white)

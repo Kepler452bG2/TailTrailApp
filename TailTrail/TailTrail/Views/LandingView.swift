@@ -33,11 +33,19 @@ struct LandingView: View {
                 VStack {
                     Spacer()
 
-                    Text("Made with ❤️\nfor Pet Families\neverywhere")
-                        .font(.system(size: 38, weight: .heavy, design: .rounded))
-                        .foregroundColor(.white)
-                        .multilineTextAlignment(.center)
-                        .lineSpacing(4)
+                    // Made with asset
+                    Image("made")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(maxWidth: 300)
+                        .padding(.horizontal)
+                        .padding(.bottom, 20)
+
+                    // PetsAsset below made
+                    Image("PetsAsset")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(maxWidth: 200)
                         .padding(.horizontal)
                         .padding(.bottom, 30)
 

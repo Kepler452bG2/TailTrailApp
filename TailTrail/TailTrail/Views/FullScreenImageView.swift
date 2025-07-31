@@ -51,6 +51,6 @@ struct FullScreenImageView: View {
 
 #Preview {
     FullScreenImageView(
-        imageNames: MockData.posts[0].images
+        imageNames: ["sample-image-1", "sample-image-2"]
     )
 } 

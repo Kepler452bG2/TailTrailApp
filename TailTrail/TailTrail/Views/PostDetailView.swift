@@ -1,4 +1,5 @@
 import SwiftUI
+import CoreLocation
 
 struct PostDetailView: View {
     let post: Post
@@ -30,7 +31,8 @@ struct PostDetailView: View {
 
     var body: some View {
         ZStack(alignment: .top) {
-            Color(.systemGray6).ignoresSafeArea() // Use a subtle off-white background
+            // Light background like Jeremy screen
+            Color(red: 0.98, green: 0.96, blue: 0.94).ignoresSafeArea()
 
             ScrollView(.vertical, showsIndicators: false) {
                 VStack(spacing: 0) {
@@ -44,34 +46,36 @@ struct PostDetailView: View {
                     .clipped()
                     .onTapGesture { showFullScreenImage = true }
 
-                    // White Content Card
+                    // Content Card in Jeremy style
                     contentCard
-                        .background(Color(.systemBackground))
+                        .background(Color.white)
                         .cornerRadius(30, corners: [.topLeft, .topRight])
                         .offset(y: -30)
                 }
             }
 
-            // Back button overlay
+            // Back button overlay in Jeremy style
             VStack {
                 HStack {
                     Button(action: { presentationMode.wrappedValue.dismiss() }) {
-                        Image(systemName: "chevron.left")
-                            .font(.title2.bold())
+                        Image("backicon")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 28, height: 28)
                             .foregroundColor(.black)
-                            .padding()
-                            .background(Color.white.opacity(0.7))
-                            .clipShape(Circle())
                     }
+                    .padding(.leading, 20)
+                    .padding(.top, 50)
                     Spacer()
                 }
-                .padding(.leading) // Added padding here
-                .padding(.top)
                 Spacer()
             }
         }
         .navigationBarHidden(true)
         .ignoresSafeArea(.all, edges: .top)
+        .navigationDestination(isPresented: .constant(chatToNavigate != nil)) {
+            chatDestination
+        }
         .fullScreenCover(isPresented: $showFullScreenImage) {
             FullScreenImageView(imageNames: post.images)
         }
@@ -82,7 +86,6 @@ struct PostDetailView: View {
     private var contentCard: some View {
         VStack(alignment: .leading, spacing: 25) {
             postHeader
-            detailsGrid
             petStory
             postedByView
         }
@@ -90,172 +93,87 @@ struct PostDetailView: View {
     }
 
     private var postHeader: some View {
-        HStack(alignment: .top) {
-            VStack(alignment: .leading, spacing: 2) {
+        VStack(alignment: .leading, spacing: 16) {
+            // Status and name like Jeremy
+            VStack(alignment: .leading, spacing: 8) {
                 Text("Missing \(post.species ?? "pet")")
-                    .font(.subheadline)
+                    .font(.custom("Poppins-Regular", size: 16))
                     .foregroundColor(.secondary)
                 Text(post.petName ?? "No Name")
-                    .font(.largeTitle.bold())
-                HStack {
-                    Image(systemName: "mappin.and.ellipse")
-                    Text(post.locationName ?? "Unknown location")
-                }.font(.subheadline).foregroundColor(.secondary)
+                    .font(.custom("Poppins-Bold", size: 32))
+                    .foregroundColor(.black)
             }
-            Spacer()
-            actionButtons
-        }
-    }
-
-    private var actionButtons: some View {
-        HStack {
-            // Like Button
-            Button(action: {
-                isLiked.toggle()
-                // TODO: Call a service to update the backend.
-            }) {
-                Image(systemName: isLiked ? "heart.fill" : "heart")
-                    .foregroundColor(isLiked ? Color(hex: "#3E5A9A") : .gray) // Blue when liked
-                    .font(.title2)
-                    .frame(width: 44, height: 44)
-                    .background(Color.white)
-                    .clipShape(Circle())
-                    .shadow(color: .gray.opacity(0.3), radius: 5)
+            
+            // Tags like Jeremy (Retriever, Male, 2 years)
+            HStack(spacing: 12) {
+                tagView(text: post.breed ?? "Unknown", color: Color(red: 1.0, green: 0.8, blue: 0.6)) // Light orange
+                tagView(text: post.gender ?? "Unknown", color: Color(red: 0.7, green: 0.9, blue: 0.9)) // Light teal
+                tagView(text: post.age != nil ? String(format: "%.0f years", post.age! / 12) : "Unknown", color: Color(red: 1.0, green: 0.8, blue: 0.6)) // Light orange
             }
-
-            // Report and Block Menu
-            Menu {
-                Button {
-                    isShowingReportDialog = true
-                } label: {
-                    Label("Report Post", systemImage: "exclamationmark.bubble")
-                }
-                
-                Button(role: .destructive) {
-                    Task {
-                        do {
-                            try await NetworkManager.shared.blockUser(userId: post.userId, authManager: authManager)
-                            showBlockConfirmation = true
-                        } catch {
-                            print("❌ Failed to block user: \(error)")
-                        }
-                    }
-                } label: {
-                    Label("Block User", systemImage: "person.crop.circle.badge.xmark")
-                }
-            } label: {
-                Image(systemName: "ellipsis.circle")
-                    .foregroundColor(.primary)
-                    .font(.title2)
-                    .frame(width: 44, height: 44)
-                    .background(Color.white)
-                    .clipShape(Circle())
-                    .shadow(color: .gray.opacity(0.3), radius: 5)
+            
+            // Location
+            HStack {
+                Image(systemName: "mappin.and.ellipse")
+                Text(post.locationName ?? "Unknown location")
             }
-        }
-        .confirmationDialog("Report Post", isPresented: $isShowingReportDialog, titleVisibility: .visible) {
-            ForEach(ReportReason.allCases) { reason in
-                Button(reason.rawValue) {
-                    Task {
-                        do {
-                            try await NetworkManager.shared.reportPost(postId: post.id.uuidString, reason: reason.rawValue, authManager: authManager)
-                            showReportConfirmation = true
-                        } catch {
-                            // Optionally, show an error alert to the user
-                            print("❌ Failed to submit report: \(error)")
-                        }
-                    }
-                }
-            }
-            Button("Cancel", role: .cancel) { }
-        }
-        .alert("Thank You", isPresented: $showReportConfirmation) {
-            Button("OK", role: .cancel) { }
-        } message: {
-            Text("Your report has been submitted and will be reviewed.")
-        }
-        .alert("User Blocked", isPresented: $showBlockConfirmation) {
-            Button("OK", role: .cancel) {
-                Task {
-                    await postService.refreshPosts()
-                    presentationMode.wrappedValue.dismiss()
-                }
-            }
-        } message: {
-            Text("You will no longer see posts or receive messages from this user.")
+            .font(.custom("Poppins-Regular", size: 16))
+            .foregroundColor(.secondary)
         }
     }
     
+    private func tagView(text: String, color: Color) -> some View {
+        Text(text)
+            .font(.custom("Poppins-Medium", size: 14))
+            .foregroundColor(.black)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
+            .background(color)
+            .overlay(
+                RoundedRectangle(cornerRadius: 20)
+                    .stroke(Color.black.opacity(0.1), lineWidth: 1)
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 20))
+    }
+
+
+    
     private var petStory: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Pet Story").font(.title3.bold())
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Pet Story")
+                .font(.custom("Poppins-Bold", size: 20))
+                .foregroundColor(.black)
+            
+            Text("Hi, I'm \(post.petName ?? "a pet"):")
+                .font(.custom("Poppins-SemiBold", size: 18))
+                .foregroundColor(.black)
+            
             Text(post.description ?? "No description provided.")
-                .font(.body)
+                .font(.custom("Poppins-Regular", size: 16))
                 .foregroundColor(.secondary)
-                .lineLimit(4)
+                .lineLimit(nil) // Allow full text like Jeremy
         }
     }
 
-    private var detailsGrid: some View {
-        let details = [
-            ("Age", post.age != nil ? String(format: "%.1f months", post.age!) : "N/A"),
-            ("Breed", post.breed ?? "N/A"),
-            ("Color", post.color ?? "N/A"),
-            ("Weight", post.weight != nil ? String(format: "%.1f lb", post.weight!) : "N/A"),
-            ("Gender", post.gender ?? "N/A")
-        ]
-        
-        return LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
-            ForEach(Array(details.enumerated()), id: \.offset) { index, detail in
-                infoBox(title: detail.0, value: detail.1, index: index)
-            }
-        }
-    }
 
-    private func infoBox(title: String, value: String, index: Int) -> some View {
-        let colors = [Color(hex: "#22A6A2"), Color(hex: "#FBCF3A")] // Teal and Yellow
-        let backgroundColor = colors[index % colors.count].opacity(0.8)
-        
-        return VStack {
-            Text(title).font(.caption).foregroundColor(.white.opacity(0.9))
-            Text(value)
-                .font(.subheadline.weight(.heavy))
-                .foregroundColor(.white)
-                .minimumScaleFactor(0.8)
-                .lineLimit(1)
-        }
-        .frame(maxWidth: .infinity, minHeight: 60)
-        .padding(8)
-        .background(backgroundColor)
-        .cornerRadius(12)
-    }
 
     private var postedByView: some View {
-        HStack {
-            Image("dog1").resizable().aspectRatio(contentMode: .fill).frame(width: 50, height: 50).clipShape(Circle())
-            Text("Nannie Barker").font(.subheadline.bold())
-            Spacer()
-
+        VStack(spacing: 16) {
+            // Chat button with chatmess asset
             Button(action: {
+                // Navigate to chat with post creator
                 if let userUUID = UUID(uuidString: post.userId) {
                     self.chatToNavigate = findOrCreateChatSession(with: userUUID)
                 }
             }) {
-                Text("Contact Me")
-                    .font(.subheadline.bold())
-                    .foregroundColor(.white)
-                    .padding(.horizontal, 20)
-                    .padding(.vertical, 12)
-                    .background(Color(hex: "#3E5A9A")) // Blue button
-                    .clipShape(Capsule())
-            }
-            .navigationDestination(isPresented: .constant(chatToNavigate != nil)) {
-                chatDestination
+                Image("chatmess")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 60)
             }
         }
-        .padding()
-        .background(Color(white: 0.95))
-        .cornerRadius(25)
+        .padding(.horizontal)
+        .padding(.vertical, 12)
     }
     
     @ViewBuilder
@@ -310,5 +228,25 @@ struct RoundedCorner: Shape {
 }
 
 #Preview {
-    PostDetailView(post: MockData.posts.first!)
+    PostDetailView(post: Post(
+        id: UUID(),
+        petName: "Sample Pet",
+        species: "dog",
+        breed: "Golden Retriever",
+        age: 3,
+        gender: "male",
+        weight: 25.0,
+        color: "Golden",
+        images: [],
+        locationName: "Sample Location",
+        lastSeenLocation: CLLocationCoordinate2D(latitude: 40.785091, longitude: -73.968285),
+        description: "Sample description for preview",
+        contactPhone: "555-1234",
+        userId: "sample-user",
+        createdAt: Date(),
+        updatedAt: Date(),
+        likesCount: 0,
+        isLiked: false,
+        status: "lost"
+    ))
 } 

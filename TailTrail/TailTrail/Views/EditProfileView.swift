@@ -30,12 +30,8 @@ struct EditProfileView: View {
 
     var body: some View {
         ZStack {
-            // Background from the image palette
-            LinearGradient(
-                gradient: Gradient(colors: [Color(hex: "#1FA6A2"), Color(hex: "#FBCF3A")]),
-                startPoint: .top,
-                endPoint: .bottom
-            ).edgesIgnoringSafeArea(.all)
+            // Background like FeedView
+            Color.clear.ignoresSafeArea()
 
             ScrollView {
                 VStack(spacing: 30) {
@@ -54,8 +50,11 @@ struct EditProfileView: View {
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button(action: { presentationMode.wrappedValue.dismiss() }) {
-                    Image(systemName: "chevron.left")
-                        .foregroundColor(.white)
+                    Image("backicon")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 24, height: 24)
+                        .foregroundColor(.black)
                 }
             }
         }
@@ -98,7 +97,7 @@ struct EditProfileView: View {
                     } else {
                             Image(systemName: "person.fill")
                             .resizable()
-                                .foregroundColor(Color.white.opacity(0.8))
+                                .foregroundColor(Color.gray.opacity(0.8))
                         }
                     }
                     .aspectRatio(contentMode: .fill)
@@ -129,137 +128,113 @@ struct EditProfileView: View {
     private var personalInfoSection: some View {
         VStack(spacing: 20) {
             Text("Personal Information")
-                .font(.title2).bold()
-                .foregroundColor(.white)
+                .font(.custom("Poppins-Bold", size: 20))
+                .foregroundColor(.black)
             
             VStack(spacing: 15) {
                 InfoTextField(icon: "person.fill", placeholder: "Name", text: $name)
                 InfoTextField(icon: "phone.fill", placeholder: "Phone", text: $phone)
-                    .keyboardType(.phonePad)
             }
             
-            ModernButton(title: "Save Changes", action: saveChanges)
+            // Save button with profbutton.png
+            Button(action: {
+                // TODO: Implement save functionality
+                print("Save changes requested")
+            }) {
+                Text("Save Changes")
+                    .font(.custom("Poppins-SemiBold", size: 16))
+                    .foregroundColor(.black)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 12)
+                    .background(Color.white.opacity(0.9))
+                    .cornerRadius(12)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(Color.black, lineWidth: 1)
+                    )
+            }
         }
-        .padding()
-        .background(Color.white.opacity(0.1))
+        .padding(.horizontal, 20)
+        .padding(.vertical, 30)
+        .background(Color.white.opacity(0.3))
         .cornerRadius(20)
     }
-
+    
     private var passwordSection: some View {
         VStack(spacing: 20) {
             Text("Change Password")
-                .font(.title2).bold()
-                .foregroundColor(.white)
-
+                .font(.custom("Poppins-Bold", size: 20))
+                .foregroundColor(.black)
+            
             VStack(spacing: 15) {
                 InfoTextField(icon: "lock.fill", placeholder: "Current Password", text: $currentPassword, isSecure: true)
                 InfoTextField(icon: "lock.fill", placeholder: "New Password", text: $newPassword, isSecure: true)
                 InfoTextField(icon: "lock.fill", placeholder: "Confirm New Password", text: $confirmNewPassword, isSecure: true)
             }
             
-            ModernButton(title: "Change Password", action: changePassword)
-                .disabled(newPassword.isEmpty || newPassword != confirmNewPassword)
+            // Change Password button with profbutton.png
+            Button(action: {
+                // TODO: Implement password change functionality
+                print("Change password requested")
+            }) {
+                Text("Change Password")
+                    .font(.custom("Poppins-SemiBold", size: 16))
+                    .foregroundColor(.black)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 12)
+                    .background(Color.white.opacity(0.9))
+                    .cornerRadius(12)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(Color.black, lineWidth: 1)
+                    )
+            }
         }
-        .padding()
-        .background(Color.white.opacity(0.1))
+        .padding(.horizontal, 20)
+        .padding(.vertical, 30)
+        .background(Color.white.opacity(0.3))
         .cornerRadius(20)
     }
-
-    private var deleteButton: some View {
-        Button(action: { showingDeleteConfirmation = true }) {
-            Text("Delete Account")
-                .bold()
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(Color.red)
-                .foregroundColor(.white)
-                .cornerRadius(15)
-        }
-    }
     
-    private func saveChanges() {
-        isSaving = true
-        Task {
-            let success = await authManager.updateUserProfile(name: self.name, phone: self.phone, image: self.profileUIImage)
-            if success {
-                Task {
-                    await authManager.fetchUserProfile() // Refresh user data
-                }
-                presentationMode.wrappedValue.dismiss()
-            }
-            isSaving = false
+    private var deleteButton: some View {
+        Button(action: {
+            showingDeleteConfirmation = true
+        }) {
+            Text("Delete Account")
+                .font(.custom("Poppins-SemiBold", size: 16))
+                .foregroundColor(.red)
+                .padding()
+                .frame(maxWidth: .infinity)
+                .background(Color.red.opacity(0.1))
+                .cornerRadius(12)
         }
-    }
-
-    private func changePassword() {
-        isSaving = true
-        Task {
-            // TODO: Implement password change functionality
-            print("Password change requested")
-            // For now, just dismiss
-            isSaving = false
-            presentationMode.wrappedValue.dismiss()
-        }
+        .padding(.horizontal, 20)
     }
 }
 
-// Custom TextField for this view
-struct InfoTextField: View {
+// Helper view for text fields
+private struct InfoTextField: View {
     let icon: String
     let placeholder: String
     @Binding var text: String
-    var isSecure = false
+    var isSecure: Bool = false
     
     var body: some View {
         HStack {
             Image(systemName: icon)
-                .foregroundColor(.accentColor)
+                .foregroundColor(Color(hex: "#3E5A9A"))
                 .frame(width: 20)
             
-            Group {
-                if isSecure {
-                    SecureField(placeholder, text: $text)
-                } else {
-                    TextField(placeholder, text: $text)
-                }
+            if isSecure {
+                SecureField(placeholder, text: $text)
+                    .font(.custom("Poppins-Regular", size: 16))
+            } else {
+                TextField(placeholder, text: $text)
+                    .font(.custom("Poppins-Regular", size: 16))
             }
-            .foregroundColor(Color("PrimaryTextColor")) // Use adaptive text color
         }
         .padding()
-        .background(Color(.systemBackground).opacity(0.8)) // Use adaptive background
-        .cornerRadius(15)
-        .shadow(color: .black.opacity(0.1), radius: 5, y: 2)
-    }
-}
-
-// Custom button for this view
-struct ModernButton: View {
-    let title: String
-    let action: () -> Void
-    @Environment(\.isEnabled) private var isEnabled: Bool
-    
-    var body: some View {
-        Button(action: action) {
-            Text(title)
-                .bold()
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(
-                    LinearGradient(
-                        gradient: Gradient(colors: [Color(hex: "#3E5A9A"), Color(hex: "#1FA6A2")]),
-                        startPoint: .leading,
-                        endPoint: .trailing
-                    )
-                )
-                .foregroundColor(.white)
-                .cornerRadius(15)
-                .opacity(isEnabled ? 1.0 : 0.5)
-        }
-    }
-}
-
-#Preview {
-    NavigationView {
-        EditProfileView(authManager: AuthenticationManager.shared)
+        .background(Color.white)
+        .cornerRadius(12)
     }
 } 

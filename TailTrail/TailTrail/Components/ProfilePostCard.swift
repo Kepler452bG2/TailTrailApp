@@ -25,8 +25,27 @@ struct ProfilePostCard: View {
 
 #Preview {
     HStack {
-        ProfilePostCard(post: MockData.posts[0])
-        ProfilePostCard(post: MockData.posts[1])
+        ProfilePostCard(post: Post(
+            id: UUID(),
+            petName: "Sample Pet",
+            species: "dog",
+            breed: "Golden Retriever",
+            age: 3,
+            gender: "male",
+            weight: 25.0,
+            color: "Golden",
+            images: [],
+            locationName: "Sample Location",
+            lastSeenLocation: nil,
+            description: "Sample description",
+            contactPhone: "123-456-7890",
+            userId: "sample-user",
+            createdAt: Date(),
+            updatedAt: Date(),
+            likesCount: 0,
+            isLiked: false,
+            status: "lost"
+        ))
     }
     .padding()
     .background(Color.gray)

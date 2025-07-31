@@ -12,7 +12,7 @@ struct TailTrailApp: App {
         let authManagerInstance = AuthenticationManager()
         _authManager = StateObject(wrappedValue: authManagerInstance)
         _postService = StateObject(wrappedValue: PostService(authManager: authManagerInstance))
-        _languageManager = StateObject(wrappedValue: LanguageManager())
+        _languageManager = StateObject(wrappedValue: LanguageManager.shared)
         
         configureKingfisher()
     }
@@ -23,7 +23,7 @@ struct TailTrailApp: App {
                 if authManager.isLoggedIn {
                     MainTabView(postService: postService)
                 } else {
-                    LandingView()
+                    AuthScreenView()
                 }
             }
             .environmentObject(authManager)

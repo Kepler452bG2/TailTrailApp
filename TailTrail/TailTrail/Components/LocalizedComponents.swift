@@ -1,65 +1,93 @@
 import SwiftUI
 
-struct LocalizedOfflineBanner: View {
+struct OfflineBanner: View {
     var body: some View {
         HStack {
             Image(systemName: "wifi.slash")
-                .foregroundColor(.white)
+                .foregroundColor(.red)
             Text("you_are_offline".localized())
-                .foregroundColor(.white)
-                .font(.subheadline)
-            Spacer()
+                .font(.caption)
+                .foregroundColor(.red)
         }
-        .padding()
-        .background(Color.orange)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 8)
+        .background(Color.red.opacity(0.1))
         .cornerRadius(8)
-        .padding(.horizontal)
-        .padding(.bottom, 100) // Avoid tab bar
     }
 }
 
-struct LocalizedErrorBanner: View {
-    let message: String
-    let onRetry: () -> Void
-    let onDismiss: () -> Void
+struct ErrorView: View {
+    let error: String
+    let retryAction: () -> Void
     
     var body: some View {
-        VStack(spacing: 8) {
-            HStack {
-                Image(systemName: "exclamationmark.triangle")
-                    .foregroundColor(.white)
-                Text("error".localized())
-                    .foregroundColor(.white)
-                    .font(.headline)
-                Spacer()
-                Button(action: onDismiss) {
-                    Image(systemName: "xmark")
-                        .foregroundColor(.white)
-                }
-            }
+        VStack(spacing: 16) {
+            Image(systemName: "exclamationmark.triangle")
+                .font(.system(size: 48))
+                .foregroundColor(.orange)
             
-            Text(message)
-                .foregroundColor(.white)
-                .font(.subheadline)
-                .multilineTextAlignment(.leading)
+            Text("error".localized())
+                .font(.headline)
+                .foregroundColor(.primary)
             
-            HStack {
-                Button("retry".localized()) {
-                    onRetry()
-                }
-                .foregroundColor(.white)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 8)
-                .background(Color.white.opacity(0.2))
-                .cornerRadius(6)
-                
-                Spacer()
+            Text(error)
+                .font(.body)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal)
+            
+            Button("retry".localized()) {
+                retryAction()
             }
+            .buttonStyle(.borderedProminent)
         }
         .padding()
-        .background(Color.red)
-        .cornerRadius(8)
-        .padding(.horizontal)
-        .padding(.bottom, 100) // Avoid tab bar
+    }
+}
+
+// LocalizedText component that automatically updates when language changes
+struct LocalizedText: View {
+    let key: String
+    @EnvironmentObject var languageManager: LanguageManager
+    
+    var body: some View {
+        Text(languageManager.localizedString(forKey: key))
+            .onReceive(languageManager.$currentLanguage) { _ in
+                // This will trigger a view update when language changes
+            }
+    }
+}
+
+// LocalizedButton component
+struct LocalizedButton: View {
+    let key: String
+    let action: () -> Void
+    @EnvironmentObject var languageManager: LanguageManager
+    
+    var body: some View {
+        Button(action: action) {
+            Text(languageManager.localizedString(forKey: key))
+        }
+        .onReceive(languageManager.$currentLanguage) { _ in
+            // This will trigger a view update when language changes
+        }
+    }
+}
+
+// ViewModifier for automatic language updates
+struct LocalizedViewModifier: ViewModifier {
+    @EnvironmentObject var languageManager: LanguageManager
+    
+    func body(content: Content) -> some View {
+        content
+            .onReceive(languageManager.$currentLanguage) { _ in
+                // Force view update when language changes
+            }
+    }
+}
+
+extension View {
+    func localized() -> some View {
+        modifier(LocalizedViewModifier())
     }
 } 

@@ -5,35 +5,12 @@ struct FeedView: View {
     @EnvironmentObject var postService: PostService
     @StateObject private var locationManager = LocationManager()
     
-    @State private var selectedSpecies: PetSpecies? = nil
     @State private var selectedStatus: PostStatus = .lost
-    @State private var searchText = ""
     @State private var autoScrollIndex = 0
+    @State private var showingFilters = false
+    @State private var showAllPosts = false
     private let timer = Timer.publish(every: 3, on: .main, in: .common).autoconnect()
     @AppStorage("searchRadius") private var searchRadius: Double = 50.0
-
-    var filteredPosts: [Post] {
-        return postService.posts.filter { post in
-            // Updated status matching logic - active posts show in lost tab
-            let statusMatch: Bool
-            if selectedStatus == .lost {
-                statusMatch = post.status == "lost" || post.status == "active"
-            } else {
-                statusMatch = post.status == selectedStatus.rawValue
-            }
-            
-            let speciesMatch = selectedSpecies == nil || post.species == selectedSpecies?.rawValue
-            let searchMatch = searchText.isEmpty ||
-                              (post.petName ?? "").localizedCaseInsensitiveContains(searchText) ||
-                              (post.description ?? "").localizedCaseInsensitiveContains(searchText)
-            
-            return statusMatch && speciesMatch && searchMatch
-        }
-    }
-    
-    private let cardColors: [Color] = [
-        .pink.opacity(0.4), .blue.opacity(0.4), .green.opacity(0.4), .yellow.opacity(0.4)
-    ]
 
     private var lostCount: Int {
         postService.posts.filter { $0.status == PostStatus.lost.rawValue }.count
@@ -45,298 +22,368 @@ struct FeedView: View {
 
     var body: some View {
         NavigationStack {
-            ZStack {
+            VStack(spacing: 0) {
+                // Fixed header at top - НЕ скроллится
+                navigationHeader
+                    .padding(.top, 20)
+                    .background(Color.clear)
+                    .zIndex(2)
+                
+                // Scrollable content - только контент скроллится
                 ScrollView {
-                    VStack(alignment: .leading, spacing: 24) {
-                        navigationHeader
+                    VStack(alignment: .leading, spacing: 2) {
                         searchBar
                         speciesFilter
-                        lostFoundSegmentedControl
+                        .padding(.top, 12)
                         nearbyPetsSection
                         
                         // Recent Posts section
-                        Text("Recent Posts")
-                            .font(.title2.bold())
-                            .padding(.horizontal)
-                            .padding(.top, 8)
+                        Text("recent_posts".localized())
+                        .font(TypographyStyles.h4)
+                        .foregroundColor(NewColorPalette.textPrimary)
+                            .padding(.horizontal, 20)
+                            .padding(.top, 4)
                         
                         mainPostList
                     }
-                    .padding(.vertical)
+                    .padding(.top, 20) // Уменьшаем отступ так как заголовок теперь фиксированный
+                    .padding(.bottom, 20)
                     .frame(maxWidth: UIDevice.current.userInterfaceIdiom == .pad ? 800 : .infinity)
                     .frame(maxWidth: .infinity)
                 }
-                .background(Color("BackgroundColor").ignoresSafeArea())
-                .navigationBarHidden(true)
-                .onAppear {
-                    // Request location and load posts
-                    locationManager.requestLocationUpdate()
-                    
-                    // Clear any previous errors
-                    postService.clearError()
-                    
-                    Task {
-                        // First try to load all posts
-                        await postService.refreshPosts()
-                        
-                        // Then filter by location if available
-                        if let location = locationManager.location {
-                            await postService.loadPostsNearLocation(location, radius: searchRadius)
-                        }
-                    }
-                }
-                .onChange(of: searchRadius) { oldValue, newRadius in
-                    // Reload posts when search radius changes
-                    if let location = locationManager.location {
-                        Task {
-                            await postService.loadPostsNearLocation(location, radius: newRadius)
-                        }
-                    }
-                }
-                .onAppear {
-                    Task {
-                        await postService.refreshPosts()
-                    }
+                .zIndex(1)
+            }
+            .background(Color.clear.ignoresSafeArea())
+            .navigationBarHidden(true)
+            .sheet(isPresented: $showingFilters) {
+                FeedFilterView(
+                    selectedSpecies: $postService.selectedSpecies,
+                    searchRadius: $searchRadius
+                )
+            }
+            .sheet(isPresented: $showAllPosts) {
+                AllPostsView(posts: postService.posts)
+            }
+            .onAppear {
+                // Request location and load posts
+                locationManager.requestLocationUpdate()
+                
+                // Clear any previous errors
+                postService.clearError()
+                
+                // Load posts from server
+                Task {
+                    print("🔄 Starting to load posts from server...")
+                    await postService.refreshPosts()
+                    print("📊 Posts loaded: \(postService.posts.count)")
+                    print("🔍 Filtered posts: \(postService.filteredPosts.count)")
                 }
                 
-                // Offline indicator
-                if postService.isOffline {
-                    VStack {
-                        Spacer()
-                        OfflineBanner()
-                    }
-                }
+                // Check available fonts
+                checkAvailableFonts()
                 
-                // Error alert
-                if postService.showError {
-                    VStack {
-                        Spacer()
-                        ErrorBanner(
-                            message: postService.errorMessage ?? "An error occurred",
-                            onRetry: {
-                                Task {
-                                    await postService.retry()
-                                }
-                            },
-                            onDismiss: {
-                                postService.clearError()
-                            }
-                        )
-                    }
+                // Test color
+                print("=== COLOR TEST ===")
+                print("lightOrange color: \(NewColorPalette.lightOrange)")
+                print("=== END COLOR TEST ===")
+            }
+            .onReceive(timer) { _ in
+                withAnimation(.easeInOut(duration: 0.5)) {
+                    autoScrollIndex = (autoScrollIndex + 1) % 3
                 }
             }
         }
     }
-
+    
+    // MARK: - Header
     private var navigationHeader: some View {
-        HStack(alignment: .top) {
-            VStack(alignment: .leading, spacing: -15) {
-                HStack(alignment: .firstTextBaseline, spacing: 2) {
-                    Text("Search")
-                        .font(.system(size: 40, weight: .heavy))
-                        .foregroundColor(Color(hex: "#3E5A9A")) // Blue color
-                    
-                    ZStack {
-                        // Декоративные линии
-                        Path { path in path.move(to: CGPoint(x: 0, y: 10)); path.addLine(to: CGPoint(x: 8, y: 0)) }.stroke(Color(hex: "#FBCF3A"), style: StrokeStyle(lineWidth: 2.5, lineCap: .round)) // Yellow
-                        Path { path in path.move(to: CGPoint(x: 5, y: 18)); path.addLine(to: CGPoint(x: 18, y: 0)) }.stroke(Color(hex: "#22A6A2"), style: StrokeStyle(lineWidth: 2.5, lineCap: .round)) // Teal
-                        Path { path in path.move(to: CGPoint(x: 15, y: 18)); path.addLine(to: CGPoint(x: 23, y: 8)) }.stroke(Color(hex: "#FBCF3A"), style: StrokeStyle(lineWidth: 2.5, lineCap: .round)) // Yellow
-                    }
-                    .offset(x: 10, y: 0)
-                }
-
-                // Текст "Pet"
-                Text("Pet")
-                    .font(.system(size: 40, weight: .heavy))
-                    .foregroundColor(Color(hex: "#3E5A9A")) // Blue color
-            }
-            .padding(.leading)
+        HStack {
+            Image("Hello ,Human! Search Pet")
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 240, height: 100)
             
             Spacer()
             
             HStack(spacing: 8) {
+                // Notification icon
                 NavigationLink(destination: NotificationsView()) {
-                    Image(systemName: "bell.badge.fill")
-                        .font(.title2)
-                        .foregroundColor(Color(hex: "#3E5A9A")) // Blue icon
+                    Image("Iconring")
+                        .resizable()
+                        .frame(width: 48, height: 48)
+                        .foregroundColor(.black)
+                }
+                
+                // Profile icon
+                                        NavigationLink(destination: ProfileView(postService: postService)) {
+                    Image("Iconperson")
+                        .resizable()
+                        .frame(width: 48, height: 48)
+                        .foregroundColor(.black)
                 }
             }
-            .padding(.trailing)
         }
+        .frame(width: 320, height: 100)
+        .padding(.horizontal, 20)
     }
-
+    
+    // MARK: - Search Bar
     private var searchBar: some View {
-        HStack {
-            Image(systemName: "magnifyingglass")
-                .foregroundColor(.gray)
-            TextField("Search pets...", text: $searchText)
+        HStack(spacing: 12) {
+            Image("search")
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 16, height: 16)
+                .foregroundColor(NewColorPalette.textSecondary)
+            
+            TextField("Search", text: $postService.searchText)
                 .textFieldStyle(PlainTextFieldStyle())
+                .font(.custom("Poppins-Regular", size: 16))
+                .foregroundColor(Color(red: 0.051, green: 0.051, blue: 0.051))
+            
+            // Clear button
+            if !postService.searchText.isEmpty {
+                Button(action: {
+                    postService.searchText = ""
+                }) {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundColor(NewColorPalette.textSecondary)
+                        .font(.system(size: 16))
+                }
+            }
+            
+            Button(action: {
+                showingFilters.toggle()
+            }) {
+                Image(systemName: "slider.horizontal.3")
+                    .foregroundColor(NewColorPalette.textSecondary)
+            }
         }
-        .padding()
-        .background(Capsule().fill(Color.white))
-        .overlay(Capsule().stroke(Color.black, lineWidth: 1.5))
-        .padding(.horizontal)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+        .background(Color(red: 0.698, green: 0.878, blue: 0.855))
+        .cornerRadius(12)
+        .shadow(color: Color.black, radius: 0, x: 0, y: 4)
+        .padding(.horizontal, 20)
     }
 
+    // MARK: - Species Filter
     private var speciesFilter: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 12) {
-                SpeciesFilterButton(
-                    title: "All",
-                    isSelected: selectedSpecies == nil,
-                    action: { selectedSpecies = nil }
-                )
+                // All species button
+                Button(action: { 
+                    postService.selectedSpecies = nil 
+                }) {
+                    Text("all".localized())
+                        .font(.custom("Poppins-SemiBold", size: 14))
+                        .foregroundColor(postService.selectedSpecies == nil ? .white : Color.black)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
+                        .background(postService.selectedSpecies == nil ? Color.black : Color(red: 0.99, green: 0.83, blue: 0.64))
+                        .cornerRadius(20)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 20)
+                                .stroke(Color.black, lineWidth: 1.0)
+                        )
+                }
                 
+                // Individual species buttons
                 ForEach(PetSpecies.allCases, id: \.self) { species in
-                    SpeciesFilterButton(
-                        title: species.rawValue.capitalized,
-                        isSelected: selectedSpecies == species,
-                        action: { selectedSpecies = species }
-                    )
+                    Button(action: { 
+                        postService.selectedSpecies = species 
+                    }) {
+                        Text(species.localizedName)
+                            .font(.custom("Poppins-SemiBold", size: 14))
+                            .foregroundColor(postService.selectedSpecies == species ? .white : Color.black)
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 8)
+                            .background(postService.selectedSpecies == species ? Color.black : Color(red: 0.99, green: 0.83, blue: 0.64))
+                            .cornerRadius(20)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 20)
+                                    .stroke(Color.black, lineWidth: 1.0)
+                            )
+                    }
                 }
             }
-            .padding(.horizontal)
+            .padding(.horizontal, 20)
         }
     }
 
-    private var lostFoundSegmentedControl: some View {
-        HStack(spacing: 0) {
-            SegmentedControlButton(
-                title: "Lost",
-                count: lostCount,
-                isSelected: selectedStatus == .lost,
-                action: { withAnimation(.bouncy) { selectedStatus = .lost } }
-            )
-            
-            SegmentedControlButton(
-                title: "Found",
-                count: foundCount,
-                isSelected: selectedStatus == .found,
-                action: { withAnimation(.bouncy) { selectedStatus = .found } }
-            )
-        }
-        .padding(4)
-        .background(Color("CardBackgroundColor").cornerRadius(12))
-        .padding(.horizontal)
-    }
-
+    // MARK: - Nearby Pets Section
     private var nearbyPetsSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Text("All pet categories near")
-                    .font(.title3.weight(.bold))
-                if let city = locationManager.currentCity {
-                    Text(city)
-                        .font(.title3.weight(.bold))
-                        .foregroundColor(.orange)
-                } else {
-                    Text("you")
-                        .font(.title3.weight(.bold))
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 4) {
+                Image("All categories near")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 200, height: 24)
+                    .padding(.top, 8)
+                
+                Text("Almaty")
+                    .font(.custom("Poppins-SemiBold", size: 16))
+                    .foregroundColor(NewColorPalette.textPrimary)
+                    .padding(.top, 8)
+                
+                Spacer()
+                
+                Button(action: {
+                    // Show all posts
+                    showAllPosts = true
+                }) {
+                    Text("All")
+                        .font(.custom("Poppins-SemiBold", size: 16))
+                        .foregroundColor(NewColorPalette.textPrimary)
+                        .padding(.top, 8)
                 }
             }
-            .padding(.horizontal)
+            .padding(.horizontal, 20)
             
-            ScrollViewReader { proxy in
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 16) {
-                        if postService.posts.isEmpty && postService.isLoading {
-                            // Show loading placeholders
-                            ForEach(0..<4, id: \.self) { index in
-                                SimplePetCardView(
-                                    color: cardColors[index % cardColors.count],
-                                    count: 0
-                                )
-                                .redacted(reason: .placeholder)
-                                .id("loading-\(index)")
+            // Nearby pets carousel
+            ScrollView(.horizontal, showsIndicators: false) {
+                LazyHStack(spacing: 16) {
+                    if locationManager.currentCity != nil {
+                        ForEach(postService.filteredPosts.prefix(4)) { post in
+                            NavigationLink(destination: PostDetailView(post: post)) {
+                                NearbyPetCardView(post: post, postService: postService)
+                                    .frame(width: 210, height: 220)
                             }
-                        } else if postService.posts.isEmpty {
-                            // Show default cards when no posts
-                            ForEach(0..<4, id: \.self) { index in
-                                SimplePetCardView(
-                                    color: cardColors[index % cardColors.count],
-                                    count: [20, 17, 15, 12][index]
-                                )
-                                .id("empty-\(index)")
-                                .scrollTransition { content, phase in
-                                    content
-                                        .scaleEffect(phase.isIdentity ? 1.0 : 0.85)
-                                }
+                            .buttonStyle(PlainButtonStyle())
+                        }
+                    } else {
+                        // Placeholder cards while loading location
+                        ForEach(0..<4, id: \.self) { index in
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color.gray.opacity(0.2))
+                                .frame(width: 210, height: 220)
+                        }
+                    }
+                }
+                .padding(.horizontal, 20)
+            }
+        }
+    }
+    
+    // MARK: - Main Post List
+    private var mainPostList: some View {
+        VStack(spacing: 12) {
+            // Loading state
+            if postService.posts.isEmpty && postService.isLoading {
+                VStack(spacing: 16) {
+                    ProgressView()
+                        .scaleEffect(1.2)
+                    Text("loading_posts".localized())
+                        .font(.custom("Poppins-Regular", size: 16))
+                        .foregroundColor(NewColorPalette.textSecondary)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .padding(.top, 50)
+            } else if postService.filteredPosts.isEmpty {
+                VStack(spacing: 16) {
+                    Image(systemName: "pawprint.circle")
+                        .font(.system(size: 60))
+                        .foregroundColor(NewColorPalette.textSecondary)
+                    
+                    Text(postService.selectedSpecies == nil ? 
+                        "No \(selectedStatus.rawValue) pets in your area" :
+                        "No \(postService.selectedSpecies?.rawValue ?? "") pets found")
+                        .font(.custom("Poppins-SemiBold", size: 18))
+                        .foregroundColor(NewColorPalette.textPrimary)
+                        .multilineTextAlignment(.center)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .padding(.top, 50)
+            } else {
+                // Posts grid - 2 columns
+                LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 24), count: 2), spacing: 24) {
+                    ForEach(postService.filteredPosts) { post in
+                        ZStack {
+                            NavigationLink(destination: PostDetailView(post: post)) {
+                                PostCardView(post: post, postService: postService)
                             }
-                        } else {
-                            // Show actual posts
-                            ForEach(postService.posts.prefix(10)) { post in
-                                NavigationLink(destination: PostDetailView(post: post)) {
-                                    NearbyPetCardView(post: post)
-                                }
-                                .id(post.id)
-                                .scrollTransition { content, phase in
-                                    content
-                                        .scaleEffect(phase.isIdentity ? 1.0 : 0.85)
-                                }
-                            }
+                            .buttonStyle(PlainButtonStyle())
                             
-                            // Add placeholders if less than 4 posts
-                            if postService.posts.count < 4 {
-                                ForEach(0..<(4 - postService.posts.count), id: \.self) { index in
-                                    SimplePetCardView(
-                                        color: cardColors[index % cardColors.count],
-                                        count: Int.random(in: 5...20)
-                                    )
-                                    .id("placeholder-\(index)")
-                                    .scrollTransition { content, phase in
-                                        content
-                                            .scaleEffect(phase.isIdentity ? 1.0 : 0.85)
+                            // Отдельная кнопка лайка поверх карточки
+                            VStack {
+                                HStack {
+                                    Spacer()
+                                    Button(action: {
+                                        postService.toggleLike(for: post)
+                                    }) {
+                                        Image("likeicon")
+                                            .resizable()
+                                            .aspectRatio(contentMode: .fit)
+                                            .frame(width: 20, height: 20)
+                                            .foregroundColor(postService.isLiked(post: post) ? .black : .white.opacity(0.6))
+                                            .background(
+                                                Circle()
+                                                    .fill(Color.black.opacity(0.3))
+                                                    .frame(width: 28, height: 28)
+                                            )
                                     }
+                                    .padding(.top, 8)
+                                    .padding(.trailing, 8)
+                                }
+                                Spacer()
+                            }
+                            .allowsHitTesting(true)
+                        }
+                        .padding(.bottom, 0) // Убираем дополнительный padding, используем только gap
+                        .onAppear {
+                            if post == postService.posts.last {
+                                Task {
+                                    await postService.loadMorePosts()
                                 }
                             }
                         }
                     }
-                    .scrollTargetLayout()
                 }
-                .contentMargins(.horizontal, (UIScreen.main.bounds.width - 140) / 2)
-                .scrollTargetBehavior(.viewAligned)
-                .frame(height: 220)
-                .onReceive(timer) { _ in
-                    let pets = Array(postService.posts.prefix(10))
-                    guard !pets.isEmpty else { return }
-                    
-                    autoScrollIndex = (autoScrollIndex + 1) % pets.count
-                    
-                    withAnimation(.spring(response: 0.6, dampingFraction: 0.7)) {
-                        proxy.scrollTo(pets[autoScrollIndex].id, anchor: .center)
-                    }
-                }
+                .padding(.horizontal, 16)
+            }
+            
+            if postService.isLoading && !postService.posts.isEmpty {
+                ProgressView()
+                    .padding()
             }
         }
+        .padding(.horizontal, 20)
     }
-
-    private var mainPostList: some View {
-        LazyVGrid(
-            columns: [
-                GridItem(.flexible(), spacing: 20),
-                GridItem(.flexible(), spacing: 20)
-            ],
-            spacing: 20
-        ) {
+    
+    // MARK: - Full Post List
+    private var fullPostList: some View {
+        VStack(spacing: 12) {
+            // Loading state
             if postService.isLoading && postService.posts.isEmpty {
-                ForEach(0..<4) { _ in
-                    PostCardSkeleton()
+                VStack(spacing: 16) {
+                    ProgressView()
+                        .scaleEffect(1.2)
+                    Text("loading_posts".localized())
+                        .font(.custom("Poppins-Regular", size: 16))
+                        .foregroundColor(NewColorPalette.textSecondary)
                 }
-            } else if filteredPosts.isEmpty {
-                EmptyStateView(
-                    title: "No posts found",
-                    message: selectedSpecies == nil ? 
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .padding(.top, 50)
+            } else if postService.filteredPosts.isEmpty {
+                VStack(spacing: 16) {
+                    Image(systemName: "pawprint.circle")
+                        .font(.system(size: 60))
+                        .foregroundColor(NewColorPalette.textSecondary)
+                    
+                    Text(postService.selectedSpecies == nil ? 
                         "No \(selectedStatus.rawValue) pets in your area" :
-                        "No \(selectedSpecies?.rawValue ?? "") pets found",
-                    iconName: "pawprint"
-                )
-                .gridCellColumns(2)
+                        "No \(postService.selectedSpecies?.rawValue ?? "") pets found")
+                        .font(.custom("Poppins-SemiBold", size: 18))
+                        .foregroundColor(NewColorPalette.textPrimary)
+                        .multilineTextAlignment(.center)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .padding(.top, 50)
             } else {
-                ForEach(filteredPosts) { post in
-                    NavigationLink(destination: PostDetailView(post: post)) {
-                        PetCardView(post: post)
-                    }
-                    .buttonStyle(PlainButtonStyle())
+                // Posts list
+                LazyVStack(spacing: 12) {
+                ForEach(postService.filteredPosts) { post in
+                        PostCardView(post: post, postService: postService)
                     .onAppear {
                         if post == postService.posts.last {
                             Task {
@@ -345,140 +392,107 @@ struct FeedView: View {
                         }
                     }
                 }
+                }
+                .padding(.horizontal, 20)
             }
             
             if postService.isLoading && !postService.posts.isEmpty {
                 ProgressView()
-                    .gridCellColumns(2)
                     .padding()
             }
         }
-        .padding(.horizontal, 16)
+        .padding(.horizontal, 20)
     }
-}
-
-// MARK: - Supporting Views
-
-struct OfflineBanner: View {
-    var body: some View {
-        HStack {
-            Image(systemName: "wifi.slash")
-                .foregroundColor(.white)
-            Text("You're offline")
-                .foregroundColor(.white)
-                .font(.subheadline)
-            Spacer()
-        }
-        .padding()
-        .background(Color.orange)
-        .cornerRadius(8)
-        .padding(.horizontal)
-        .padding(.bottom, 100) // Avoid tab bar
-    }
-}
-
-struct ErrorBanner: View {
-    let message: String
-    let onRetry: () -> Void
-    let onDismiss: () -> Void
     
-    var body: some View {
-        VStack(spacing: 8) {
-            HStack {
-                Image(systemName: "exclamationmark.triangle")
-                    .foregroundColor(.white)
-                Text("Error")
-                    .foregroundColor(.white)
-                    .font(.headline)
-                Spacer()
-                Button(action: onDismiss) {
-                    Image(systemName: "xmark")
-                        .foregroundColor(.white)
+    private func checkAvailableFonts() {
+        print("=== AVAILABLE FONTS ===")
+        for family in UIFont.familyNames.sorted() {
+            let names = UIFont.fontNames(forFamilyName: family)
+            if family.contains("Poppins") {
+                print("✅ Found Poppins family: \(family)")
+                for name in names {
+                    print("   - \(name)")
                 }
             }
-            
-            Text(message)
-                .foregroundColor(.white)
-                .font(.subheadline)
-                .multilineTextAlignment(.leading)
-            
-            HStack {
-                Button("Retry") {
-                    onRetry()
+        }
+        print("=== END FONTS ===")
+    }
+}
+
+// MARK: - Filter View
+struct FeedFilterView: View {
+    @Binding var selectedSpecies: PetSpecies?
+    @Binding var searchRadius: Double
+    @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject var languageManager: LanguageManager
+    
+    var body: some View {
+        NavigationView {
+            VStack(spacing: 20) {
+                Text(languageManager.localizedString(forKey: "search_filters"))
+                    .font(.custom("Poppins-Bold", size: 24))
+                    .padding(.top)
+                
+                VStack(alignment: .leading, spacing: 16) {
+                    Text(languageManager.localizedString(forKey: "animal_type"))
+                        .font(.custom("Poppins-SemiBold", size: 18))
+                    
+                    LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 2), spacing: 12) {
+                        Button(languageManager.localizedString(forKey: "all")) {
+                            selectedSpecies = nil
+                        }
+                        .padding()
+                        .background(selectedSpecies == nil ? Color.blue : Color.gray.opacity(0.3))
+                        .foregroundColor(selectedSpecies == nil ? .white : .primary)
+                        .cornerRadius(8)
+                        
+                        Button(languageManager.localizedString(forKey: "Dog")) {
+                            selectedSpecies = PetSpecies.dog
+                        }
+                        .padding()
+                        .background(selectedSpecies == PetSpecies.dog ? Color.blue : Color.gray.opacity(0.3))
+                        .foregroundColor(selectedSpecies == PetSpecies.dog ? .white : .primary)
+                        .cornerRadius(8)
+                        
+                        Button(languageManager.localizedString(forKey: "Cat")) {
+                            selectedSpecies = PetSpecies.cat
+                        }
+                        .padding()
+                        .background(selectedSpecies == PetSpecies.cat ? Color.blue : Color.gray.opacity(0.3))
+                        .foregroundColor(selectedSpecies == PetSpecies.cat ? .white : .primary)
+                        .cornerRadius(8)
+                        
+                        Button(languageManager.localizedString(forKey: "Bird")) {
+                            selectedSpecies = PetSpecies.bird
+                        }
+                        .padding()
+                        .background(selectedSpecies == PetSpecies.bird ? Color.blue : Color.gray.opacity(0.3))
+                        .foregroundColor(selectedSpecies == PetSpecies.bird ? .white : .primary)
+                        .cornerRadius(8)
+                    }
+                    
+                    Text("\(languageManager.localizedString(forKey: "search_radius")): \(Int(searchRadius)) \(languageManager.localizedString(forKey: "km"))")
+                        .font(.custom("Poppins-SemiBold", size: 18))
+                        .padding(.top)
+                    
+                    Slider(value: $searchRadius, in: 1...100, step: 1)
+                        .accentColor(NewColorPalette.accentTeal)
                 }
-                .foregroundColor(.white)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 8)
-                .background(Color.white.opacity(0.2))
-                .cornerRadius(6)
+                .padding(.horizontal)
                 
                 Spacer()
             }
-        }
-        .padding()
-        .background(Color.red)
-        .cornerRadius(8)
-        .padding(.horizontal)
-        .padding(.bottom, 100) // Avoid tab bar
-    }
-}
-
-struct EmptyStateView: View {
-    let title: String
-    let message: String
-    let iconName: String
-    
-    var body: some View {
-        VStack(spacing: 16) {
-            Image(systemName: iconName)
-                .font(.system(size: 48))
-                .foregroundColor(.gray)
-            
-            Text(title)
-                .font(.title2.bold())
-                .foregroundColor(.primary)
-            
-            Text(message)
-                .font(.body)
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
-        }
-        .padding()
-        .frame(maxWidth: .infinity)
-    }
-}
-
-struct PostCardSkeleton: View {
-    var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            // Image placeholder
-            Rectangle()
-                .fill(Color(.systemGray6))
-                .frame(height: 100)
-            
-            // Info section
-            VStack(alignment: .leading, spacing: 4) {
-                Rectangle()
-                    .fill(Color.gray.opacity(0.3))
-                    .frame(height: 16)
-                    .frame(maxWidth: 100)
-                
-                Rectangle()
-                    .fill(Color.gray.opacity(0.3))
-                    .frame(height: 12)
-                    .frame(maxWidth: 70)
-                
-                Rectangle()
-                    .fill(Color.gray.opacity(0.3))
-                    .frame(height: 10)
-                    .frame(maxWidth: 50)
+            .background(Color.clear.ignoresSafeArea()) // Like FeedView
+            .navigationTitle(languageManager.localizedString(forKey: "filters"))
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(languageManager.localizedString(forKey: "Done")) {
+                        dismiss()
+                    }
+                    .foregroundColor(NewColorPalette.accentTeal)
+                }
             }
-            .padding(12)
-            .background(Color.white)
         }
-        .background(Color.white)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
-        .shadow(color: .black.opacity(0.08), radius: 4, x: 0, y: 2)
-        .redacted(reason: .placeholder)
     }
 } 

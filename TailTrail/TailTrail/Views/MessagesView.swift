@@ -3,10 +3,13 @@ import SwiftUI
 struct MessagesView: View {
     @EnvironmentObject var languageManager: LanguageManager
     @EnvironmentObject var authManager: AuthenticationManager
+    @Environment(\.dismiss) private var dismiss
     
     @State private var searchText = ""
     @State private var showingCreateChat = false
     @State private var chats: [Chat] = []
+    @State private var newChatName = ""
+    @State private var selectedParticipants: [String] = []
     
     var filteredChats: [Chat] {
         if searchText.isEmpty {
@@ -39,34 +42,36 @@ struct MessagesView: View {
                     chatListView
                 }
             }
-            .navigationTitle(languageManager.localizedString(forKey: "messages"))
-            .navigationBarTitleDisplayMode(.large)
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    // Temporarily hidden until chat creation is implemented
-                    /*
-                    Button(action: { showingCreateChat = true }) {
-                        Image(systemName: "square.and.pencil")
-                            .foregroundColor(.orange)
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(action: {
+                        dismiss()
+                    }) {
+                        Image("backicon")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 24, height: 24)
+                            .foregroundColor(.black)
                     }
-                    */
+                }
+                
+                ToolbarItem(placement: .principal) {
+                    Image("messages")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(height: 40)
                 }
             }
-            .background(Color.theme.background.ignoresSafeArea())
+            .background(Color.clear.ignoresSafeArea())
             .foregroundColor(Color.theme.primaryText)
             .onAppear {
                 // Load chats from mock data for now
                 loadChats()
             }
-            .alert("Create Chat", isPresented: $showingCreateChat) {
-                Button("Cancel", role: .cancel) { }
-                Button("Create") {
-                    // TODO: Implement chat creation
-                    print("Create chat functionality not implemented yet")
-                }
-            } message: {
-                Text("Chat creation feature is coming soon!")
-                    }
+            .sheet(isPresented: $showingCreateChat) {
+                createChatView
+            }
         }
     }
     
@@ -75,62 +80,61 @@ struct MessagesView: View {
             Circle()
                 .fill(Color.green)
                 .frame(width: 8, height: 8)
-            Text("Connected")
+            Text("Online")
                 .font(.caption)
                 .foregroundColor(.green)
             Spacer()
                     }
                     .padding(.horizontal)
         .padding(.vertical, 4)
-        .background(Color.theme.background)
+        .background(Color.clear)
     }
     
     private var searchBar: some View {
         HStack {
             Image(systemName: "magnifyingglass")
-                .foregroundColor(.gray)
+                .foregroundColor(.black)
             
-            TextField(languageManager.localizedString(forKey: "search_chats"), text: $searchText)
+            TextField("Search", text: $searchText)
                 .textFieldStyle(PlainTextFieldStyle())
+                .font(.custom("Poppins-Regular", size: 16))
+            
+            if !searchText.isEmpty {
+                Button(action: { searchText = "" }) {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundColor(.gray)
+                }
+            }
         }
         .padding()
-        .background(Color.white)
-        .cornerRadius(25)
-                    .overlay(
+        .background(Color(red: 0.7, green: 0.9, blue: 0.9)) // Light teal like in image
+        .overlay(
             RoundedRectangle(cornerRadius: 25)
-                .stroke(Color.black, lineWidth: 1.5)
+                .stroke(Color.black, lineWidth: 1)
         )
+        .cornerRadius(25)
         .padding(.horizontal)
         .padding(.vertical, 8)
     }
     
     private var emptyStateView: some View {
-        VStack(spacing: 20) {
-            Image(systemName: "message.circle")
-                .font(.system(size: 60))
+        VStack(spacing: 16) {
+            Text("No chats yet")
+                .font(.custom("Poppins-SemiBold", size: 18))
                 .foregroundColor(.gray)
             
-            Text(languageManager.localizedString(forKey: "no_chats_yet"))
-                .font(.title2)
-                .fontWeight(.medium)
-                .foregroundColor(.gray)
-            
-            Text(languageManager.localizedString(forKey: "start_conversation"))
-                .font(.body)
+            Text("Start conversation")
+                .font(.custom("Poppins-Regular", size: 16))
                 .foregroundColor(.gray)
                 .multilineTextAlignment(.center)
             
             Button(action: { showingCreateChat = true }) {
-                Text(languageManager.localizedString(forKey: "start_chat"))
-                    .fontWeight(.bold)
-                    .foregroundColor(.white)
-                    .padding(.horizontal, 30)
-                    .padding(.vertical, 12)
-                    .background(Color.orange)
-                    .clipShape(Capsule())
+                Image("startchat")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(height: 50)
             }
         }
-        .padding()
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
     
@@ -154,6 +158,112 @@ struct MessagesView: View {
     private func loadChats() {
         // For now, use empty array. In a real app, this would load from API
         chats = []
+    }
+    
+    private var createChatView: some View {
+        NavigationView {
+            VStack(spacing: 20) {
+                // Chat name input with SearchBar
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Chat Name")
+                        .font(.custom("Poppins-SemiBold", size: 16))
+                        .foregroundColor(.black)
+                    
+                    HStack {
+                        Image(systemName: "magnifyingglass")
+                            .foregroundColor(.black)
+                        
+                        TextField("Enter chat name", text: $newChatName)
+                            .textFieldStyle(PlainTextFieldStyle())
+                            .font(.custom("Poppins-Regular", size: 16))
+                        
+                        if !newChatName.isEmpty {
+                            Button(action: { newChatName = "" }) {
+                                Image(systemName: "xmark.circle.fill")
+                                    .foregroundColor(.gray)
+                            }
+                        }
+                    }
+                    .padding()
+                    .background(Color(red: 0.7, green: 0.9, blue: 0.9)) // Light teal like SearchBar
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 25)
+                            .stroke(Color.black, lineWidth: 1)
+                    )
+                    .cornerRadius(25)
+                }
+                .padding(.horizontal)
+                
+                // Participants selection (simplified for demo)
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Participants")
+                        .font(.custom("Poppins-SemiBold", size: 16))
+                        .foregroundColor(.black)
+                    
+                    Text("Demo: Will add with first message")
+                        .font(.custom("Poppins-Regular", size: 14))
+                        .foregroundColor(.gray)
+                }
+                .padding(.horizontal)
+                
+                Spacer()
+                
+                // Create button with createchat asset
+                Button(action: createChat) {
+                    Image("createchat")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(height: 50)
+                }
+                .padding(.horizontal)
+                .padding(.bottom)
+            }
+            .background(Color.clear.ignoresSafeArea()) // Like FeedView
+            .navigationTitle("Create Chat")
+            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarItems(
+                leading: Button("Cancel") {
+                    showingCreateChat = false
+                    newChatName = ""
+                }
+                .foregroundColor(.blue)
+                .font(.custom("Poppins-Regular", size: 16))
+            )
+        }
+    }
+    
+    private func createChat() {
+        // Create a new chat (name can be empty, will be set when first message is sent)
+        let chatName = newChatName.isEmpty ? "New Chat" : newChatName
+        
+        let newChat = Chat(
+            id: UUID().uuidString,
+            name: chatName,
+            isGroup: false,
+            createdAt: Date(),
+            updatedAt: Date(),
+            participants: [
+                Chat.Participant(
+                    id: UUID().uuidString,
+                    email: "demo@example.com",
+                    imageUrl: nil,
+                    isOnline: true,
+                    lastSeen: Date()
+                )
+            ],
+            lastMessage: "Chat created",
+            lastMessageTime: Date(),
+            unreadCount: 0
+        )
+        
+        // Add to chats array
+        chats.append(newChat)
+        
+        // Reset form and close sheet
+        newChatName = ""
+        showingCreateChat = false
+        
+        print("✅ Chat created: \(newChat.name ?? "Unknown")")
     }
 }
 
