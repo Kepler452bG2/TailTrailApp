@@ -1,6 +1,6 @@
 import SwiftUI
 import AVFoundation
-import Foundation
+import Foundation 
 
 struct VoiceAgentView: View {
     @State private var isRecording = false
@@ -61,7 +61,7 @@ struct VoiceAgentView: View {
                 
                 // Status cards
                 VStack(spacing: 20) {
-                                        // Connection status
+                    // Connection status
                     StatusCard(
                         title: "Connection Status",
                         status: isConnected ? "Connected" : "Disconnected",
@@ -89,7 +89,7 @@ struct VoiceAgentView: View {
                 if audioPlayer.isPlaying {
                     HStack(spacing: 20) {
                         Button(action: {
-                            audioPlayer.pauseAudio()
+                            audioPlayer.stop()
                         }) {
                             Image(systemName: "pause.circle.fill")
                                 .font(.system(size: 30))
@@ -97,7 +97,7 @@ struct VoiceAgentView: View {
                         }
                         
                         Button(action: {
-                            audioPlayer.stopAudio()
+                            audioPlayer.stop()
                         }) {
                             Image(systemName: "stop.circle.fill")
                                 .font(.system(size: 30))
@@ -181,7 +181,7 @@ struct VoiceAgentView: View {
                 
                 // Current URL info
                 #if targetEnvironment(simulator)
-                Text(useLocalhost ? "localhost:8080" : "209.38.237.102:8080")
+                Text(useLocalhost ? "localhost:8667" : "209.38.237.102:8667")
                     .font(.custom("Poppins-Regular", size: 10))
                     .foregroundColor(.black.opacity(0.5))
                     .padding(.top, 2)
@@ -206,7 +206,6 @@ struct VoiceAgentView: View {
                 // Manual reconnect button
                 if !isConnected {
                     Button(action: {
-//                        connectWebSocket()
                         testAlternativeConnection()
                     }) {
                         Text("Reconnect")
@@ -315,9 +314,9 @@ struct VoiceAgentView: View {
         }
     }
     
-    // MARK: - WebSocket Connection
+    // MARK: - WebSocket Connection (Voice Chat)
     private func connectWebSocket() {
-        // Use the correct WebSocket URL format - same as React app
+        // Use the correct WebSocket URL format for voice chat
         #if targetEnvironment(simulator)
         // For simulator, allow switching between localhost and external IP
         let wsURL = "ws://209.38.237.102:8667/listen"
@@ -332,12 +331,9 @@ struct VoiceAgentView: View {
         }
         
         print("🔌 Attempting to connect to: \(url)")
-//
-//        let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMjQyMmVhYzktY2I0MS00MjY0LWI0MjUtMmY4MWM4ZTM1ZGIxIiwiZXhwIjoxNzU0MDU5MDExfQ.f8vSzUb6LYbcLwLvuoqmjRei8adeOxlqUhWbtV_9PC0"
 
         var request = URLRequest(url: url)
         request.timeoutInterval = 15
-//        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         
         // Create URLSession with custom configuration for better error handling
         let config = URLSessionConfiguration.default
@@ -347,18 +343,9 @@ struct VoiceAgentView: View {
         
         let session = URLSession(configuration: config)
         webSocket = session.webSocketTask(with: request)
-
         webSocket?.resume()
         // Start receiving messages
         receiveMessage()
-        
-//        Task {
-//            let state = self.webSocket?.state
-//            print("🧭 WebSocket state after resume: \(String(describing: state))")
-//        }
-//
-//        status = "Connecting to voice agent..."
-        
         
         // Send immediate ping to establish connection
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
@@ -455,7 +442,6 @@ struct VoiceAgentView: View {
                     print("❌ Error details: \(error.localizedDescription)")
                     print("❌ Error domain: \(error._domain)")
                     print("❌ Error code: \(error._code)")
-                    
                     // Check specific error types
                     if let urlError = error as? URLError {
                         print("🌐 URL Error code: \(urlError.code.rawValue)")
@@ -628,11 +614,12 @@ struct VoiceAgentView: View {
         }
     }
     
+    // MARK: - Test Alternative Connection (Main API - NOT Voice Chat)
     private func testAlternativeConnection() {
         #if targetEnvironment(simulator)
-        let wsURL = useLocalhost ? "ws://209.38.237.102:8667/listen" : "ws://209.38.237.102:8667/listen"
+        let wsURL = useLocalhost ? "ws://209.38.237.102:8080/api/v1/websocket/ws/2422eac9-cb41-4264-b425-2f81c8e35db1" : "ws://209.38.237.102:8080/api/v1/websocket/ws/2422eac9-cb41-4264-b425-2f81c8e35db1"
         #else
-        let wsURL = "ws://209.38.237.102:8667/listen"
+        let wsURL = "ws://209.38.237.102:8080/api/v1/websocket/ws/2422eac9-cb41-4264-b425-2f81c8e35db1"
         #endif
         
         guard let url = URL(string: wsURL) else {
@@ -642,15 +629,15 @@ struct VoiceAgentView: View {
         
         print("🔌 Testing alternative connection to: \(url)")
         
-//        let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMjQyMmVhYzktY2I0MS00MjY0LWI0MjUtMmY4MWM4ZTM1ZGIxIiwiZXhwIjoxNzU0MDU5MDExfQ.f8vSzUb6LYbcLwLvuoqmjRei8adeOxlqUhWbtV_9PC0"
-
+        let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMjQyMmVhYzktY2I0MS00MjY0LWI0MjUtMmY4MWM4ZTM1ZGIxIiwiZXhwIjoxNzU0MDU5MDExfQ.f8vSzUb6LYbcLwLvuoqmjRei8adeOxlqUhWbtV_9PC0"
+        
         var request = URLRequest(url: url)
         request.setValue("websocket", forHTTPHeaderField: "Upgrade")
         request.setValue("Upgrade", forHTTPHeaderField: "Connection")
         request.setValue("13", forHTTPHeaderField: "Sec-WebSocket-Version")
         request.setValue("x3JJHMbDL1EzLkh9GBhXDw==", forHTTPHeaderField: "Sec-WebSocket-Key")
         request.setValue("application/json", forHTTPHeaderField: "Accept")
-//        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         
         let session = URLSession(configuration: .default)
         let testWebSocket = session.webSocketTask(with: request)
@@ -836,5 +823,4 @@ struct VoiceVisualizer: View {
     NavigationView {
         VoiceAgentView()
     }
-}
-
+} 
