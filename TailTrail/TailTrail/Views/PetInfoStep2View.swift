@@ -3,6 +3,9 @@ import PhotosUI
 
 struct PetInfoStep2View: View {
     @EnvironmentObject var viewModel: CreatePostViewModel
+    @State private var showImagePicker = false
+    @State private var showCamera = false
+    @State private var showActionSheet = false
 
     var body: some View {
         ScrollView {
@@ -41,27 +44,46 @@ struct PetInfoStep2View: View {
 
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 10) {
-                        PhotosPicker(
-                            selection: $viewModel.selectedPhotoItems,
-                            maxSelectionCount: 5,
-                            matching: .images
-                        ) {
+                        // Add Photo Button
+                        Button(action: {
+                            showActionSheet = true
+                        }) {
                             ZStack {
                                 RoundedRectangle(cornerRadius: 12)
                                     .fill(Color(.systemGray6))
-                                Image(systemName: "plus.circle.fill")
-                                    .font(.largeTitle)
-                                    .foregroundColor(.gray)
+                                VStack(spacing: 4) {
+                                    Image(systemName: "plus.circle.fill")
+                                        .font(.title)
+                                        .foregroundColor(.blue)
+                                    Text("Add Photo")
+                                        .font(.caption)
+                                        .foregroundColor(.blue)
+                                }
                             }
                             .frame(width: 100, height: 100)
                         }
                         
-                        ForEach(viewModel.selectedImages, id: \.self) { image in
-                            Image(uiImage: image)
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                                .frame(width: 100, height: 100)
-                                .clipShape(RoundedRectangle(cornerRadius: 12))
+                        // Display selected images
+                        ForEach(Array(viewModel.selectedImages.enumerated()), id: \.offset) { index, image in
+                            ZStack(alignment: .topTrailing) {
+                                Image(uiImage: image)
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fill)
+                                    .frame(width: 100, height: 100)
+                                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                                
+                                // Delete button
+                                Button(action: {
+                                    viewModel.selectedImages.remove(at: index)
+                                }) {
+                                    Image(systemName: "xmark.circle.fill")
+                                        .font(.title2)
+                                        .foregroundColor(.white)
+                                        .background(Color.red)
+                                        .clipShape(Circle())
+                                }
+                                .offset(x: 5, y: -5)
+                            }
                         }
                     }
                 }
@@ -72,6 +94,41 @@ struct PetInfoStep2View: View {
             LocationPickerView(
                 selectedLocation: $viewModel.selectedLocation,
                 locationName: $viewModel.locationName
+            )
+        }
+        .sheet(isPresented: $showImagePicker) {
+            ImagePicker(selectedImage: Binding(
+                get: { nil },
+                set: { newImage in
+                    if let image = newImage {
+                        viewModel.selectedImages.append(image)
+                    }
+                }
+            ), sourceType: .photoLibrary)
+        }
+        .sheet(isPresented: $showCamera) {
+            ImagePicker(selectedImage: Binding(
+                get: { nil },
+                set: { newImage in
+                    if let image = newImage {
+                        viewModel.selectedImages.append(image)
+                    }
+                }
+            ), sourceType: .camera)
+        }
+        .actionSheet(isPresented: $showActionSheet) {
+            ActionSheet(
+                title: Text("Add Photo"),
+                message: Text("Choose how you want to add a photo"),
+                buttons: [
+                    .default(Text("Take Photo")) {
+                        showCamera = true
+                    },
+                    .default(Text("Choose from Library")) {
+                        showImagePicker = true
+                    },
+                    .cancel()
+                ]
             )
         }
     }

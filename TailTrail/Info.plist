@@ -32,6 +32,10 @@
 	<string>Приложению необходим доступ к микрофону для голосового взаимодействия с помощником</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
 	<string>Приложению необходим доступ к распознаванию речи для понимания ваших вопросов</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Приложению необходим доступ к камере для съемки фотографий питомцев</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Приложению необходим доступ к галерее для выбора фотографий питомцев</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>

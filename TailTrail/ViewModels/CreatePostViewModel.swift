@@ -28,7 +28,7 @@ class CreatePostViewModel: ObservableObject {
     @Published var showLocationPicker = false
     @Published var useCurrentLocation = true
     
-    // Photos Picker
+    // Photos Picker (kept for backward compatibility)
     @Published var selectedPhotoItems: [PhotosPickerItem] = [] {
         didSet {
             Task {
