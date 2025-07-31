@@ -645,7 +645,7 @@ struct VoiceAgentView: View {
         testWebSocket.receive { result in
             DispatchQueue.main.async {
                 switch result {
-                case .success(let message):
+                case .success(let _):
                     print("✅ Alternative connection successful!")
                     self.isConnected = true
                     self.status = "Alternative connection successful"
