@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>WebSocket Test</title>
+</head>
+
+<body>
+  <h1>WebSocket Test</h1>
+  <button onclick="connect()">Connect</button>
+  <button onclick="disconnect()">Disconnect</button>
+  <button onclick="sendMessage()">Send Test Message</button>
+  <div id="messages"></div>
+
+  <script>
+    let ws = null;
+
+    function connect() {
+      try {
+        ws = new WebSocket('ws://209.38.237.102:8667/listen');
+
+        ws.onopen = function (event) {
+          addMessage('✅ Connected to WebSocket');
+        };
+
+        ws.onmessage = function (event) {
+          addMessage('📨 Received: ' + event.data);
+        };
+
+        ws.onclose = function (event) {
+          addMessage('❌ Disconnected: ' + event.code + ' - ' + event.reason);
+        };
+
+        ws.onerror = function (error) {
+          addMessage('❌ Error: ' + error);
+        };
+
+      } catch (error) {
+        addMessage('❌ Connection failed: ' + error);
+      }
+    }
+
+    function disconnect() {
+      if (ws) {
+        ws.close();
+        ws = null;
+        addMessage('🔌 Disconnected manually');
+      }
+    }
+
+    function sendMessage() {
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        const message = {
+          type: 'test',
+          message: 'Hello from browser!',
+          timestamp: new Date().toISOString()
+        };
+        ws.send(JSON.stringify(message));
+        addMessage('📤 Sent: ' + JSON.stringify(message));
+      } else {
+        addMessage('❌ WebSocket not connected');
+      }
+    }
+
+    function addMessage(text) {
+      const div = document.getElementById('messages');
+      const p = document.createElement('p');
+      p.textContent = new Date().toLocaleTimeString() + ': ' + text;
+      div.appendChild(p);
+    }
+  </script>
+</body>
+
+</html>
