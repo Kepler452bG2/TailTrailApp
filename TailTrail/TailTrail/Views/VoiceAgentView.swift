@@ -27,111 +27,158 @@ struct VoiceAgentView: View {
     
     var body: some View {
         ZStack {
-            // Background gradient
+            // Dark background with subtle gradient edges
             LinearGradient(
                 gradient: Gradient(colors: [
-                    Color(hex: "FED3A4"),
-                    Color(hex: "FFE4B5")
+                    Color.black,
+                    Color.black,
+                    Color(red: 0.2, green: 0.8, blue: 0.2).opacity(0.1), // Lime green edge
+                    Color(red: 1.0, green: 0.8, blue: 0.2).opacity(0.1)  // Yellow-orange edge
                 ]),
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
             .ignoresSafeArea()
             
-            VStack(spacing: 30) {
-                // Header
-                VStack(spacing: 15) {
-                    Image("made")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(maxWidth: 200)
+            VStack(spacing: 0) {
+                // AI Buddy label and status
+                VStack(spacing: 8) {
+                    // AI Buddy pill
+                    HStack {
+                        Text("AI Buddy")
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 6)
+                            .background(
+                                Capsule()
+                                    .fill(Color(red: 0.2, green: 0.8, blue: 0.2)) // Lime green
+                            )
+                    }
                     
-                    Text("Voice Assistant")
-                        .font(.custom("Poppins-Bold", size: 28))
-                        .foregroundColor(.black)
-                    
-                    Text("Ask questions about pet search")
-                        .font(.custom("Poppins-Regular", size: 16))
-                        .foregroundColor(.black.opacity(0.7))
-                        .multilineTextAlignment(.center)
+                    // Online status dot
+                    HStack {
+                        Circle()
+                            .fill(Color.yellow)
+                            .frame(width: 6, height: 6)
+                        Text("Online")
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundColor(.gray)
+                    }
                 }
-                .padding(.top, 40)
+                .padding(.top, 20)
                 
                 Spacer()
                 
-                // Status cards
-                VStack(spacing: 20) {
-                                        // Connection status
-                    StatusCard(
-                        title: "Connection Status",
-                        status: isConnected ? "Connected" : "Disconnected",
-                        icon: isConnected ? "wifi" : "wifi.slash",
-                        color: isConnected ? .green : .red
-                    )
+                // Animated amorphous blob avatar
+                ZStack {
+                    // Background glow effect
+                    Circle()
+                        .fill(
+                            RadialGradient(
+                                gradient: Gradient(colors: [
+                                    Color.purple.opacity(0.3),
+                                    Color.blue.opacity(0.2),
+                                    Color.clear
+                                ]),
+                                center: .center,
+                                startRadius: 50,
+                                endRadius: 150
+                            )
+                        )
+                        .frame(width: 300, height: 300)
+                        .scaleEffect(isRecording ? 1.2 : 1.0)
+                        .opacity(isRecording ? 0.8 : 0.4)
+                        .animation(.easeInOut(duration: 2.0).repeatForever(autoreverses: true), value: isRecording)
                     
-                    // Recording status
-                    StatusCard(
-                        title: "Recording",
-                        status: isRecording ? "Recording..." : "Waiting",
-                        icon: isRecording ? "mic.fill" : "mic",
-                        color: isRecording ? .red : .gray
-                    )
-                    
-                    // Gemini response status
-                    StatusCard(
-                        title: "Assistant Response",
-                        status: geminiStatus,
-                        icon: "brain.head.profile",
-                        color: .blue
-                    )
-                
-                // Audio playback controls
-                if audioPlayer.isPlaying {
-                    HStack(spacing: 20) {
-                        Button(action: {
-                            audioPlayer.pauseAudio()
-                        }) {
-                            Image(systemName: "pause.circle.fill")
-                                .font(.system(size: 30))
-                                .foregroundColor(.blue)
-                        }
-                        
-                        Button(action: {
-                            audioPlayer.stopAudio()
-                        }) {
-                            Image(systemName: "stop.circle.fill")
-                                .font(.system(size: 30))
-                                .foregroundColor(.red)
-                        }
-                    }
-                    .padding(.top, 10)
-                }
-                }
-                .padding(.horizontal, 20)
-                
-                Spacer()
-                
-                // Voice visualization
-                if isRecording {
-                    VoiceVisualizer(audioLevel: audioLevel)
-                        .frame(height: 100)
-                        .padding(.horizontal, 40)
-                }
-                
-                // Main action button
-                Button(action: {
-                    if isRecording {
-                        stopRecording()
-                    } else {
-                        startRecording()
-                    }
-                }) {
+                    // Main AI Assistant Avatar
                     ZStack {
-                        // Pulsing animation for recording state
+                        // Background circle with gradient
+                        Circle()
+                            .fill(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [
+                                        Color(red: 0.2, green: 0.6, blue: 1.0),
+                                        Color(red: 0.4, green: 0.8, blue: 1.0),
+                                        Color(red: 0.6, green: 0.9, blue: 1.0)
+                                    ]),
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                            .frame(width: 200, height: 200)
+                            .shadow(color: Color(red: 0.2, green: 0.6, blue: 1.0).opacity(0.4), radius: 20, x: 0, y: 10)
+                        
+                        // Inner circle for depth
+                        Circle()
+                            .fill(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [
+                                        Color.white.opacity(0.3),
+                                        Color.white.opacity(0.1)
+                                    ]),
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                            .frame(width: 160, height: 160)
+                        
+                        // AI Brain/Neural Network Icon
+                        VStack(spacing: 4) {
+                            // Top row of dots
+                            HStack(spacing: 8) {
+                                Circle()
+                                    .fill(Color.white)
+                                    .frame(width: 8, height: 8)
+                                Circle()
+                                    .fill(Color.white)
+                                    .frame(width: 8, height: 8)
+                                Circle()
+                                    .fill(Color.white)
+                                    .frame(width: 8, height: 8)
+                            }
+                            
+                            // Middle row with more dots
+                            HStack(spacing: 6) {
+                                Circle()
+                                    .fill(Color.white)
+                                    .frame(width: 6, height: 6)
+                                Circle()
+                                    .fill(Color.white)
+                                    .frame(width: 6, height: 6)
+                                Circle()
+                                    .fill(Color.white)
+                                    .frame(width: 6, height: 6)
+                                Circle()
+                                    .fill(Color.white)
+                                    .frame(width: 6, height: 6)
+                                Circle()
+                                    .fill(Color.white)
+                                    .frame(width: 6, height: 6)
+                            }
+                            
+                            // Bottom row
+                            HStack(spacing: 8) {
+                                Circle()
+                                    .fill(Color.white)
+                                    .frame(width: 8, height: 8)
+                                Circle()
+                                    .fill(Color.white)
+                                    .frame(width: 8, height: 8)
+                                Circle()
+                                    .fill(Color.white)
+                                    .frame(width: 8, height: 8)
+                            }
+                        }
+                        .scaleEffect(isRecording ? 1.2 : 1.0)
+                        .opacity(isRecording ? 0.9 : 0.7)
+                        .animation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true), value: isRecording)
+                        
+                        // Pulsing ring when recording
                         if isRecording {
                             Circle()
-                                .stroke(Color.red.opacity(0.3), lineWidth: 4)
-                                .frame(width: 140, height: 140)
+                                .stroke(Color.white.opacity(0.6), lineWidth: 2)
+                                .frame(width: 220, height: 220)
                                 .scaleEffect(isRecording ? 1.3 : 1.0)
                                 .opacity(isRecording ? 0.0 : 1.0)
                                 .animation(
@@ -140,150 +187,110 @@ struct VoiceAgentView: View {
                                     value: isRecording
                                 )
                         }
-                        
-                        Circle()
-                            .fill(
-                                LinearGradient(
-                                    gradient: Gradient(colors: [
-                                        isRecording ? Color.red.opacity(0.8) : Color.blue.opacity(0.8),
-                                        isRecording ? Color.red : Color.blue
-                                    ]),
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                )
-                            )
-                            .frame(width: 120, height: 120)
-                            .shadow(color: .black.opacity(0.3), radius: 10, x: 0, y: 5)
-                        
-                        Image(systemName: isRecording ? "stop.fill" : "mic.fill")
-                            .font(.system(size: 40, weight: .bold))
-                            .foregroundColor(.white)
                     }
-                }
-                .scaleEffect(isRecording ? 1.1 : 1.0)
-                .animation(.easeInOut(duration: 0.2), value: isRecording)
-                
-                Text(isRecording ? "Tap to stop" : "Tap to start recording")
-                    .font(.custom("Poppins-Regular", size: 14))
-                    .foregroundColor(.black.opacity(0.7))
-                    .padding(.top, 10)
-                
-                // Connection status indicator
-                HStack(spacing: 8) {
-                    Circle()
-                        .fill(isConnected ? Color.green : Color.red)
-                        .frame(width: 8, height: 8)
-                    Text(isConnected ? "Connected" : "Disconnected")
-                        .font(.custom("Poppins-Regular", size: 12))
-                        .foregroundColor(.black.opacity(0.6))
-                }
-                .padding(.top, 5)
-                
-                // Current URL info
-                #if targetEnvironment(simulator)
-                Text(useLocalhost ? "localhost:8080" : "209.38.237.102:8080")
-                    .font(.custom("Poppins-Regular", size: 10))
-                    .foregroundColor(.black.opacity(0.5))
-                    .padding(.top, 2)
-                #endif
-                
-                // Test button for simulator
-                #if targetEnvironment(simulator)
-                Button(action: {
-                    geminiStatus = "Test response from assistant"
-                }) {
-                    Text("Test Response")
-                        .font(.custom("Poppins-Regular", size: 14))
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 10)
-                        .background(Color.blue)
-                        .cornerRadius(20)
-                }
-                .padding(.top, 10)
-                #endif
-                
-                // Manual reconnect button
-                if !isConnected {
-                    Button(action: {
-//                        connectWebSocket()
-                        testAlternativeConnection()
-                    }) {
-                        Text("Reconnect")
-                            .font(.custom("Poppins-Regular", size: 14))
-                            .foregroundColor(.white)
-                            .padding(.horizontal, 20)
-                            .padding(.vertical, 10)
-                            .background(Color.green)
-                            .cornerRadius(20)
-                    }
-                    .padding(.top, 10)
-                }
-                
-                // Test connection button
-                Button(action: {
-                    testConnection()
-                }) {
-                    Text("Test WebSocket")
-                        .font(.custom("Poppins-Regular", size: 14))
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 10)
-                        .background(Color.orange)
-                        .cornerRadius(20)
-                }
-                .padding(.top, 10)
-                
-                // Test HTTP connection button
-                Button(action: {
-                    testHTTPConnection()
-                }) {
-                    Text("Test HTTP")
-                        .font(.custom("Poppins-Regular", size: 14))
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 10)
-                        .background(Color.teal)
-                        .cornerRadius(20)
-                }
-                .padding(.top, 5)
-                
-                // Check server port button
-                Button(action: {
-                    checkServerPort()
-                }) {
-                    Text("Check Server Health")
-                        .font(.custom("Poppins-Regular", size: 14))
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 10)
-                        .background(Color.purple)
-                        .cornerRadius(20)
-                }
-                .padding(.top, 5)
-                
-                // Localhost toggle for simulator
-                #if targetEnvironment(simulator)
-                HStack {
-                    Text("Use Localhost:")
-                        .font(.custom("Poppins-Regular", size: 12))
-                        .foregroundColor(.black.opacity(0.7))
+                    .scaleEffect(isRecording ? 1.05 : 1.0)
+                    .animation(.easeInOut(duration: 0.5), value: isRecording)
                     
-                    Toggle("", isOn: $useLocalhost)
-                        .toggleStyle(SwitchToggleStyle(tint: .blue))
-                        .scaleEffect(0.8)
-                        .onChange(of: useLocalhost) { _, _ in
-                            // Disconnect and reconnect with new URL
-                            disconnectWebSocket()
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                                connectWebSocket()
-                            }
-                        }
+                    // Subtle wavy lines pattern
+                    if isRecording {
+                        WavyLinesPattern()
+                            .stroke(Color.white.opacity(0.1), lineWidth: 1)
+                            .frame(width: 250, height: 250)
+                            .scaleEffect(isRecording ? 1.3 : 1.0)
+                            .opacity(isRecording ? 0.6 : 0.0)
+                            .animation(.easeInOut(duration: 2.0).repeatForever(autoreverses: true), value: isRecording)
+                    }
                 }
-                .padding(.top, 5)
-                #endif
+                .padding(.bottom, 40)
+                
+                // Query text area (placeholder for now)
+                VStack(spacing: 8) {
+                    Text("How to care for your pet")
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundColor(.black)
+                    Text("or find a lost animal?")
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundColor(.black)
+                    Text("Ask the voice assistant")
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundColor(.black)
+                }
+                .padding(.horizontal, 40)
+                .padding(.bottom, 40)
                 
                 Spacer()
+                
+                // Bottom control buttons
+                HStack(spacing: 20) {
+                    // Left button - folder/document
+                    Button(action: {}) {
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 8)
+                                .fill(Color.gray.opacity(0.3))
+                                .frame(width: 40, height: 40)
+                            
+                            Image(systemName: "folder")
+                                .font(.system(size: 18, weight: .medium))
+                                .foregroundColor(.white)
+                        }
+                    }
+                    
+                    // Center microphone button
+                    Button(action: {
+                        if isRecording {
+                            stopRecording()
+                        } else {
+                            startRecording()
+                        }
+                    }) {
+                        ZStack {
+                            // Outer ring
+                            Circle()
+                                .stroke(Color.gray.opacity(0.5), lineWidth: 2)
+                                .frame(width: 80, height: 80)
+                            
+                            // Main button
+                            Circle()
+                                .fill(Color(red: 0.2, green: 0.8, blue: 0.2)) // Lime green
+                                .frame(width: 70, height: 70)
+                                .shadow(color: Color(red: 0.2, green: 0.8, blue: 0.2).opacity(0.5), radius: 15, x: 0, y: 8)
+                            
+                            // Pulsing animation when recording
+                            if isRecording {
+                                Circle()
+                                    .stroke(Color.red.opacity(0.6), lineWidth: 3)
+                                    .frame(width: 90, height: 90)
+                                    .scaleEffect(isRecording ? 1.3 : 1.0)
+                                    .opacity(isRecording ? 0.0 : 1.0)
+                                    .animation(
+                                        Animation.easeInOut(duration: 1.5)
+                                            .repeatForever(autoreverses: false),
+                                        value: isRecording
+                                    )
+                            }
+                            
+                            Image(systemName: isRecording ? "stop.fill" : "mic.fill")
+                                .font(.system(size: 24, weight: .medium))
+                                .foregroundColor(.white)
+                        }
+                    }
+                    .scaleEffect(isRecording ? 1.05 : 1.0)
+                    .animation(.easeInOut(duration: 0.2), value: isRecording)
+                    
+                    // Right button - X/cancel
+                    Button(action: {}) {
+                        ZStack {
+                            Circle()
+                                .fill(Color.gray.opacity(0.3))
+                                .frame(width: 40, height: 40)
+                            
+                            Image(systemName: "xmark")
+                                .font(.system(size: 18, weight: .medium))
+                                .foregroundColor(.white)
+                        }
+                    }
+                }
+                .padding(.bottom, 30)
             }
         }
         .navigationTitle("Voice Assistant")
@@ -336,13 +343,13 @@ struct VoiceAgentView: View {
 //        let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMjQyMmVhYzktY2I0MS00MjY0LWI0MjUtMmY4MWM4ZTM1ZGIxIiwiZXhwIjoxNzU0MDU5MDExfQ.f8vSzUb6LYbcLwLvuoqmjRei8adeOxlqUhWbtV_9PC0"
 
         var request = URLRequest(url: url)
-        request.timeoutInterval = 15
+        request.timeoutInterval = 120
 //        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         
         // Create URLSession with custom configuration for better error handling
         let config = URLSessionConfiguration.default
-        config.timeoutIntervalForRequest = 15.0
-        config.timeoutIntervalForResource = 30.0
+        config.timeoutIntervalForRequest = 120.0
+        config.timeoutIntervalForResource = 300.0
         config.waitsForConnectivity = true
         
         let session = URLSession(configuration: config)
@@ -490,7 +497,7 @@ struct VoiceAgentView: View {
         geminiStatus = "Playing response..."
         
         // Play the audio response from Gemini
-        audioPlayer.playAudio(from: data)
+        audioPlayer.playAudio(data: data)
         
         // Update status when audio finishes
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
@@ -563,6 +570,8 @@ struct VoiceAgentView: View {
         let inputNode = audioEngine.inputNode
         let recordingFormat = inputNode.outputFormat(forBus: 0)
         
+        inputNode.removeTap(onBus: 0)
+        
         inputNode.installTap(onBus: 0, bufferSize: 1024, format: recordingFormat) { buffer, _ in
             // Convert buffer to data and send via WebSocket
             let audioData = self.convertBufferToData(buffer)
@@ -576,20 +585,38 @@ struct VoiceAgentView: View {
         }
     }
     
+//    private func convertBufferToData(_ buffer: AVAudioPCMBuffer) -> Data {
+//        guard let channelData = buffer.floatChannelData?[0] else { return Data() }
+//        let frameLength = Int(buffer.frameLength)
+//        
+//        // Convert to Int16 format for WebSocket
+//        var int16Data = [Int16](repeating: 0, count: frameLength)
+//        for i in 0..<frameLength {
+//            let sample = channelData[i]
+//            int16Data[i] = Int16(sample * 32767.0)
+//        }
+//        
+//        return Data(bytes: int16Data, count: int16Data.count * MemoryLayout<Int16>.size)
+//    }
+//
+    
     private func convertBufferToData(_ buffer: AVAudioPCMBuffer) -> Data {
         guard let channelData = buffer.floatChannelData?[0] else { return Data() }
         let frameLength = Int(buffer.frameLength)
-        
-        // Convert to Int16 format for WebSocket
+
         var int16Data = [Int16](repeating: 0, count: frameLength)
         for i in 0..<frameLength {
-            let sample = channelData[i]
-            int16Data[i] = Int16(sample * 32767.0)
+            var sample = channelData[i]
+            
+            // Clamp between -1.0 and 1.0
+            sample = max(-1.0, min(1.0, sample))
+            
+            // Scale properly based on sign
+            int16Data[i] = sample < 0 ? Int16(sample * 32768.0) : Int16(sample * 32767.0)
         }
-        
+
         return Data(bytes: int16Data, count: int16Data.count * MemoryLayout<Int16>.size)
     }
-    
     private func calculateAudioLevel(_ buffer: AVAudioPCMBuffer) -> CGFloat {
         guard let channelData = buffer.floatChannelData?[0] else { return 0.0 }
         let frameLength = Int(buffer.frameLength)
@@ -717,70 +744,197 @@ struct VoiceAgentView: View {
         task.resume()
     }
     
-    // MARK: - Check Server Port
-    private func checkServerPort() {
-        print("🔍 Checking server health...")
-        status = "Checking server health..."
-        
-        #if targetEnvironment(simulator)
-        let host = useLocalhost ? "localhost" : "209.38.237.102"
-        #else
-        let host = "209.38.237.102"
-        #endif
-        
-        let port: UInt16 = 8080
-        
-        // Try health check endpoint first
-        let healthURL = "http://\(host):\(port)/health"
-        guard let url = URL(string: healthURL) else {
-            status = "Invalid health check URL"
-            return
-        }
-        
-        let task = URLSession.shared.dataTask(with: url) { data, response, error in
-            DispatchQueue.main.async {
-                if let error = error {
-                    print("Health check failed: \(error)")
-                    self.status = "Health check failed: \(error.localizedDescription)"
-                    
-                    // Fallback to simple port check
-                    self.fallbackPortCheck(host: host, port: port)
-                } else if let httpResponse = response as? HTTPURLResponse {
-                    print("Health check response: \(httpResponse.statusCode)")
-                    if httpResponse.statusCode == 200 {
-                        self.status = "✅ Server is healthy and running"
-                    } else {
-                        self.status = "⚠️ Server responded with status \(httpResponse.statusCode)"
-                    }
-                } else {
-                    self.status = "Health check completed"
-                }
-            }
-        }
-        task.resume()
-    }
-    
-    private func fallbackPortCheck(host: String, port: UInt16) {
-        print("🔍 Fallback: checking port \(port)...")
-        
-        let task = URLSession.shared.dataTask(with: URL(string: "http://\(host):\(port)")!) { data, response, error in
-            DispatchQueue.main.async {
-                if let error = error {
-                    print("Port check failed: \(error)")
-                    self.status = "Port \(port) not accessible: \(error.localizedDescription)"
-                } else if let httpResponse = response as? HTTPURLResponse {
-                    print("Port check response: \(httpResponse.statusCode)")
-                    self.status = "Port \(port) is open (HTTP \(httpResponse.statusCode))"
-                } else {
-                    self.status = "Port \(port) check completed"
-                }
-            }
-        }
-        task.resume()
-    }
+    // MARK: - Supporting Views
 }
 
 // MARK: - Supporting Views
+struct AmorphousBlob: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        
+        let width = rect.width
+        let height = rect.height
+        let centerX = width / 2
+        let centerY = height / 2
+        
+        // Create amorphous blob with curved edges
+        path.move(to: CGPoint(x: centerX - width * 0.4, y: centerY - height * 0.3))
+        
+        // Top curve
+        path.addCurve(
+            to: CGPoint(x: centerX + width * 0.4, y: centerY - height * 0.3),
+            control1: CGPoint(x: centerX - width * 0.2, y: centerY - height * 0.5),
+            control2: CGPoint(x: centerX + width * 0.2, y: centerY - height * 0.5)
+        )
+        
+        // Right curve
+        path.addCurve(
+            to: CGPoint(x: centerX + width * 0.3, y: centerY + height * 0.4),
+            control1: CGPoint(x: centerX + width * 0.6, y: centerY - height * 0.1),
+            control2: CGPoint(x: centerX + width * 0.6, y: centerY + height * 0.2)
+        )
+        
+        // Bottom curve
+        path.addCurve(
+            to: CGPoint(x: centerX - width * 0.3, y: centerY + height * 0.4),
+            control1: CGPoint(x: centerX + width * 0.1, y: centerY + height * 0.6),
+            control2: CGPoint(x: centerX - width * 0.1, y: centerY + height * 0.6)
+        )
+        
+        // Left curve
+        path.addCurve(
+            to: CGPoint(x: centerX - width * 0.4, y: centerY - height * 0.3),
+            control1: CGPoint(x: centerX - width * 0.6, y: centerY + height * 0.2),
+            control2: CGPoint(x: centerX - width * 0.6, y: centerY - height * 0.1)
+        )
+        
+        path.closeSubpath()
+        return path
+    }
+}
+
+struct WavyLinesPattern: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        
+        let width = rect.width
+        let height = rect.height
+        
+        // Create multiple wavy lines
+        for i in 0..<5 {
+            let y = height * 0.2 + CGFloat(i) * height * 0.15
+            let amplitude = 10.0
+            let frequency = 0.02
+            
+            path.move(to: CGPoint(x: 0, y: y))
+            
+            for x in stride(from: 0, to: width, by: 2) {
+                let waveY = y + sin(x * frequency) * amplitude
+                path.addLine(to: CGPoint(x: x, y: waveY))
+            }
+        }
+        
+        return path
+    }
+}
+
+struct SoftStatusCard: View {
+    let title: String
+    let status: String
+    let icon: String
+    let color: Color
+    
+    var body: some View {
+        HStack(spacing: 16) {
+            // Icon with soft background
+            ZStack {
+                Circle()
+                    .fill(color.opacity(0.1))
+                    .frame(width: 40, height: 40)
+                
+                Image(systemName: icon)
+                    .font(.system(size: 18, weight: .medium))
+                    .foregroundColor(color)
+            }
+            
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title)
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundColor(.purple)
+                
+                Text(status)
+                    .font(.system(size: 13, weight: .regular))
+                    .foregroundColor(.gray)
+                    .lineLimit(2)
+            }
+            
+            Spacer()
+        }
+        .padding(16)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color.white.opacity(0.7))
+                .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 4)
+        )
+    }
+}
+
+struct SoftButton: View {
+    let title: String
+    let icon: String
+    let color: Color
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 8) {
+                Image(systemName: icon)
+                    .font(.system(size: 14, weight: .medium))
+                
+                Text(title)
+                    .font(.system(size: 14, weight: .medium))
+            }
+            .foregroundColor(.white)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(color.opacity(0.8))
+                    .shadow(color: color.opacity(0.3), radius: 6, x: 0, y: 3)
+            )
+        }
+        .buttonStyle(PlainButtonStyle())
+    }
+}
+
+struct DarkStatusCard: View {
+    let title: String
+    let status: String
+    let icon: String
+    let color: Color
+    
+    var body: some View {
+        SoftStatusCard(
+            title: title,
+            status: status,
+            icon: icon,
+            color: color
+        )
+    }
+}
+
+struct DarkButton: View {
+    let title: String
+    let icon: String
+    let color: Color
+    let action: () -> Void
+    
+    var body: some View {
+        SoftButton(
+            title: title,
+            icon: icon,
+            color: color,
+            action: action
+        )
+    }
+}
+
+struct ChatGPTButton: View {
+    let title: String
+    let icon: String
+    let color: Color
+    let action: () -> Void
+    
+    var body: some View {
+        SoftButton(
+            title: title,
+            icon: icon,
+            color: color,
+            action: action
+        )
+    }
+}
+
 struct StatusCard: View {
     let title: String
     let status: String
@@ -788,47 +942,12 @@ struct StatusCard: View {
     let color: Color
     
     var body: some View {
-        HStack(spacing: 15) {
-            Image(systemName: icon)
-                .font(.system(size: 24))
-                .foregroundColor(color)
-                .frame(width: 40)
-            
-            VStack(alignment: .leading, spacing: 4) {
-                Text(title)
-                    .font(.custom("Poppins-SemiBold", size: 14))
-                    .foregroundColor(.black.opacity(0.8))
-                
-                Text(status)
-                    .font(.custom("Poppins-Regular", size: 12))
-                    .foregroundColor(.black.opacity(0.6))
-                    .lineLimit(2)
-            }
-            
-            Spacer()
-        }
-        .padding(15)
-        .background(Color.white.opacity(0.3))
-        .cornerRadius(15)
-        .overlay(
-            RoundedRectangle(cornerRadius: 15)
-                .stroke(Color.black.opacity(0.1), lineWidth: 1)
+        SoftStatusCard(
+            title: title,
+            status: status,
+            icon: icon,
+            color: color
         )
-    }
-}
-
-struct VoiceVisualizer: View {
-    let audioLevel: CGFloat
-    
-    var body: some View {
-        HStack(spacing: 4) {
-            ForEach(0..<20, id: \.self) { index in
-                RoundedRectangle(cornerRadius: 2)
-                    .fill(Color.blue.opacity(0.6))
-                    .frame(width: 4, height: max(4, audioLevel * CGFloat.random(in: 0.5...1.5)))
-                    .animation(.easeInOut(duration: 0.1), value: audioLevel)
-            }
-        }
     }
 }
 
